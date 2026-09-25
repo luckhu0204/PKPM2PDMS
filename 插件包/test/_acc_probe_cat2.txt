@@ -1,0 +1,10 @@
+== TUBE_TUBE-SPEC : 0
+== TUBE_TUBE50018-SPEC : 0
+== TUBE_TUBE6728_2002-SPEC : 0
+== USER_CIRCLE-SPEC : 0
+== USER_PIPE-SPEC : 0
+== USER_TUBE-SPEC : 0
+== 含 20 的 TUBE 名 ==
+== 含 圆钢/圆形/圆管 的行 ==
+== PARA 行样例（TUBE_TUBE-SPEC 第一个） ==
+== USER_CIRCLE-SPEC 定义块 ==

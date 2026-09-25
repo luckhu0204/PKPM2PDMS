@@ -1,0 +1,542 @@
+=== 1. USER_* / 参数化族行 ===
+  RECT     key=RECT     pkpm=RECT     fam=0   kind=0   mat=5 spec=/USER_RECT-SPEC/Rectangle_Profile
+           shapeval='' is_parametric=true dims={}
+           params=[{"default":"0","desp_index":1,"name":"Parameter 1"}]
+           extra.pdms_stcategory=/USER_RECT param_count=1 stcategory_param_count=1
+  CIRCLE   key=CIRCLE   pkpm=CIRCLE   fam=3   kind=0   mat=5 spec=/USER_CIRCLE-SPEC/Circle_Profile
+           shapeval='3' is_parametric=true dims={"family":3}
+           params=[{"default":"0","desp_index":1,"name":"Parameter 1"}]
+           extra.pdms_stcategory=/USER_CIRCLE param_count=1 stcategory_param_count=1
+  H        key=H        pkpm=H        fam=16  kind=0   mat=5 spec=/USER_H-SPEC/H_Profile
+           shapeval='16' is_parametric=true dims={"H":500,"family":16,"tw":8}
+           params=[{"default":"250","desp_index":1,"name":"B1"},{"default":"250","desp_index":2,"name":"B2"},{"default":"500","desp_index":3,"name":"H"},{"default":"8","desp_index":4,"name":"Tw"},{"default":"10","desp_
+           extra.pdms_stcategory=/USER_H param_count=6 stcategory_param_count=6
+  XI       key=XI       pkpm=XI       fam=2   kind=0   mat=5 spec=/USER_XI-SPEC/XI_Profile
+           shapeval='2' is_parametric=true dims={"B":400,"H":600,"family":2,"tw":200}
+           params=[{"default":"400","desp_index":1,"name":"B"},{"default":"600","desp_index":2,"name":"H"},{"default":"200","desp_index":3,"name":"Tw"},{"default":"200","desp_index":4,"name":"T1"},{"default":"150","des
+           extra.pdms_stcategory=/USER_XI param_count=5 stcategory_param_count=5
+  TUBE     key=TUBE     pkpm=TUBE     fam=15  kind=0   mat=5 spec=/USER_TUBE-SPEC/Tube_Profile
+           shapeval='15' is_parametric=true dims={"family":15}
+           params=[{"default":"0","desp_index":1,"name":"Parameter 1"}]
+           extra.pdms_stcategory=/USER_TUBE param_count=1 stcategory_param_count=1
+  PIPE     key=PIPE     pkpm=PIPE     fam=17  kind=0   mat=5 spec=/USER_PIPE-SPEC/Pipe_Profile
+           shapeval='17' is_parametric=true dims={"family":17}
+           params=[{"default":"0","desp_index":1,"name":"Parameter 1"}]
+           extra.pdms_stcategory=/USER_PIPE param_count=1 stcategory_param_count=1
+  C        不在表里
+  T        不在表里
+  Z        key=Z        pkpm=Z        fam=20  kind=0   mat=5 spec=/USER_Z-SPEC/Z_Profile
+           shapeval='20' is_parametric=true dims={"family":20}
+           params=[{"default":"0","desp_index":1,"name":"Parameter 1"}]
+           extra.pdms_stcategory=/USER_Z param_count=1 stcategory_param_count=1
+  CROSS    key=CROSS    pkpm=CROSS    fam=22  kind=0   mat=5 spec=/USER_CROSS-SPEC/Cross_Profile
+           shapeval='22' is_parametric=true dims={"family":22,"t":10,"tw":10}
+           params=[{"default":"300","desp_index":1,"name":"B1"},{"default":"300","desp_index":2,"name":"B2"},{"default":"300","desp_index":3,"name":"H1"},{"default":"300","desp_index":4,"name":"H2"},{"default":"10","de
+           extra.pdms_stcategory=/USER_CROSS param_count=6 stcategory_param_count=6
+  I        不在表里
+
+=== 2. 目录宏：/USER_RECT、/USER_CIRCLE、/USER_H 的 DTSET 块（逐行） ===
+  --- NEW STCATEGORY /USER_RECT 行号=[2826]
+     2826| NEW STCATEGORY /USER_RECT
+     2827| PURP STL
+     2828| 
+     2829| NEW TEXT /USER_RECT-PA1
+     2830| PURP PARA
+     2831| STEX 'Parameter 1'
+     2832| 
+     2833| END
+     2834| NEW DTSET
+     2835| 
+     2836| NEW DATA
+     2837| DKEY B
+     2838| PTYP DIST
+     2839| PPRO ( ATTRIB DESP[1 ] )
+     2840| DPRO ( 500 )
+     2841| PURP DESP
+     2842| NUMB 1
+     2843| DTIT 'B '
+     2844| 
+     2845| END
+     2846| NEW DATA
+     2847| DKEY H
+     2848| PTYP DIST
+     2849| PPRO ( ATTRIB DESP[2 ] )
+     2850| DPRO ( 500 )
+     2851| PURP DESP
+     2852| NUMB 2
+     2853| DTIT 'H '
+     2854| 
+     2855| END
+     2856| END
+     2857| NEW PTSSET
+     2858| 
+     2859| NEW PLINE
+     2860| PKEY TOS
+     2861| PX 0
+     2862| PY ( ATTRIB DESP[2 ] / 2 )
+     2863| DX 0
+     2864| DY 0
+     2865| CLFL true
+     2866| TUFL true
+     2867| PURP CLEW
+     2868| CCON ANY
+     2869| 
+     2870| END
+     2871| NEW PLINE
+     2872| PKEY LTOS
+     2873| PX ( - ATTRIB DESP[1 ] / 2 )
+     2874| PY ( ATTRIB DESP[2 ] / 2 )
+     2875| DX 0
+     2876| DY 0
+     2877| CLFL true
+     2878| TUFL true
+     2879| PURP CLEW
+     2880| CCON ANY
+     2881| 
+     2882| END
+     2883| NEW PLINE
+     2884| PKEY RTOS
+     2885| PX ( ATTRIB DESP[1 ] / 2 )
+     2886| PY ( ATTRIB DESP[2 ] / 2 )
+     2887| DX 0
+     2888| DY 0
+     2889| CLFL true
+     2890| TUFL true
+     2891| PURP CLEW
+     2892| CCON ANY
+     2893| 
+     2894| END
+     2895| NEW PLINE
+     2896| PKEY BOS
+     2897| PX 0
+     2898| PY ( - ATTRIB DESP[2 ] / 2 )
+     2899| DX 0
+     2900| DY 0
+     2901| PLAX -Y
+     2902| CLFL true
+     2903| TUFL true
+     2904| PURP CLEW
+     2905| CCON ANY
+     2906| 
+     2907| END
+     2908| NEW PLINE
+     2909| PKEY LBOS
+     2910| PX ( - ATTRIB DESP[1 ] / 2 )
+     2911| PY ( - ATTRIB DESP[2 ] / 2 )
+     2912| DX 0
+     2913| DY 0
+     2914| PLAX -Y
+     2915| CLFL true
+     2916| TUFL true
+     2917| PURP CLEW
+     2918| CCON ANY
+     2919| 
+     2920| END
+     2921| NEW PLINE
+     2922| PKEY LEFT
+     2923| PX ( - ATTRIB DESP[1 ] / 2 )
+     2924| PY 0
+     2925| DX 0
+     2926| DY 0
+     2927| PLAX -X
+     2928| CLFL true
+     2929| TUFL true
+     2930| PURP CLEW
+     2931| CCON ANY
+     2932| 
+     2933| END
+     2934| NEW PLINE
+     2935| PKEY RIGH
+     2936| PX ( ATTRIB DESP[1 ] / 2 )
+     2937| PY 0
+     2938| DX 0
+     2939| DY 0
+     2940| PLAX X
+     2941| CLFL true
+     2942| TUFL true
+     2943| PURP CLEW
+     2944| CCON ANY
+     2945| 
+     2946| END
+     2947| NEW PLINE
+     2948| PKEY RBOS
+     2949| PX ( ATTRIB DESP[1 ] / 2 )
+     2950| PY ( - ATTRIB DESP[2 ] / 2 )
+     2951| DX 0
+     2952| DY 0
+     2953| PLAX -Y
+     2954| CLFL true
+     2955| TUFL true
+     2956| PURP CLEW
+     2957| CCON ANY
+     2958| 
+     2959| END
+     2960| NEW PLINE
+     2961| PKEY NA
+     2962| PX 0
+     2963| PY 0
+     2964| DX 0
+     2965| DY 0
+     2966| CLFL true
+     2967| TUFL true
+     2968| PURP CLEW
+     2969| CCON ANY
+     2970| 
+     2971| END
+     2972| END
+     2973| NEW GMSSET
+     2974| 
+     2975| NEW SRECTANGLE
+     2976| PX 0
+     2977| PY 0
+     2978| PXLE ( ATTRIB DESP[1 ] )
+     2979| PYLE ( ATTRIB DESP[2 ] )
+     2980| DX 0
+     2981| DY 0
+     2982| DXL 0
+     2983| DYL 0
+     2984| TUFL true
+     2985| 
+     2986| END
+     2987| END
+     2988| NEW SPRFILE /Rectangle_Profile
+     2989| GTYP BEAM
+     2990| PARA 0
+     2991| 
+     2992| END
+     2993| END
+  --- NEW STCATEGORY /USER_CIRCLE 行号=[2494]
+     2494| NEW STCATEGORY /USER_CIRCLE
+     2495| PURP STL
+     2496| 
+     2497| NEW TEXT /USER_CIRCLE-PA1
+     2498| PURP PARA
+     2499| STEX 'Parameter 1'
+     2500| 
+     2501| END
+     2502| NEW DTSET
+     2503| 
+     2504| NEW DATA
+     2505| DKEY D
+     2506| PTYP DIST
+     2507| PPRO ( ATTRIB DESP[1 ] )
+     2508| DPRO ( 300 )
+     2509| PURP DESP
+     2510| NUMB 1
+     2511| DTIT 'D '
+     2512| 
+     2513| END
+     2514| END
+     2515| NEW PTSSET
+     2516| 
+     2517| NEW PLINE
+     2518| PKEY GG
+     2519| PX 0
+     2520| PY ( ATTRIB DESP[1 ] / 2 )
+     2521| DX 0
+     2522| DY 0
+     2523| CLFL true
+     2524| TUFL true
+     2525| PURP CLEW
+     2526| CCON ANY
+     2527| 
+     2528| END
+     2529| NEW PLINE
+     2530| PKEY SS
+     2531| PX 0
+     2532| PY ( - ATTRIB DESP[1 ] / 2 )
+     2533| DX 0
+     2534| DY 0
+     2535| PLAX -Y
+     2536| CLFL true
+     2537| TUFL true
+     2538| PURP CLEW
+     2539| CCON ANY
+     2540| 
+     2541| END
+     2542| NEW PLINE
+     2543| PKEY MM
+     2544| PX ( - ATTRIB DESP[1 ] / 2 )
+     2545| PY 0
+     2546| DX 0
+     2547| DY 0
+     2548| PLAX -X
+     2549| CLFL true
+     2550| TUFL true
+     2551| PURP CLEW
+     2552| CCON ANY
+     2553| 
+     2554| END
+     2555| NEW PLINE
+     2556| PKEY AA
+     2557| PX ( ATTRIB DESP[1 ] / 2 )
+     2558| PY 0
+     2559| DX 0
+     2560| DY 0
+     2561| PLAX X
+     2562| CLFL true
+     2563| TUFL true
+     2564| PURP CLEW
+     2565| CCON ANY
+     2566| 
+     2567| END
+     2568| NEW PLINE
+     2569| PKEY NA
+     2570| PX 0
+     2571| PY 0
+     2572| DX 0
+     2573| DY 0
+     2574| CLFL true
+     2575| TUFL true
+     2576| PURP CLEW
+     2577| CCON ANY
+     2578| 
+     2579| END
+     2580| END
+     2581| NEW GMSSET
+     2582| 
+     2583| NEW SANNULUS
+     2584| PX 0
+     2585| PY 0
+     2586| PANG 180
+     2587| PRAD ( ATTRIB DESP[1 ] / 2 )
+     2588| PWID ( ATTRIB DESP[1 ] / 2 )
+     2589| DX 0
+     2590| DY 0
+     2591| DRAD 0
+     2592| DWID 0
+     2593| TUFL true
+     2594| 
+     2595| END
+     2596| NEW SANNULUS
+     2597| PX 0
+     2598| PY 0
+     2599| PANG ( -180 )
+     2600| PRAD ( ATTRIB DESP[1 ] / 2 )
+     2601| PWID ( ATTRIB DESP[1 ] / 2 )
+     2602| DX 0
+     2603| DY 0
+     2604| DRAD 0
+     2605| DWID 0
+     2606| TUFL true
+     2607| 
+     2608| END
+     2609| END
+     2610| NEW SPRFILE /Circle_Profile
+     2611| GTYP BEAM
+     2612| PARA 0
+     2613| 
+     2614| END
+     2615| END
+  --- NEW STCATEGORY /USER_H 行号=[946]
+      946| NEW STCATEGORY /USER_H
+      947| PURP STL
+      948| 
+      949| NEW TEXT /USER_H-PA1
+      950| PURP PARA
+      951| STEX 'B1'
+      952| 
+      953| END
+      954| NEW TEXT /USER_H-PA2
+      955| PURP PARA
+      956| STEX 'B2'
+      957| 
+      958| END
+      959| NEW TEXT /USER_H-PA3
+      960| PURP PARA
+      961| STEX 'H'
+      962| 
+      963| END
+      964| NEW TEXT /USER_H-PA4
+      965| PURP PARA
+      966| STEX 'Tw'
+      967| 
+      968| END
+      969| NEW TEXT /USER_H-PA5
+      970| PURP PARA
+      971| STEX 'T1'
+      972| 
+      973| END
+      974| NEW TEXT /USER_H-PA6
+      975| PURP PARA
+      976| STEX 'T2'
+      977| 
+      978| END
+      979| NEW DTSET
+      980| 
+      981| NEW DATA
+      982| DKEY APAR
+      983| PTYP DIST
+      984| PPRO ( ATTRIB DESP[1 ] )
+      985| DPRO ( 250 )
+      986| PURP DESP
+      987| NUMB 1
+      988| DTIT 'B1 '
+      989| 
+      990| END
+      991| NEW DATA
+      992| DKEY BPAR
+      993| PTYP DIST
+      994| PPRO ( ATTRIB DESP[2 ] )
+      995| DPRO ( 250 )
+      996| PURP DESP
+      997| NUMB 2
+      998| DTIT 'B2 '
+      999| 
+     1000| END
+     1001| NEW DATA
+     1002| DKEY CPAR
+     1003| PTYP DIST
+     1004| PPRO ( ATTRIB DESP[3 ] )
+     1005| DPRO ( 500 )
+     1006| PURP DESP
+     1007| NUMB 3
+     1008| DTIT 'H '
+     1009| 
+     1010| END
+     1011| NEW DATA
+     1012| DKEY DPAR
+     1013| PTYP DIST
+     1014| PPRO ( ATTRIB DESP[4 ] )
+     1015| DPRO ( 8 )
+     1016| PURP DESP
+     1017| NUMB 4
+     1018| DTIT 'Tw '
+     1019| 
+     1020| END
+     1021| NEW DATA
+     1022| DKEY EPAR
+     1023| PTYP DIST
+     1024| PPRO ( ATTRIB DESP[5 ] )
+     1025| DPRO ( 10 )
+     1026| PURP DESP
+     1027| NUMB 5
+     1028| DTIT 'T1 '
+     1029| 
+     1030| END
+     1031| NEW DATA
+     1032| DKEY FPAR
+     1033| PTYP DIST
+     1034| PPRO ( ATTRIB DESP[6 ] )
+     1035| DPRO ( 10 )
+     1036| PURP DESP
+     1037| NUMB 6
+     1038| DTIT 'T2 '
+     1039| 
+     1040| END
+     1041| END
+     1042| NEW PTSSET
+     1043| 
+     1044| NEW PLINE
+     1045| PKEY TOS
+     1046| PX 0
+     1047| PY ( ATTRIB DESP[3 ] / 2 )
+     1048| DX 0
+     1049| DY 0
+     1050| CLFL true
+     1051| TUFL true
+     1052| PURP CLEW
+     1053| CCON ANY
+     1054| 
+     1055| END
+     1056| NEW PLINE
+     1057| PKEY BOS
+     1058| PX 0
+     1059| PY ( - ATTRIB DESP[3 ] / 2 )
+     1060| DX 0
+     1061| DY 0
+     1062| PLAX -Y
+     1063| CLFL true
+     1064| TUFL true
+     1065| PURP CLEW
+     1066| CCON ANY
+     1067| 
+     1068| END
+     1069| NEW PLINE
+     1070| PKEY LTOS
+     1071| PX ( - ATTRIB DESP[1 ] / 2 )
+     1072| PY ( ATTRIB DESP[3 ] / 2 )
+     1073| DX 0
+     1074| DY 0
+     1075| CLFL true
+     1076| TUFL true
+     1077| PURP CLEW
+     1078| CCON ANY
+     1079| 
+     1080| END
+     1081| NEW PLINE
+     1082| PKEY LTBS
+     1083| PX ( - ATTRIB DESP[1 ] / 2 )
+     1084| PY ( ATTRIB DESP[3 ] / 2 - ATTRIB DESP[5 ] )
+     1085| DX 0
+     1086| DY 0
+     1087| PLAX -Y
+     1088| CLFL true
+     1089| TUFL true
+     1090| PURP CLEW
+     1091| CCON ANY
+     1092| 
+     1093| END
+     1094| NEW PLINE
+     1095| PKEY LBOS
+     1096| PX ( - ATTRIB DESP[1 ] / 2 )
+     1097| PY ( - ATTRIB DESP[3 ] / 2 )
+     1098| DX 0
+     1099| DY 0
+     1100| PLAX -Y
+     1101| CLFL true
+     1102| TUFL true
+     1103| PURP CLEW
+     1104| CCON ANY
+     1105| 
+     1106| END
+     1107| NEW PLINE
+     1108| PKEY LBTS
+     1109| PX ( - ATTRIB DESP[1 ] / 2 )
+     1110| PY ( - ATTRIB DESP[3 ] / 2 + ATTRIB DESP[6 ] )
+     1111| DX 0
+     1112| DY 0
+     1113| CLFL true
+     1114| TUFL true
+     1115| PURP CLEW
+     1116| CCON ANY
+     1117| 
+     1118| END
+     1119| NEW PLINE
+     1120| PKEY RTOS
+     1121| PX ( ATTRIB DESP[1 ] / 2 )
+     1122| PY ( ATTRIB DESP[3 ] / 2 )
+     1123| DX 0
+     1124| DY 0
+     1125| CLFL true
+     1126| TUFL true
+     1127| PURP CLEW
+     1128| CCON ANY
+     1129| 
+     1130| END
+     1131| NEW PLINE
+     1132| PKEY RTBS
+     1133| PX ( ATTRIB DESP[1 ] / 2 )
+     1134| PY ( ATTRIB DESP[3 ] / 2 - ATTRIB DESP[5 ] )
+     1135| DX 0
+     1136| DY 0
+     1137| PLAX -Y
+     1138| CLFL true
+     1139| TUFL true
+     1140| PURP CLEW
+     1141| CCON ANY
+     1142| 
+     1143| END
+     1144| NEW PLINE
+     1145| PKEY RBOS
+
+=== 3. 目录宏：PARA 与表 dims 的交叉核对（抽 5 个族码 39 的截面） ===
+  解析出 SPRFILE 数 = 2920
+  /HN450X200     L31326  gtyp=BEAM  PARA=450 200 9 14 13
+                表 dims={"B":200,"H":450,"family":39,"r":13,"tf":14,"tw":9}
+  /HN300X150     L31263  gtyp=BEAM  PARA=300 150 6.5 9 13
+                表 dims={"B":150,"H":300,"family":39,"r":13,"tf":9,"tw":6.5}
+  /HW200X200     L30920  gtyp=BEAM  PARA=200 200 8 12 13
+                表 dims={"B":200,"H":200,"family":39,"r":13,"tf":12,"tw":8}
+  /B250*10.00    L20875  gtyp=BEAM  PARA=250 10 92.6 8707 9.7
+  /D194X8.0      L14105  gtyp=BEAM  PARA=194 8 46.75 2025.31 6.58

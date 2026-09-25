@@ -1,0 +1,14 @@
+源表：3176 行 × 38 列  sha256=fc19f317be9cf9d0
+写出 D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\engine\section_table.csv（3176 行）
+写出 D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\engine\section_table.meta.json
+stats={"keys_unique": 3176, "pkpm_name_nonempty": 2835, "pkpm_name_unique": 2835, "pdms_spec_path_unique": 3176, "shapeval_nonempty": 2335, "is_parametric_true": 15, "family_code_known": 2335, "kind_known": 7, "confidence": {"high": 1146, "medium": 1433, "low": 597}}
+非 ASCII 字符数=3115（中文名等，来自源列的 family_cn/pkpm_name）
+
+抽查（应与 .jwd/.pdt 样本一致）：
+  HN450X200      fam=39  kind=26  dims={"B":200,"H":450,"family":39,"r":13,"tf":14,"tw":9}  spec=/H_INTERNATIONAL-SPEC/HN450X200
+  HN300X150      fam=39  kind=26  dims={"B":150,"H":300,"family":39,"r":13,"tf":9,"tw":6.5} spec=/H_INTERNATIONAL-SPEC/HN300X150
+  2-[18a         fam=32  kind=0   dims={"B":74,"H":180,"family":32,"name":"[18a","r":9,"subtype":2,"t":9.3,"tw":5.1} spec=/C_LIGHT-SPEC/CL18a
+  6-B250*10.00   fam=77  kind=0   dims={"d":250,"family":77,"lib_family":6,"t":10}          spec=/RECT_SQUARE6728_2002-SPEC/B250*10.00
+  RECT           fam=0   kind=0   dims={}                                                   spec=/USER_RECT-SPEC/Rectangle_Profile
+  CIRCLE         fam=3   kind=0   dims={"family":3}                                         spec=/USER_CIRCLE-SPEC/Circle_Profile
+  3-B25X1.5      fam=77  kind=0   dims={"d":25,"family":77,"lib_family":3,"t":1.5}          spec=/RECT_SQUARE50018-SPEC/B25X1.5

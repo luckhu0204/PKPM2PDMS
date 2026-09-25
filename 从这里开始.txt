@@ -1,0 +1,25 @@
+﻿================================================================
+ 从这里开始 —— PKPM-JWD导入导出 v2.0（契约 CONTRACT v3 = v1 + R2 + R3；CONTRACT_VERSION 常量 "1.0"）
+================================================================
+
+1. 先读什么：插件包\docs\使用说明.md（三种用法谁是主、装在哪一步、已知限制）。
+   原生 .NET 插件另见：PDMS原生插件\README.txt 与 插件包\docs\原生插件说明.md。
+
+2. 主用法（R3）：在 PDMS 里用——菜单「PKPM JWD」→「PKPM JWD 导入导出」打开原生窗体：
+   选文件、点执行、看摘要；转换 / 建 PDMS 模型 / 截面库 / 导出都在这个窗体里。
+
+3. 装在哪一步（务必 PDMS 停机时；本交付【未部署】，安装由你自己执行）：
+   ① 主路线（R3 原生插件）：cd PDMS原生插件\deploy 后  python deploy_pkpmjwd.py  先 dry-run
+      看清单，再  python deploy_pkpmjwd.py --execute  真执行；装完启动 PDMS 出「PKPM JWD」菜单。
+   ② legacy（v1 PML 菜单）：插件包\install\install.ps1 先 -DryRun 再真装——原生窗体的
+      「PDMS 文本导出」按钮依赖它装的 !!pkpmjwdexport；不用导出功能可跳过。
+   ③ 两条路线装完都要【完全退出并重启 PDMS】。
+
+4. 免 Python 的转换入口：插件包\engine\dist\pkpmjwd_engine.exe（PyInstaller 独立引擎）+
+   安装程序\ 下两个 v1 图形入口 exe（2026-09-24 构建；R3 新功能以源码版/独立引擎为准）。
+
+5. 卸载（同样 PDMS 停机时）：原生插件  python undeploy_pkpmjwd.py  （先 dry-run；XML 从
+   .pkpmjwd-bak 逐字节复原、安装文件移入 _uninstalled_<时间>\，不删除）；
+   legacy：插件包\install\uninstall.ps1（先 -DryRun）。
+
+逐文件清单与 SHA256 见同目录 交付清单.txt。

@@ -1,0 +1,92 @@
+P:Aveva.ApplicationFramework.Presentation.ButtonTool.Command
+P:Aveva.ApplicationFramework.Presentation.ComboBoxTool.Command
+T:Aveva.ApplicationFramework.Presentation.Command
+P:Aveva.ApplicationFramework.Presentation.CommandBar.Command
+P:Aveva.ApplicationFramework.Presentation.CommandEventArgs.Command
+T:Aveva.ApplicationFramework.Presentation.CommandManager
+M:Aveva.ApplicationFramework.Presentation.CommandManager.AddAllCommands
+P:Aveva.ApplicationFramework.Presentation.CommandManager.Instance
+P:Aveva.ApplicationFramework.Presentation.CommandManager.Commands
+P:Aveva.ApplicationFramework.Presentation.CommandManager.ApplicationContext
+P:Aveva.ApplicationFramework.Presentation.CommandManager.MacroCommand
+P:Aveva.ApplicationFramework.Presentation.CommandManager.CommandTypes
+P:Aveva.ApplicationFramework.Presentation.CommandManager.CommandContext
+T:Aveva.ApplicationFramework.Presentation.CommandTypesCollection
+M:Aveva.ApplicationFramework.Presentation.CommandTypesCollection.Add(System.Type)
+M:Aveva.ApplicationFramework.Presentation.CommandTypesCollection.ContainsKey(System.String)
+M:Aveva.ApplicationFramework.Presentation.CommandTypesCollection.Remove(System.String)
+M:Aveva.ApplicationFramework.Presentation.CommandTypesCollection.GetEnumerator
+M:Aveva.ApplicationFramework.Presentation.CommandTypesCollection.CopyTo(System.Array,System.Int32)
+P:Aveva.ApplicationFramework.Presentation.CommandTypesCollection.Item(System.String)
+P:Aveva.ApplicationFramework.Presentation.CommandTypesCollection.IsSynchronized
+P:Aveva.ApplicationFramework.Presentation.CommandTypesCollection.Count
+P:Aveva.ApplicationFramework.Presentation.CommandTypesCollection.SyncRoot
+T:Aveva.ApplicationFramework.Presentation.IPopupGalleryToolCommand
+P:Aveva.ApplicationFramework.Presentation.PopupGalleryTool.Command
+P:Aveva.ApplicationFramework.Presentation.RibbonContextualTabGroup.Command
+F:Aveva.ApplicationFramework.Presentation.UpdateOptions.Command
+P:Aveva.ApplicationFramework.Presentation.FontListTool.Command
+P:Aveva.ApplicationFramework.Presentation.LabelTool.Command
+P:Aveva.ApplicationFramework.Presentation.ListTool.Command
+P:Aveva.ApplicationFramework.Presentation.MenuTool.Command
+P:Aveva.ApplicationFramework.Presentation.PopupColorPickerTool.Command
+P:Aveva.ApplicationFramework.Presentation.PopupContainerTool.Command
+P:Aveva.ApplicationFramework.Presentation.StateButtonTool.Command
+P:Aveva.ApplicationFramework.Presentation.TextBoxTool.Command
+===== around CommandManager.MacroCommand =====
+     </summary>
+        </member>
+        <member name="P:Aveva.ApplicationFramework.Presentation.CommandManager.MacroCommand">
+            <summary>
+            Property which holds the type of a class which implements a command to execute a macro in the context of the host application. (e.g. A PML command)
+            </summary>
+        </member>
+        <member name="P:Aveva.ApplicationFramework.Presentation.CommandManager.CommandTypes">
+            <summary>
+            Property which returns a collection of Command Types
+            </summary>
+        </member>
+        <member name="P:Aveva.ApplicationFramework.Presentation.CommandManager.CommandContext">
+            <summary>
+            Property which returns a collection of Command Contexts
+            </summary>
+  
+===== around CommandManager.CommandTypes =====
+     </summary>
+        </member>
+        <member name="P:Aveva.ApplicationFramework.Presentation.CommandManager.CommandTypes">
+            <summary>
+            Property which returns a collection of Command Types
+            </summary>
+        </member>
+        <member name="P:Aveva.ApplicationFramework.Presentation.CommandManager.CommandContext">
+            <summary>
+            Property which returns a collection of Command Contexts
+            </summary>
+        </member>
+        <member name="T:Aveva.ApplicationFramework.Presentation.CommandEventHandler">
+            <summary>
+             Represents the method that will handle command related events.
+            </summary>
+        </member>
+        <member name="T:Aveva.ApplicationFramework.Presentation.CommandsCol
+===== around CommandType =====
+
+        </member>
+        <member name="P:Aveva.ApplicationFramework.Presentation.CommandManager.CommandTypes">
+            <summary>
+            Property which returns a collection of Command Types
+            </summary>
+        </member>
+        <member name="P:Aveva.ApplicationFramework.Presentation.CommandManager.CommandContext">
+            <summary>
+            Property which returns a collection of Command Contexts
+            </summary>
+        </member>
+        <member name="T:Aveva.ApplicationFramework.Presentation.CommandEventHandler">
+            <summary>
+             Represents the method that will handle command related events.
+            </summary>
+        </member>
+        <member name="T:Aveva.ApplicationFramework.Presentation.CommandsCollection">
+    

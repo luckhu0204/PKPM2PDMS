@@ -1,0 +1,86 @@
+=== grouped record counts ===
+   $DEADLOAD    $DEFLINELOAD     82
+   $DEADLOAD    $DEFNODELOAD     4
+   $DEADLOAD    $DEFSLABLOAD     331
+   $DEADLOAD    $SETLINELOAD     60
+   $DEADLOAD    $SETNODELOAD     4
+   $DEADLOAD    $SETSLABLOAD     335
+   $LIVELOAD    $DEFLINELOAD     42
+   $LIVELOAD    $DEFSLABLOAD     331
+   $LIVELOAD    $SETLINELOAD     30
+   $LIVELOAD    $SETSLABLOAD     331
+   None         $DEFFRAMESECTION 32
+   None         $DEFMATERIAL     5
+   None         $DEFWASLABSECTION 4
+   None         $DESIGNPARA      50
+   None         $NET             1058
+   None         $NODECOOR        617
+   None         $RIGID           6
+   None         $SETELEMENT      1046
+   None         $SETSLAB         331
+   None         $SETWALL         4
+   None         $STORY           5
+   None         $VERSION         1
+
+=== DEFMATERIAL ===
+       ID=110, NAME=C30, TYPE=262, ES=3e+04, PR=0.2, EXC=1e-05, DS=26
+       ID=210, NAME=Q235, TYPE=261, ES=2.1e+05, PR=0.3, EXC=1e-05, DS=78
+       ID=310, NAME=C30, TYPE=262, ES=3e+04, PR=0.2, EXC=1e-05, DS=25
+       ID=410, NAME=Q235, TYPE=261, ES=2.1e+05, PR=0.3, EXC=0.00012, DS=78.5
+       ID=510, NAME=Q345, TYPE=261, ES=2.1e+05, PR=0.3, EXC=0.00012, DS=78.5
+
+=== DEFNODELOAD ===
+       ID=6012, KIND=1, EX=0.0, EY=0.0, EZ=0.0, PX=0.000, PY=0.000, PZ=150.000, MX=0.000, MY=0.000, MZ=0.000
+       ID=11012, KIND=1, EX=0.0, EY=0.0, EZ=0.0, PX=0.000, PY=0.000, PZ=150.000, MX=0.000, MY=0.000, MZ=0.000
+       ID=36012, KIND=1, EX=0.0, EY=0.0, EZ=0.0, PX=0.000, PY=0.000, PZ=150.000, MX=0.000, MY=0.000, MZ=0.000
+       ID=43112, KIND=1, EX=0.0, EY=0.0, EZ=0.0, PX=0.000, PY=0.000, PZ=150.000, MX=0.000, MY=0.000, MZ=0.000
+=== SETNODELOAD ===
+       ID=5907, NUB=1, LOADID= 6012 
+       ID=10907, NUB=1, LOADID= 11012 
+       ID=35907, NUB=1, LOADID= 36012 
+       ID=43007, NUB=1, LOADID= 43112 
+
+=== DEFLINELOAD keys/type distribution ===
+   (group, TYPE, UCS) -> [(('$DEADLOAD', '1', '1'), 69), (('$DEADLOAD', '101', '1'), 13), (('$LIVELOAD', '1', '1'), 17), (('$LIVELOAD', '1', '2'), 24), (('$LIVELOAD', '101', '1'), 1)]
+   sample keys=['ID', 'KIND', 'TYPE', 'UCS', 'DS', 'S', 'FX', 'FY', 'FZ', 'MX', 'MY', 'MZ', 'FX2', 'FY2', 'FZ2', 'MX2', 'MY2', 'MZ2']
+      ID     len=1 ['171713']
+      KIND   len=1 ['2']
+      TYPE   len=1 ['101']
+      UCS    len=1 ['1']
+      DS     len=1 ['0.500']
+      S      len=1 ['1.700']
+      FX     len=1 ['0.000']
+      FY     len=1 ['0.000']
+      FZ     len=1 ['30.000']
+      MX     len=1 ['0.000']
+      MY     len=1 ['0.000']
+      MZ     len=1 ['0.000']
+      FX2    len=1 ['0.000']
+      FY2    len=1 ['0.000']
+      FZ2    len=1 ['30.000']
+      MX2    len=1 ['0.000']
+      MY2    len=1 ['0.000']
+      MZ2    len=1 ['0.000']
+   TYPE=1 sample keys=['ID', 'KIND', 'TYPE', 'UCS', 'DS', 'FX', 'FY', 'FZ', 'MX', 'MY', 'MZ']
+
+=== SETLINELOAD NUB histogram + target check ===
+   (group, NUB, len) -> [(('$DEADLOAD', '1', 1), 42), (('$DEADLOAD', '2', 2), 18), (('$LIVELOAD', '1', 1), 18), (('$LIVELOAD', '2', 2), 12)]
+
+=== DEFSLABLOAD ===
+   $DEADLOAD keys=['ID', 'KIND', 'UCS', 'FZ']
+   $LIVELOAD keys=['ID', 'KIND', 'UCS', 'FZ']
+
+=== SETSLABLOAD sign/NUB ===
+   $DEADLOAD sign=[('$DEADLOAD', ('neg',)), ('$DEADLOAD', ('pos',))]
+   $LIVELOAD sign=[('$LIVELOAD', ('pos',))]
+   nub=[(('$DEADLOAD', '1', 1), 335), (('$LIVELOAD', '1', 1), 331)]
+   negative-LOADID rows=[('$DEADLOAD', '183805', [-183913]), ('$DEADLOAD', '184005', [-184113]), ('$DEADLOAD', '184205', [-184313]), ('$DEADLOAD', '184405', [-184513])]
+
+=== EXR -42 (层内序号) for slabs/walls ===
+   $SETWALL: n=4  first5=[('183805', '3', '1', '5'), ('184005', '2', '1', '5'), ('184205', '4', '1', '5'), ('184405', '1', '1', '5')]
+      -41 distinct=['5']
+      -42 distinct count=4 min=1 max=4
+   $SETSLAB: n=331  first5=[('184706', '79', '2', '6'), ('185006', '7', '4', '6'), ('185306', '69', '2', '6'), ('185706', '67', '1', '6'), ('186006', '76', '3', '6')]
+      -41 distinct=['6']
+      -42 distinct count=106 min=1 max=99
+DONE

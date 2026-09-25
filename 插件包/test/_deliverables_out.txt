@@ -1,0 +1,96 @@
+=== 1. Python 源码编码：UTF-8 无 BOM ===
+  [OK] engine/jwd_write.py UTF-8 无 BOM 83457 字节
+  [OK] engine/pdms_dump.py UTF-8 无 BOM 32508 字节
+  [OK] test/check_jwd_write_roundtrip.py UTF-8 无 BOM 23560 字节
+  [OK] test/check_dump_to_jwd.py UTF-8 无 BOM 24073 字节
+  [OK] test/_jwd_read_stub.py UTF-8 无 BOM 7920 字节
+  [OK] test/fixture_dump_min.txt UTF-8 无 BOM 706 字节
+  [OK] test/fixture_dump_ext.txt UTF-8 无 BOM 1290 字节
+
+=== 2. import 边界（契约 §b.5）===
+  [OK] jwd_write.py 只 import 标准库 + canonical ['__future__', 'canonical', 'os', 're', 'sqlite3', 'tempfile', 'typing']
+  [OK] pdms_dump.py 只 import 标准库 + canonical（SectionMap 走鸭子类型注入） ['__future__', 'canonical', 're', 'typing']
+
+=== 3. 用户原件内容指纹（证明"只读、未改写"；数字出自契约附录 B.2 / 侦察报告）===
+  [OK] JLCJ2.jwd = 1,073,152 字节（契约 B.2） 1073152
+  [OK] JLCJ2.jwd 是 SQLite3 文件（头 16 字节） b'SQLite f'
+  [OK] JLCJ2.jwd：46 表 / PRAGMA encoding=UTF-8 / user_version=0 / 合计 6480 行（契约 §0.2） 表 46 编码 UTF-8 uv 0 行 6480
+  [OK] 匹配文件：3,023 物理行（split("\r\n") 元素数）、无 BOM（契约 B.2） 3023
+  [OK] 匹配文件：2,836 条数据行、左值 0 重复（契约 C2） 2836 条
+  [OK] 匹配文件：右值缺前导 "/" 的 4 条正是 L2979–2982，内容与契约一致（契约 B.2） [2979, 2980, 2981, 2982]
+        （附带信息：// 与整行 "/" 注释合计 186 行、空行 108 行、规格前缀 52 个——契约 C2 的 78 只数 // 开头行）
+  [OK] 1_PM.pdt：9,677 行、首行是 ";" 注释、$VERSION 记录值为 4.2.0（契约 B.2 / pdt §2.1） 9677 行；前 4 行=[';File I:\\氯化因局部设备变动20250227\\PDMS\\1_PM.pdt saved 3/19/2025 8:4:27', '', '$VERSION', '   4.2.0']
+  [OK] PKPM（PDMS数据库）.txt：1,406,051 B、UTF-8 带 BOM（契约 B.2） 1406051 B
+  [OK] PKPM（PDMS数据库）.txt：70,301 行、首行 $S-（契约 B.2） 70301 行
+
+=== 4. 本包只以只读方式打开用户原件（代码级核对）===
+  [OK] engine/jwd_write.py：没有以写模式打开原件 （只读用法 0 处）
+  [OK] engine/pdms_dump.py：没有以写模式打开原件 （只读用法 1 处）
+  [OK] test/check_jwd_write_roundtrip.py：没有以写模式打开原件 （只读用法 1 处）
+  [OK] test/check_dump_to_jwd.py：没有以写模式打开原件 （只读用法 3 处）
+  [OK] test/check_db2jwd_sections.py：没有以写模式打开原件 （只读用法 1 处）
+  [OK] test/_jwd_read_stub.py：没有以写模式打开原件 （只读用法 1 处）
+  [OK] test/probe_wr_sample.py：没有以写模式打开原件 （只读用法 1 处）
+  [OK] test/probe_fixture_specs.py：没有以写模式打开原件 （只读用法 1 处）
+  [OK] test/probe_jwd_read_avail.py：没有以写模式打开原件 （只读用法 0 处）
+  [OK] test/probe_fingerprint.py：没有以写模式打开原件 （只读用法 2 处）
+  [OK] test/probe_v2_db_source.py：没有以写模式打开原件 （只读用法 1 处）
+  [OK] test/probe_v2_db_params.py：没有以写模式打开原件 （只读用法 1 处）
+  [OK] test/probe_v2_db_dtset.py：没有以写模式打开原件 （只读用法 1 处）
+  [OK] test/probe_v2_slots.py：没有以写模式打开原件 （只读用法 1 处）
+
+=== 5. 本包新增/改动的文件（固定清单）===
+   engine/jwd_write.py                                      83457 B
+   engine/pdms_dump.py                                      32508 B
+   test/check_jwd_write_roundtrip.py                        23560 B
+   test/_rt_out.txt                                          6949 B
+   test/_rt_out/JLCJ2.roundtrip.jwd                        786432 B
+   test/_rt_out/JLCJ2.real.jwd                             798720 B
+   test/check_dump_to_jwd.py                                24073 B
+   test/_dump_chain_out.txt                                 12194 B
+   test/_rt_out/fixture_dump_min.gbk.txt                      726 B
+   test/_rt_out/fixture_dump_ext.gbk.txt                     1319 B
+   test/_rt_out/dump_min.jwd                               569344 B
+   test/_rt_out/dump_ext.jwd                               569344 B
+   test/_rt_out/dump_ext_prop.jwd                          569344 B
+   test/_rt_out/dump_ext_nojoints.jwd                      569344 B
+   test/fixture_dump_min.txt                                  706 B
+   test/fixture_dump_ext.txt                                 1290 B
+   test/_jwd_read_stub.py                                    7920 B
+   test/probe_wr_sample.py                                  13926 B
+   test/_wr_sample.txt                                      22195 B
+   test/probe_fixture_specs.py                               1224 B
+   test/_fixture_specs.txt                                   1197 B
+   test/probe_jwd_read_avail.py                               792 B
+   test/_jwdread_avail.txt                                    573 B
+   test/gen_ddl_block.py                                     1260 B
+   test/splice_ddl.py                                         831 B
+   test/probe_fingerprint.py                                 2187 B
+   test/_fingerprint.txt                                     1325 B
+   test/check_db2jwd_sections.py                            34995 B
+   test/_db2jwd_out.txt                                     13817 B
+   test/probe_v2_db_source.py                                6692 B
+   test/_v2_db_source.txt                                    6780 B
+   test/probe_v2_db_params.py                                3820 B
+   test/_v2_db_params.txt                                   14569 B
+   test/probe_v2_db_dtset.py                                 2309 B
+   test/_v2_db_dtset.txt                                     1632 B
+   test/probe_v2_slots.py                                    5374 B
+   test/_v2_slots.txt                                        4513 B
+   test/_rt_out/db_sections.jwd                            802816 B
+   test/_rt_out/db_sections_split.jwd                      802816 B
+   test/_rt_out/db_sections_empty.jwd                      569344 B
+   test/_rt_out/db_sections_dict.jwd                       569344 B
+   test/_rt_out/db_sections_reid.jwd                       569344 B
+   test/_rt_out/db2jwd_closure.json                         51499 B
+   test/_rt_out/db2jwd_losses.json                           4036 B
+   test/check_deliverables.py                                9714 B
+   test/_deliverables_out.txt                                   0 B
+   test/summary.py                                            501 B
+   test/_summary_out.txt                                      185 B
+   test/summary_v2.py                                         549 B
+   test/_summary_v2_out.txt                                   272 B
+  [OK] 清单里 50 个文件全部存在 []
+
+=== 结论 ===
+FAIL 项: 0 

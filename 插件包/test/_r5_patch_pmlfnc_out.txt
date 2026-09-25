@@ -1,0 +1,6 @@
+bytes 9562 -> 10051
+BOM: False
+lone LF: 0
+probe 行： ['-- 形态 = EXIST $!cand（!cand 自带前导 / ，插值后就是 /名）——带斜杠名字的本机', 'var !probe EXIST $!cand']
+旧 //名 探测残留： True
+TYPE 通道/两种都写 字样在： True True

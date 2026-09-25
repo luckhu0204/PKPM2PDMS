@@ -1,0 +1,6 @@
+bytes 10050
+BOM: False
+lone LF: 0
+代码探测行： ['var !probe EXIST $!cand']
+残留代码形 EXIST /$!cand： False
+TYPE 通道/两种都写： True True

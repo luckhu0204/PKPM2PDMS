@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserInterfaceCustomization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="www.aveva.com">
+  <Version>1.0</Version>
+  <Tools>
+    <ButtonTool Name="PKPMJWD.Open">
+      <Command>
+        <Type>Instance</Type>
+        <Key>PKPMJWD.OpenTools</Key>
+        <Arguments />
+      </Command>
+      <Image />
+      <Caption>PKPM JWD 导入导出</Caption>
+      <DisplayStyle>Default</DisplayStyle>
+    </ButtonTool>
+    <MenuTool Name="PKPMJWD.Menu">
+      <Image />
+      <Caption>PKPM JWD</Caption>
+      <DisplayStyle>Default</DisplayStyle>
+      <Tools>
+        <Tool Name="PKPMJWD.Open" />
+      </Tools>
+    </MenuTool>
+  </Tools>
+  <InstanceTools />
+  <MenuBar>
+    <Tool Name="PKPMJWD.Menu" />
+  </MenuBar>
+  <CommandBars />
+  <TaskPanes />
+  <ContextMenus />
+  <AreaLeftTools />
+  <AreaRightTools />
+  <FooterTools />
+  <QATTools>
+    <Tool Name="PKPMJWD.Open" />
+  </QATTools>
+  <ContextualTabGroups />
+  <TabToolbarTools />
+  <Tabs />
+  <MiniToolbarTools />
+</UserInterfaceCustomization>

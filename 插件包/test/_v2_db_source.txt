@@ -1,0 +1,105 @@
+=== 1. 表规模 ===
+  行数 = 3176
+  列 = ['key', 'pkpm_name', 'family_code', 'family_name_cn', 'kind', 'shapeval', 'dims_json', 'mat', 'pdms_spec_path', 'pdms_catalogue', 'is_parametric', 'params_json', 'confidence', 'source', 'extra_json']
+  meta.json = {'confidence': {'high': 1146, 'low': 597, 'medium': 1433}, 'family_code_known': 2335, 'is_parametric_true': 15, 'keys_unique': 3176, 'kind_known': 7, 'pdms_spec_path_unique': 3176, 'pkpm_name_nonempty': 2835, 'pkpm_name_unique': 2835, 'shapeval_nonempty': 2335}
+
+=== 2. 分布 ===
+  kind           取值数=2    [('0', 3169), ('26', 7)]
+  family_code    取值数=25   [('77', 1199), ('0', 841), ('38', 267), ('33', 179), ('39', 130), ('36', 119), ('31', 72), ('66', 67), ('32', 63), ('37', 62), ('71', 48), ('40', 45), ('72', 42), ('73', 31), ('15', 1), ('16', 1), ('17', 1), ('18', 1), ('2', 1), ('20', 1), ('21', 1), ('22', 1), ('23', 1), ('24', 1), ('3', 1)]
+  mat            取值数=1    [('5', 3176)]
+  is_parametric  取值数=2    [('false', 3161), ('true', 15)]
+  confidence     取值数=3    [('medium', 1433), ('high', 1146), ('low', 597)]
+
+=== 3. 各 kind 的 dims 键空间（决定能否按 §k.3 反算）===
+  Kind=0    n=3169  dims 键 = ['B', 'H', 'b', 'b1', 'b2', 'b3', 'd', 'family', 'h', 'lib_family', 'name', 'order', 'r', 'subtype', 't', 'tf', 'tw']
+             family_code 分布 = [(77, 1199), (0, 841), (38, 267), (33, 179), (39, 123), (36, 119), (31, 72), (66, 67), (32, 63), (37, 62), (71, 48), (40, 45)]
+  Kind=26   n=7     dims 键 = ['B', 'H', 'family', 'r', 'tf', 'tw']
+             family_code 分布 = [(39, 7)]
+
+=== 4. 抽样（每 kind 前 3 条，看 shapeval/dims/extra 的实际形状）===
+  --- Kind=0
+    key=TUBE                       pkpm=TUBE                 fam=15   spec=/USER_TUBE-SPEC/Tube_Profile
+       shapeval='15'
+       dims={"family":15}
+       extra keys=['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count']
+    key=H                          pkpm=H                    fam=16   spec=/USER_H-SPEC/H_Profile
+       shapeval='16'
+       dims={"H":500,"family":16,"tw":8}
+       extra keys=['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count']
+    key=PIPE                       pkpm=PIPE                 fam=17   spec=/USER_PIPE-SPEC/Pipe_Profile
+       shapeval='17'
+       dims={"family":17}
+       extra keys=['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count']
+  --- Kind=26
+    key=HN200X100                  pkpm=HN200X100            fam=39   spec=/H_INTERNATIONAL-SPEC/HN200X100
+       shapeval='39,200,100'
+       dims={"B":100,"H":200,"family":39,"r":8,"tf":8,"tw":5.5}
+       extra keys=['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_jwd_sample', 'in_matching_file', 'in_pdms_macro', 'jwd_shapeval', 'name_variants', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile']
+    key=HN300X150                  pkpm=HN300X150            fam=39   spec=/H_INTERNATIONAL-SPEC/HN300X150
+       shapeval='39,300,150'
+       dims={"B":150,"H":300,"family":39,"r":13,"tf":9,"tw":6.5}
+       extra keys=['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_jwd_sample', 'in_matching_file', 'in_pdms_macro', 'jwd_shapeval', 'name_variants', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile']
+    key=HN350X175                  pkpm=HN350X175            fam=39   spec=/H_INTERNATIONAL-SPEC/HN350X175
+       shapeval='39,350,175'
+       dims={"B":175,"H":350,"family":39,"r":13,"tf":11,"tw":7}
+       extra keys=['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_jwd_sample', 'in_matching_file', 'in_pdms_macro', 'jwd_shapeval', 'name_variants', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile']
+
+=== 5. §k.3 反算可行性（按 kind 逐条判定）===
+  Kind=26 且 family==39（需 H,B,tf,tw）: 7 / 共 7
+  Kind=26 且 family!=39（§k.3: 不可反算）: 0
+  Kind=303 且 dims 有 spec_str,d,lib_family: 0 / 共 0
+    Kind=303 的 dims 键空间 = []
+  Kind=1 且 dims 有 B,H: 0 / 共 0
+  Kind=3 且 dims 有 d: 0 / 共 0
+  shapeval 非空（可直接当 ShapeVal 用，只换尾部 ID）: 2335
+  含 jwd_id 的行: 0
+  jwd_id 示例: []
+
+=== 6. family 77（薄壁管/钢管族）的规格串形状 ===
+  n = 1199
+  规格串首字符分布 = [('', 1199)]
+    1-D102X3.5             spec_str=None           d=102      lib=1 kind=0
+    1-D102X4.0             spec_str=None           d=102      lib=1 kind=0
+    1-D102X4.5             spec_str=None           d=102      lib=1 kind=0
+    1-D102X5.0             spec_str=None           d=102      lib=1 kind=0
+    1-D102X5.5             spec_str=None           d=102      lib=1 kind=0
+    1-D102X6.0             spec_str=None           d=102      lib=1 kind=0
+  形状（* 个数）分布 = {'other': 1199}
+
+=== 7. 目录宏交叉核对（只读前 200 行做计数 + 抽 1 个 SPRFILE 的 PARA）===
+  行数 = 70301  BOM = True
+   NEW SPRFILE          2920
+   NEW SPCOMPONENT      2920
+   NEW STSECTION        12
+   NEW STCATEGORY       57
+   NEW TEXT             533
+   NEW DTSET            57
+   NEW DATA             578
+   NEW PTSSET           57
+   NEW PLINE            430
+   NEW GMSSET           57
+   NEW PROFILE          0
+   NEW SPECIFICATION    12
+   NEW SELEC            57
+   OLD                  5890
+  /HN450X200 的 NEW SPRFILE 行号（1 基）: [31326]
+  --- 该处 ±12 行原文 ---
+    31324| 
+    31325| END
+    31326| NEW SPRFILE /HN450X200
+    31327| GTYP BEAM
+    31328| PARA 450 200 9 14 13 $
+    31329| 95.43 74.9 32900 1460 18.6 $
+    31330| 1870 187 4.42
+    31331| 
+    31332| END
+    31333| NEW SPRFILE /HN470X150
+    31334| GTYP BEAM
+    31335| PARA 470 150 7 13 13 $
+    31336| 71.53 56.2 26200 1110 19.1 $
+    31337| 733 97.8 3.2
+    31338| 
+  含 /H_INTERNATIONAL-SPEC/HN450X200 的行: [44580, 68143]
+  NEW STCATEGORY /USER_RECT 行号: [2826]
+  NEW STCATEGORY /USER_CIRCLE 行号: [2494]
+  NEW STCATEGORY /USER_H 行号: [946]

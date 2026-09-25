@@ -1,0 +1,82 @@
+=== 0. DDL 逐字核对（契约 §b.3「原样嵌入」）===
+  [OK] jwd_write.py 里 125 条语句全部逐字出现在 00_schema.txt 
+  [OK] DDL 条数 = 46 表 / 79 索引 46 / 79
+  [OK] TABLE_NAMES 与 schema 的 46 张表一致 
+
+=== 1. 样本 → Model → write_jwd ===
+  首轮 Model counts = {'levels': 5, 'joints': 382, 'sections': 28, 'members': {'beam': 598, 'column': 200, 'brace': 13}, 'members_total': 811, 'slabs': 222, 'slabs_holes': 29, 'slabs_with_thickness': 80, 'walls': 0, 'loads': {'beam-line': 77, 'joint-point': 44}, 'loads_total': 121}
+  write_jwd: rows=2808 tables=15 skipped=0 warnings=9
+  [OK] 产物存在 D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\_rt_out\JLCJ2.roundtrip.jwd
+  [OK] 返回值键与契约 §b.3 一致 ['loads', 'members', 'rows', 'skipped', 'slabs', 'tables', 'walls', 'warnings']
+
+=== 2. 读回 .jwd' 并比对 ===
+  回读 Model counts = {'levels': 5, 'joints': 382, 'sections': 28, 'members': {'beam': 598, 'column': 200, 'brace': 13}, 'members_total': 811, 'slabs': 222, 'slabs_holes': 29, 'slabs_with_thickness': 80, 'walls': 0, 'loads': {'beam-line': 77, 'joint-point': 44}, 'loads_total': 121}
+  [OK] 回读的 counts() 与首轮一致 {'levels': 5, 'joints': 382, 'sections': 28, 'members': {'beam': 598, 'column': 200, 'brace': 13}, 'members_total': 811, 'slabs': 222, 'slabs_holes': 29, 'slabs_with_thickness': 80, 'walls': 0, 'loads': {'beam-line': 77, 'joint-point': 44}, 'loads_total': 121} vs {'levels': 5, 'joints': 382, 'sections': 28, 'members': {'beam': 598, 'column': 200, 'brace': 13}, 'members_total': 811, 'slabs': 222, 'slabs_holes': 29, 'slabs_with_thickness': 80, 'walls': 0, 'loads': {'beam-line': 77, 'joint-point': 44}, 'loads_total': 121}
+  [OK] Model JSON 规范形式逐字节一致（忽略 note/source/table 等读取期注解） 
+  [OK] PRAGMA encoding = UTF-8 
+  [OK] 46 张表名与样本一致 46 vs 46
+  [OK] 79 条显式索引名与样本一致 79 vs 79
+
+=== 3. 逐表行数（写出 vs 样本）===
+  样本 LoadSect 未被 LoadSeg 引用的行数: 8
+  差异 pkpmAxis             样本   112 → 写出   598  每根梁一行 pkpmAxis 的**合成**结果（契约 §b.3 允许简化，§12#13）
+  差异 pkpmGrid             样本   604 → 写出   598  轴网由梁端点合成：样本 604 行里有 6 行是不被任何梁引用的轴线网格
+  差异 pkpmLoadSect         样本    17 → 写出     9  只写被 pkpmLoadSeg 引用到的荷载截面；样本另有未被引用的荷载截面行（规范模型只能从 LoadSeg 看到被引用的那些）
+  差异 pkpmProperty         样本  3574 → 写出     0  只写构件材料等级 HNTDJ/GANGH；样本另有 Sp*/roomrf/support/DXF 设计属性
+  差异 pkpmSatTowPara       样本   180 → 写出     0  施工/塔吊参数（规范模型不承载）
+  差异 pkpmSatTowReinInfo   样本    60 → 写出     0  施工/塔吊参数（规范模型不承载）
+  差异 pkpmSatTower         样本     5 → 写出     0  施工/塔吊参数（规范模型不承载）
+  差异 pkpmStdFlrPara       样本   130 → 写出     0  规范模型不承载每标准层 26 项设计参数
+  差异 pkpmSysInfo          样本   195 → 写出     0  规范模型不承载工程名（样本 ID=2 = "JLCJ2"）
+  [OK] 除契约允许的合成/不承载表外，逐表行数与样本相同（37/46 表完全相同） 
+  行数完全相同的表：37 张；有差异：9 张（全部有理由）
+
+=== 4. 关键列逐行比对 ===
+  [OK] pkpmStdFlr         5 行 ×  3 列全部一致
+  [OK] pkpmFloor          5 行 ×  6 列全部一致
+  [OK] pkpmJoint        382 行 ×  6 列全部一致
+  [OK] pkpmBeamSect      22 行 ×  6 列全部一致
+  [OK] pkpmColSect        4 行 ×  6 列全部一致
+  [OK] pkpmBraceSect      2 行 ×  6 列全部一致
+  [OK] pkpmBeamSeg      598 行 × 10 列全部一致
+  [OK] pkpmColSeg       200 行 × 13 列全部一致
+  [OK] pkpmBraceSeg      13 行 × 13 列全部一致
+  [OK] pkpmSlab         222 行 × 16 列全部一致
+  [OK] pkpmSlabHole      29 行 ×  7 列全部一致
+  [OK] pkpmLoadSect       9 行 ×  3 列全部一致
+  [OK] pkpmLoadSeg      121 行 × 11 列全部一致
+
+=== 4b. 列级差异清单（同一批 ID 上逐列比对；用来量化"关键列"之外还剩什么差异）===
+  pkpmSlab       共同行 222：逐列不一致的列 [('TransWay', 222), ('Ang1', 222), ('Ang2', 222)]
+  pkpmLoadSeg    共同行 121：逐列不一致的列 无
+  pkpmLoadSect   共同行   9：逐列不一致的列 [('No', 7), ('Loadname', 1)]
+  pkpmProperty   共同行   0：逐列不一致的列 无
+
+=== 4c. 文本列字节规则（契约 §b.3 / jwd_format.md §9.1）===
+  样本 pkpmColSect(3985): typeof=text hex=B1A1B1DAB7BDB8D6B9DC3A20423235…
+  [OK] 样本：中文截面名是 TEXT 存储类里的 GBK 字节 
+  写出 pkpmColSect(3985): typeof=text hex=B1A1B1DAB7BDB8D6B9DC3A20423235…
+  [OK] 写出：中文截面名是 TEXT 存储类里的 GBK 字节 
+  [OK] 样本与写出物的 Name 字节完全相同（GBK 字节级一致） 
+
+=== 5. 外键逐列检查（按 46 条 DDL 里的 REFERENCES）===
+  DDL 里的外键声明共 45 条
+  [OK] 外键声明条数 ≥ 40 45
+  [OK] 写出产物的未解析外键行数 = 0（共查 45 条外键） 样本自身基线 = 0 行
+
+=== 6. 跨模块端到端：交付的 engine/jwd_read.py 读样本 → write_jwd → 再用它读回 ===
+  read_jwd(样本).counts()  = {'levels': 5, 'joints': 382, 'sections': 28, 'members': {'beam': 598, 'column': 200, 'brace': 13}, 'members_total': 811, 'slabs': 222, 'slabs_holes': 29, 'slabs_with_thickness': 80, 'walls': 0, 'loads': {'beam-line': 77, 'joint-point': 44}, 'loads_total': 121}
+  read_jwd(产物).counts()  = {'levels': 5, 'joints': 382, 'sections': 28, 'members': {'beam': 598, 'column': 200, 'brace': 13}, 'members_total': 811, 'slabs': 222, 'slabs_holes': 29, 'slabs_with_thickness': 80, 'walls': 0, 'loads': {'beam-line': 77, 'joint-point': 44}, 'loads_total': 121}
+  样本 material 统计: C30=467 空=344
+  产物 material 统计: C30=467 空=344
+  产物 pkpmProperty 行数 = 467（样本 3574，其中构件材料 HNTDJ/GANGH 各 1033）
+  [OK] 端到端产物外键全部可解析 []
+  [OK] 交付 reader 读样本与读产物的 counts() 一致 
+  [OK] 交付 reader 读出的 Model 规范 JSON **逐字节一致**（含 material / 截面参数 / 全部几何） 
+  [OK] 交付 reader 读产物无 E- 项 []
+  [OK] 交付 reader 在样本与产物上的 W- 类型分布一致 ['W-MEM-SHORT', 'W-MEM-SHORT', 'W-MEM-SHORT', 'W-MEM-SHORT', 'W-MEM-SHORT', 'W-MEM-ZRANGE'] vs ['W-MEM-SHORT', 'W-MEM-SHORT', 'W-MEM-SHORT', 'W-MEM-SHORT', 'W-MEM-SHORT', 'W-MEM-ZRANGE']
+  write_jwd 返回值: rows=3275, warnings=10 条
+
+=== 结论 ===
+产出文件：D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\_rt_out\JLCJ2.roundtrip.jwd
+FAIL 项: 0 

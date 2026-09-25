@@ -1,0 +1,22 @@
+/H_INTERNATIONAL-SPEC/HN450X200            -> ['HN450X200']
+/H_INTERNATIONAL-SPEC/HN300X150            -> ['HN300X150']
+/H_INTERNATIONAL-SPEC/HN400X200            -> ['HN400X200']
+/USER_RECT-SPEC/Rectangle_Profile          -> ['RECT']
+/USER_H-SPEC/H_Profile                     -> ['H']
+/C_COMMON-SPEC/[18a                        -> ['1-[18a']
+/C_LIGHT-SPEC/CL18a                        -> ['2-[18a']
+/RECT_SQUARE6728_2002-SPEC/B250*10.00      -> ['6-B250*10.00']
+/Concrete_Wall-SPEC/WALL-300               -> None
+/TUBE_TUBE-SPEC/D194X8.0                   -> ['1-D194X8.0']
+
+反查（右值 -> 左值）首条：
+  /H_INTERNATIONAL-SPEC/HN450X200            => HN450X200
+  /H_INTERNATIONAL-SPEC/HN300X150            => HN300X150
+  /H_INTERNATIONAL-SPEC/HN400X200            => HN400X200
+  /USER_RECT-SPEC/Rectangle_Profile          => RECT
+  /USER_H-SPEC/H_Profile                     => H
+  /C_COMMON-SPEC/[18a                        => 1-[18a
+  /C_LIGHT-SPEC/CL18a                        => 2-[18a
+  /RECT_SQUARE6728_2002-SPEC/B250*10.00      => 6-B250*10.00
+  /Concrete_Wall-SPEC/WALL-300               => None
+  /TUBE_TUBE-SPEC/D194X8.0                   => 1-D194X8.0

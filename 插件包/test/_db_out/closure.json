@@ -1,0 +1,1621 @@
+{
+ "closure": {
+  "direction": "gen",
+  "covered": 3176,
+  "src_specs": 3176,
+  "via_specs": 3176,
+  "not_closable": [],
+  "differences": [
+   {
+    "key": "+2L100X10",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE100x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L100X12",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE100x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L100X14",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE100x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L100X16",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE100x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L100X6",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE100x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L100X7",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE100x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L100X8",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE100x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L100X9",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE100x9",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L110X10",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE110x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L110X12",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE110x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L110X14",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE110x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L110X7",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE110x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L110X8",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE110x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L125X10",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE125x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L125X12",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE125x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L125X14",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE125x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L125X16",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE125x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L125X8",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE125x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L140X10",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE140x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L140X12",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE140x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L140X14",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE140x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L140X16",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE140x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L150X10",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE150x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L150X12",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE150x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L150X14",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE150x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L150X15",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE150x15",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L150X16",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE150x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L150X8",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE150x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L160X10",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE160x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L160X12",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE160x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L160X14",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE160x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L160X16",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE160x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L180X12",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE180x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L180X14",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE180x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L180X16",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE180x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L180X18",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE180x18",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L200X14",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE200x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L200X16",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE200x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L200X18",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE200x18",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L200X20",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE200x20",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L200X24",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE200x24",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L20X3",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE20X3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L20X4",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE20x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L220X16",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE220x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L220X18",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE220x18",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L220X20",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE220x20",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L220X22",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE220x22",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L220X24",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE220x24",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L220X26",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE220x26",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L250X18",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE250x18",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L250X20",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE250x20",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L250X24",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE250x24",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L250X26",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE250x26",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L250X28",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE250x28",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L250X30",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE250x30",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L250X32",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE250x32",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L250X35",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE250x35",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L25X3",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE25x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L25X4",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE25x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L30X3",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE30x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L30X4",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE30x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L36X3",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE36x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L36X4",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE36x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L36X5",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE36x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L40X3",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE40x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L40X4",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE40x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L40X5",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE40x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L45X3",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE45x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L45X4",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE45x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L45X5",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE45x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L45X6",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE45x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L50X3",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE50x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L50X4",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE50x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L50X5",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE50x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L50X6",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE50x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L56X3",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE56x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L56X4",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE56x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L56X5",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE56x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L56X6",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE56x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L56X7",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE56x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L56X8",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE56x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L60X5",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE60x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L60X6",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE60x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L60X7",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE60x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L60X8",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE60x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L63X10",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE63x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L63X4",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE63x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L63X5",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE63x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L63X6",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE63x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L63X7",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE63x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L63X8",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE63x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L70X4",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE70x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L70X5",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE70x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L70X6",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE70x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L70X7",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE70x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L70X8",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE70x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L75X10",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE75x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L75X5",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE75x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L75X6",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE75x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L75X7",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE75x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L75X8",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE75x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L75X9",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE75x9",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L80X10",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE80x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L80X5",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE80x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L80X6",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE80x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L80X7",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE80x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L80X8",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE80x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L80X9",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE80x9",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L90X10",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE90x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L90X12",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE90x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L90X6",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE90x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L90X7",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE90x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L90X8",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE90x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "+2L90X9",
+    "spec_path": "/DOUBLE_L_EQUAL_CROSS-SPEC/DLE90x9",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0'), ('y0(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L100X63X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU100x63x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L100X63X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU100x63x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L100X63X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU100x63x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L100X63X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU100x63x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L100X80X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU100x80x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L100X80X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU100x80x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L100X80X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU100x80x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L100X80X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU100x80x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L110X70X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU110x70x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L110X70X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU110x70x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L110X70X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU110x70x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L110X70X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU110x70x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L125X80X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU125x80x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L125X80X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU125x80x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L125X80X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU125x80x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L125X80X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU125x80x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L140X90X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU140x90x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L140X90X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU140x90x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L140X90X14",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU140x90x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L140X90X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU140x90x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L150X90X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU150x90x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L150X90X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU150x90x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L150X90X14",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU150x90x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L150X90X15",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU150x90x15",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L150X90X16",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU150x90x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L150X90X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU150x90x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L160X100X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU160x100x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L160X100X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU160x100x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L160X100X14",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU160x100x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L160X100X16",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU160x100x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L180X110X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU180x110x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L180X110X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU180x110x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L180X110X14",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU180x110x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L180X110X16",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU180x110x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L200X125X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU200x125x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L200X125X14",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU200x125x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L200X125X16",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU200x125x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L200X125X18",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU200x125x18",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L25X16X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU25x16x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L25X16X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU25x16x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L32X20X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU32x20x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L32X20X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU32x20x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L40X25X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU40x25x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L40X25X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU40x25x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L45X28X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU45x28x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L45X28X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU45x28x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L50X32X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU50x32x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L50X32X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU50x32x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L56X36X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU56x36x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L56X36X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU56x36x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L56X36X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU56x36x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L63X40X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU63x40x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L63X40X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU63x40x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L63X40X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU63x40x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L63X40X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU63x40x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L70X45X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU70x45x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L70X45X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU70x45x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L70X45X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU70x45x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L70X45X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU70x45x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L75X50X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU75x50x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L75X50X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU75x50x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L75X50X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU75x50x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L75X50X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU75x50x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L80X50X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU80x50x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L80X50X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU80x50x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L80X50X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU80x50x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L80X50X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU80x50x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L90X56X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU90x56x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L90X56X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU90x56x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L90X56X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU90x56x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "长2L90X56X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_LONG-SPEC/LU90x56x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L100X63X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU100x63x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L100X63X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU100x63x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L100X63X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU100x63x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L100X63X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU100x63x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L100X80X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU100x80x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L100X80X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU100x80x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L100X80X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU100x80x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L100X80X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU100x80x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L110X70X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU110x70x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L110X70X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU110x70x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L110X70X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU110x70x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L110X70X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU110x70x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L125X80X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU125x80x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L125X80X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU125x80x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L125X80X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU125x80x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L125X80X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU125x80x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L140X90X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU140x90x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L140X90X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU140x90x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L140X90X14",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU140x90x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L140X90X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU140x90x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L150X90X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU150x90x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L150X90X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU150x90x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L150X90X14",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU150x90x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L150X90X15",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU150x90x15",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L150X90X16",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU150x90x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L150X90X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU150x90x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L160X100X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU160x100x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L160X100X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU160x100x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L160X100X14",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU160x100x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L160X100X16",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU160x100x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L180X110X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU180x110x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L180X110X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU180x110x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L180X110X14",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU180x110x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L180X110X16",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU180x110x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L200X125X12",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU200x125x12",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L200X125X14",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU200x125x14",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L200X125X16",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU200x125x16",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L200X125X18",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU200x125x18",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L25X16X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU25x16x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L25X16X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU25x16x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L32X20X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU32x20x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L32X20X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU32x20x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L40X25X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU40x25x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L40X25X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU40x25x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L45X28X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU45x28x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L45X28X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU45x28x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L50X32X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU50x32x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L50X32X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU50x32x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L56X36X3",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU56x36x3",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L56X36X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU56x36x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L56X36X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU56x36x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L63X40X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU63x40x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L63X40X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU63x40x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L63X40X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU63x40x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L63X40X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU63x40x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L70X45X4",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU70x45x4",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L70X45X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU70x45x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L70X45X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU70x45x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L70X45X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU70x45x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L75X50X10",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU75x50x10",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L75X50X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU75x50x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L75X50X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU75x50x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L75X50X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU75x50x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L80X50X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU80x50x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L80X50X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU80x50x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L80X50X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU80x50x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L80X50X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU80x50x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L90X56X5",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU90x56x5",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L90X56X6",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU90x56x6",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L90X56X7",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU90x56x7",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "短2L90X56X8",
+    "spec_path": "/DOUBLE_L_UNEQUAL_SHORT-SPEC/LU90x56x8",
+    "why": "输入表该行没有参数定义（只出现在匹配文件的那批），生成侧按同族参数补齐：[('B(mm)', '0'), ('b(mm)', '0'), ('r(mm)', '0'), ('t(mm)', '0')]",
+    "class": "src-no-params"
+   },
+   {
+    "key": "CIRCLE",
+    "spec_path": "/USER_CIRCLE-SPEC/Circle_Profile",
+    "why": "生成侧补出了输入表没有的 DESP 参数 ['D']（表只留了 PURP=PARA 的参数名）",
+    "class": "desp-param-added"
+   },
+   {
+    "key": "RECT",
+    "spec_path": "/USER_RECT-SPEC/Rectangle_Profile",
+    "why": "生成侧补出了输入表没有的 DESP 参数 ['B', 'H']（表只留了 PURP=PARA 的参数名）",
+    "class": "desp-param-added"
+   }
+  ],
+  "differences_by_class": {
+   "src-no-params": 256,
+   "desp-param-added": 2
+  },
+  "extra_specs": []
+ },
+ "stats": {
+  "catalogue": [
+   "/PKPM_JWD_STSS_SELFTEST",
+   "/PKPM_JWD_USER_SELFTEST"
+  ],
+  "spec_world": [
+   "/PKPM_JWD_LIB_SELFTEST",
+   "/PKPM_JWD_USER_SECTION_SELFTEST"
+  ],
+  "stsection": 12,
+  "stcategory": 57,
+  "sprfile": 3176,
+  "spcomponent": 3176,
+  "text": 533,
+  "dtset": 57,
+  "data": 534,
+  "ptsset": 57,
+  "pline": 81,
+  "gmsset": 3,
+  "profile": 3,
+  "specification": 12,
+  "selec": 57,
+  "pass2": {
+   "PSTR": 3176,
+   "DTRE": 3176,
+   "NARE": 57,
+   "GSTR": 3,
+   "CATR": 3176
+  }
+ },
+ "warnings": [
+  "族 /DOUBLE_L_EQUAL_CROSS 同时落在 /PKPM_JWD_STSS_SELFTEST/SECTION_DOUBLE_L 与 /PKPM_JWD_STSS_SELFTEST/PKPM_JWD_SPEC ⇒ 按前者生成",
+  "族 /DOUBLE_L_UNEQUAL_SHORT 同时落在 /PKPM_JWD_STSS_SELFTEST/SECTION_DOUBLE_L 与 /PKPM_JWD_STSS_SELFTEST/PKPM_JWD_SPEC ⇒ 按前者生成",
+  "族 /DOUBLE_L_UNEQUAL_LONG 同时落在 /PKPM_JWD_STSS_SELFTEST/SECTION_DOUBLE_L 与 /PKPM_JWD_STSS_SELFTEST/PKPM_JWD_SPEC ⇒ 按前者生成"
+ ],
+ "assumptions": [
+  "头注释为纯 ASCII（契约 §l.1-5 与 §l.3.1 的中文示例冲突，取硬约束一侧）",
+  "STSECTION：用户侧用原件名 /USER_SECTION；型钢侧按每个 SPECIFICATION 一个 /STSS_<SPEC 基名>，可用 DbOptions.stsection_of 指定（契约 §l.3.2 要求 11 个，但转化表没有族到 STSECTION 的字段）",
+  "除 /USER_RECT、/USER_CIRCLE、/USER_H 三族外，其余族的 PTSSET 只写参考点 PLINE、不写 GMSSET（转化表无几何信息；禁止臆造轮廓）",
+  "SPRFILE/SPCOMPONENT/STCATEGORY/SPECIFICATION 保持源名；只有 4 个顶层容器带唯一名（契约 §l.4）",
+  "第二遍引用全部带父级限定链（of STCATEGORY/STSECTION/CATALOGUE、of SELEC/SPECIFICATION/SPWLD，§0.4-9）：供应商源名与用户库可能同名并存，裸名 OLD 的归属取决于 PDMS 运行时解析顺序；链深为样本同文法的外推 ⇒ §12#25 待实机确认",
+  "uniquify 缺省后缀到秒（_YYYYMMDD_HHMMSS，§0.4-9）：同日重跑不撞名；--clean 只清成员（DELETE … MEM 未直证，§12#16）且重建容器带新的运行戳、绝不复用刚清场的名字",
+  "宏不写 INPUT BEGIN/END/FINISH（契约 §l.3.1；DbOptions.input_wrap=True 可写）"
+ ],
+ "safety": {
+  "forbidden_names_scanned": true,
+  "forbidden_hits": [],
+  "clean_targets": [],
+  "clean_targets_owned": true,
+  "ascii_only": true,
+  "containers": {
+   "catalogue_user": "/PKPM_JWD_USER_SELFTEST",
+   "catalogue_stss": "/PKPM_JWD_STSS_SELFTEST",
+   "spec_world_user": "/PKPM_JWD_USER_SECTION_SELFTEST",
+   "spec_world_lib": "/PKPM_JWD_LIB_SELFTEST"
+  }
+ }
+}

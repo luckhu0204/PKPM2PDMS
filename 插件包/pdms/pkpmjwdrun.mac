@@ -1,0 +1,31 @@
+-- ===========================================================================
+-- PKPM-JWD导入导出 —— PDMS 命令行入口宏
+-- 文件   : pkpmjwdrun.mac          落盘: GBK 无 BOM + CRLF，注释用 --
+-- 用法   : 在 PDMS DESIGN 模块命令行执行（子目录下的宏不进宏搜索路径，
+--          必须全路径加载；同 PMLLIB\TIANGONG\tiangong_v2.mac 头部的既有说明）：
+--              $m "%PMLLIB%/pkpmjwd/pkpmjwdrun.mac"
+-- 效果   : 打开操作窗体 !!pkpmjwd（show !!表单名 —— 同
+--          PMLLIB\TIANGONG\tiangong_v2.mac 的 "show !!tgMain"）
+-- 菜单   : 装完菜单后由 design.uic 的
+--          <Command><Type>Macro</Type><Macro>show !!pkpmjwd</Macro></Command>
+--          直接打开窗体，本宏只是命令行兜底入口
+-- 唯一化 : 本宏先 $M 预载命名唯一化函数（CONTRACT v3 §o：重名自动加 re/re2/…）；
+--          macgen 生成的导入宏头部也会自带同样的 $M 预载行（§o.4 模板），
+--          因此单独 $M 导入宏也能工作。窗体「改名统计」栏显示本次改名个数。
+--          （$M 加载 %PMLLIB% 下 .pmlfnc 的出处：
+--            admin\forms\adminapplic.pmlfrm:205
+--            $M "%PMLLIB%/limbo/functions/moduleswitch.pmlfnc"）
+-- ===========================================================================
+
+-- 预载命名唯一化函数；失败不中止（窗体对未加载有 handle any 兜底，
+-- 导入宏头部还有自己的 $M 预载行）
+$P PKPM-JWD导入导出：预载命名唯一化函数 …
+$M "%PMLLIB%/pkpmjwd/pkpmjwduniquename.pmlfnc"
+   handle any
+      $P PKPM-JWD：唯一化函数预载失败（不影响打开窗体；导入宏会自带 $M 预载行）
+   endhandle
+
+$P PKPM-JWD导入导出：加载操作窗体 …
+show !!pkpmjwd
+
+-- End of file pkpmjwdrun.mac

@@ -1,0 +1,53 @@
+{
+ "column_chars": null,
+ "contract": "spec/CONTRACT.md §k.2",
+ "dll_siblings": {
+  "names_total": 2326,
+  "rows_with": 576,
+  "rule": "recon §2.6 的 DLL 名集（norm_pkpm2 同键、行内未记录的拼写），与 test/acceptance_r2.py _dll_variant_index 同一规则",
+  "source": "_dll_tokens.json + _dll_pairs_full.json"
+ },
+ "encoding": "UTF-8 with BOM",
+ "generated_by": "test/build_section_table.py",
+ "line_ending": "CRLF",
+ "output": "engine/section_table.csv",
+ "output_bytes_with_bom": 4835597,
+ "output_columns": [
+  "key",
+  "pkpm_name",
+  "family_code",
+  "family_name_cn",
+  "kind",
+  "shapeval",
+  "dims_json",
+  "mat",
+  "pdms_spec_path",
+  "pdms_catalogue",
+  "is_parametric",
+  "params_json",
+  "confidence",
+  "source",
+  "extra_json"
+ ],
+ "output_rows": 3176,
+ "output_sha256_no_bom": "d96f5cff906062038c6eea351f129e356a85c5f38930586a4fda39e2a59446e8",
+ "schema": "section_table/1.0",
+ "source": "D:\\AI_Work\\PKPM数据解析\\_recon\\dbsect\\pkpm_pdms_section_table.csv",
+ "source_rows": 3176,
+ "source_sha256": "fc19f317be9cf9d0f225bf3b54571ef1bb8c4d92d154655708877219ca8ec597",
+ "stats": {
+  "confidence": {
+   "high": 1146,
+   "low": 597,
+   "medium": 1433
+  },
+  "family_code_known": 2335,
+  "is_parametric_true": 15,
+  "keys_unique": 3176,
+  "kind_known": 7,
+  "pdms_spec_path_unique": 3176,
+  "pkpm_name_nonempty": 2835,
+  "pkpm_name_unique": 2835,
+  "shapeval_nonempty": 2335
+ }
+}

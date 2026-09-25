@@ -1,0 +1,57 @@
+///截面匹配补充（本文件属于 PKPM-JWD导入导出 实施包，**不改动**用户原件；契约 §e.4/§g）
+// 语法与 PKPM转PDMS截面匹配文件.txt 完全相同：<PKPM 截面名>, <PDMS 规格路径>
+// 编码 GBK / CRLF / 无 BOM；加载顺序 用户原件 -> 本文件；同名左值以本文件为准（会记 warnings）
+//
+// ===== 为什么需要本文件 ==================================================
+// 用户原件里**没有**板/墙条目：.pdt 的墙板截面名就是 T<厚度mm>（pdt_format.md §2.7 实测
+// T600/T120/T120/T100），而契约 §e.3 规定板/墙只能用 T<厚度> 键去查规格，
+// 原件无条目 => 必须在补充文件里显式给出（契约 §e.3 末行 / §e.4）。
+// 下面 3 条 = 1_PM.pdt 样本用到的全部厚度（T600 墙 4 面；T120/T100 板 331 块）。
+// 右侧路径请按**你自己的 PDMS 等级库**核对/替换：契约 §e.4 给的示例命名就是
+// /Concrete_Slab-SPEC/ 与 /Concrete_Wall-SPEC/（后者另有本机插件的旁证：
+// pdms_target.md §3.3 从 PDMSxCA_Addin121.dll 里提出字面量 "/Concrete_Wall-SPEC"）。
+// 注意：随附的 PKPM（PDMS数据库）.txt 只是**钢材**目录宏（57 个 SPCOMPONENT 属主全是钢截面），
+//   所以这 3 条必然被 SectionMap.extra_issues() 报"不在目录宏里"——那是预期，不是错误；
+//   SectionMap.validate()（契约 §e.6，原件基线 257 条坏映射）只校验用户原件，不受本文件影响。
+T120, /Concrete_Slab-SPEC/T120
+T100, /Concrete_Slab-SPEC/T100
+T600, /Concrete_Wall-SPEC/WALL-600
+//
+// ===== 本样本已由原件覆盖、故意**不**重复的族（备查，别误加）===============
+// 两个样本里出现的 303 族截面，原件已用 ShapeVal 打包串解出的
+// <冷弯库族码>-<规格串> 键（契约 §a.4 / §e.1 候选键 2）命中，实测 3/3 全部命中：
+//   薄壁方钢管 6-B250*10.00 -> /RECT_SQUARE6728_2002-SPEC/B250*10.00  (jwd pkpmColSect)
+//   薄壁方钢管 6-B200*10.00 -> /RECT_SQUARE6728_2002-SPEC/B200*10.00  (jwd pkpmBraceSect)
+//   热轧无缝圆钢管 1-D194X8.0 -> /TUBE_TUBE-SPEC/D194X8.0              (jwd pkpmColSect)
+//   薄壁方钢管 GB50018 那一支在原件里是 3-B* -> /RECT_SQUARE50018-SPEC/B*
+// 注意：若把 "薄壁方钢管: B25" 这类**截面原名**写进来，会先命中契约 §e.1 的第 1 级，
+//   Resolution.source 从 'shapeval' 变成 'name'（报告口径变化，契约 §h 的示例正是
+//   source='shapeval'），因此这里**刻意不写**这些原名条目。
+// 同理，矩形混凝土截面（.jwd Kind=1 / .pdt KIND=1）走 §e.3 的 RECT 参数化族
+// （/USER_RECT-SPEC/Rectangle_Profile + DESP=[B,H]），不需要、也不应写进本文件。
+//
+// ===== 点名任何一个截面：候选键 5「<Kind>#<ShapeVal 参数体>」（契约 §e.1）=====
+// 原件确实没有条目的截面，可以用它复现（只需 ShapeVal 原文）：
+//   圆形4800, /USER_CIRCLE-SPEC/Circle_Profile
+//        ^ 1_PM.pdt 的 SHAPE=3（B1=4800=直径，pdt_format.md §5.3）。原件无此名；
+//          它走的是下面的 @FAMILY 推断（KIND=3 已是圆形），此处只留模板备查。
+
+// ===== 推断族指令行（契约 §e.4a / §e.1a；本文件是唯一可改的地方）=============
+// 语法：@FAMILY <Kind> = <族键|none>     （注意：这一行没有逗号，不是"左值,右值"）
+//   @FAMILY 3 = CIRCLE   启用：Kind=3 的单尺寸截面按圆形族解析
+//                        → SPREF /USER_CIRCLE-SPEC/Circle_Profile + DESP <直径>
+//                        → 报告里 status='inferred'（不是 resolved）并带 evidence
+//   @FAMILY 3 = none     停用：回到 status='unresolved'（宏里只留 -- UNRESOLVED SECTION 标记）
+//
+// 为什么是 CIRCLE（证据，详见 spec/CONTRACT.md §e.3 的 Kind=3 行与 §0.4-1 变更记录）：
+//   ① 1_PM.pdt:2387-2388  ID=1009, NAME=圆形4800, SHAPE=3 / KIND=3, B1=4800
+//      → Shape/Kind=3 就是"圆形"，B1 承载直径；
+//   ② 同一 JLCJ2 模型把「薄壁方钢管: B20」归 Kind=303（pkpmBraceSect ID=62965）→ 排除方管；
+//   ③ PKPM（PDMS数据库）.txt:2502-2513  /USER_CIRCLE 的 DTSET 只有一个参数
+//      DKEY D / PTYP DIST / PPRO ( ATTRIB DESP[1] ) / NUMB 1 → DESP 只有一个数=直径；
+//   ④ PKPM转PDMS截面匹配文件.txt:27  CIRCLE, /USER_CIRCLE-SPEC/Circle_Profile（原件自己的约定）。
+// 残余风险（必须随交付物一起给用户）：不能 100% 排除 d=20 是别的单尺寸族；影响面仅本样本
+//   12 根屋面水平支撑（pkpmBraceSect ID=32335，ShapeVal='3,20,5,32335,'）。
+//   注意：若把本行改成 none，宏里这 12 根构件将不再有 SPREF/DESP（验收标准 1「每构件有 SPREF 或
+//     DESP」会随之不成立）——那是故意的：宁可少写规格，也不写没证据的规格。
+@FAMILY 3 = CIRCLE

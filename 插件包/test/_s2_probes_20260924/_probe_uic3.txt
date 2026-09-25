@@ -1,0 +1,17 @@
+===== Aveva.ApplicationFramework.Presentation.dll
+    <Instance>k__BackingField
+    Instance
+    commandType
+===== Aveva.ApplicationFramework.Presentation.Implementation.dll
+    Instance
+    commandType
+===== Aveva.ApplicationFramework.Presentation.Customize.dll
+    Class
+    Class: 
+    Command Class
+    CommandType
+    Instance
+    commandType
+===== Aveva.ApplicationFramework.dll
+    <Instance>k__BackingField
+    Instance

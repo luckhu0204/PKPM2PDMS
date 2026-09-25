@@ -1,0 +1,281 @@
+------------------------------------------------------------------------------
+-- PKPM-JWD导入导出 —— PDMS 侧「导出数据库（目录/规格）」函数
+-- 文件   : pkpmjwddbexport.pmlfnc      落盘: GBK 无 BOM + CRLF，注释一律用 --
+--
+-- 入口   : !!pkpmjwddbexport(!outFile is STRING) is STRING
+--            缺省：自动遍历出根（全部 CATALOGUE + 全部 SPWLD），选项 TABULATE 0 ；
+--            返回 'OK|file=…|bytes=…|roots=…|cata=…|spwl=…|sprf=…|spco=…|first=…'
+--          !!pkpmjwddbexportWith(!outFile is STRING, !itemsText is STRING, !options is STRING)
+--            显式给根与选项（!itemsText = 空格分隔的元素全名；空则回退自动遍历）
+--          !!pkpmjwddbroots() is STRING            -- 遍历出根（全名，空格分隔）
+--          !!pkpmjwddbinventory() is STRING        -- 按类型计数（预检 / 与 dbparse 交叉核对）
+--          !!pkpmjwddbcounts(!container is DBREF)  -- 某容器的直接子元素按类型计数
+--          !!pkpmjwddbdate() is STRING             -- 头尾注释里的日期文本
+--
+-- 产物   : 与用户原件 `PKPM（PDMS数据库）.txt` 同格式的 DB Listing 文本
+--          （`$S-` 头 → 核心写的 INPUT BEGIN … INPUT END/FINISH → `LABEL/handle/$S+/RETURN ERROR/endhandle` 尾），
+--          供 Python 侧 engine/dbparse.py 解析（契约 v2 §l.5 的 12 条规则）。
+--
+-- == 为什么这里不逐元素手写这份文本（重要，不是偷懒）==
+--   这份文本是 PDMS 核心 DATAL/DATALOG 引擎的产物，有 24 条文本级坑：
+--   `$` 续行 + 纯值续行、类型全名/缩写混用、`OLD` 无 `END`、`END` 可省、
+--   词值含空格且不加引号、`PPRO ( ATTRIB DESP[n] )` 表达式、`NARE`/`PSTR`/`GSTR`/`DTRE`/`CATR`
+--   的“序号+宿主”引用、`LOCK` 零值属性、负数两种写法……（逐条带样本行号：
+--   _recon/db_pdms_catalogue.md §5.3 坑清单 1..24）。
+--   手写 PML 属性 dump 无法稳定复现它；PDMS 自己也不是手写的 —— `rptoutput.pmlfrm` 只是
+--   「ALPHA FILE 打开输出文件 + 写头尾注释 + 核心 OUTPUT 命令出正文」的包装。
+--   本函数照抄这一机制（每条都在本机 PDMS 安装内有出处）：
+--     rptoutput.pmlfrm:707,737         OUTPUT $!options $!itemsText        ← 正文由核心写
+--     rptoutput.pmlfrm:724-729         头部 6 行 WRITEALPHAFILE（逐字）
+--     rptoutput.pmlfrm:3584-3596       footerComment() 尾部 9 行（逐字）
+--     rptoutput.pmlfrm:744             调用方 comment = 'End Data Listing    Date : … '
+--     实测（本次会话比对用户样本 L1/L70300）：WRITEALPHAFILE 会去掉行尾空格 ——
+--     rptoutput 的字面量 `'$S-  -- Synonym translation OFF '`（尾空格）与样本实际字节
+--     `$S-  -- Synonym translation OFF`（无尾空格）一致；本文件照抄字面量，产物同字节。
+--     rptoutput.pmlfrm:2887            ALPHA FILE "$!文件" $!模式
+--     rptoutput.pmlfrm:2302-2307,734-737   传给 OUTPUT 的是元素 fullName（不是 name）
+--     rptoutput.pmlfrm:2862-2870       先 object FILE(...) 校验，再 ALPHA FILE
+--     rptoutput.pmlfrm:691             !options = … & 'TABULATE' & !tabOpt
+--     rptoutputopts.pmlfrm:144-163     AVEVA 默认选项：standard+udas+connections => 无 PASS/NOUDA/BRIEF，
+--                                      TABULATE 用 ' 0 ' => 产物无缩进（与用户样本一致）
+--     nucdesooutput.pmlobj:52-79       非窗体 PML 里 alpha file / writealphafile / output 的实际用法
+--                                      （两遍式：output pass 1 = NEW…END，pass 2 = OLD…）
+--     mds\common\functions\output.pmlfnc:32-36      OUTPUT 可在 define function 里执行
+--     mds\design\objects\mdshealthchkdata.pmlobj:1193,1195          ALPHA FILE / ALPHA FILE END
+--     pipefabricationmanager\design\objects\pfpipeconsistencycheck.pmlobj:113-120
+--                                      全路径写法 + 事后 object FILE 读回
+--   遍历用到的类型码与集合函数（全部有本机出处）：
+--     common\functions\collectallfor.pmlfnc:35   define function !!collectAllFor(!types,!expr,!item) is ARRAY
+--     common\functions\findspecworlds.pmlfnc:41  !!collectAllFor( |SPWL|, !with, WORLD )
+--     common\functions\findspecs.pmlfnc:56       !!collectAllFor(|SPEC|, !with, !spwls[!index] )
+--     admin\forms\admdbset.pmlfrm:224            !!collectAllFor('DB','',!!ce)   ← 表达式可空
+--     common\functions\findfirstmember.pmlfnc:37,43,46  .mCount() / .members[i] / .type
+--     paragon\objects\cgeocataupgrade.pmlobj:282 var !catas collect all CATA      ← 目录 = CATA
+--     paragon\forms\catcreate.pmlfrm:138-179,187-235   elementTypes[]/longTypes[] 两表（Catalogue=CATA 等）
+--     paragon\objects\catrefdata.pmlobj:263-292        同上（两份表一致）
+--     paragon\objects\catdtseelement.pmlobj:140,148,590   DATA 类型码
+--     paragon\objects\catgetelement.pmlobj:240,339        TEXT 类型码
+--     paragon\objects\cgeocataupgrade.pmlobj:510          PLIN（PLINE 的缩写）
+--     limbo\functions\clock.pmlfnc:31,34        define function !!clock() is CLOCK / object CLOCK()
+--     common\objects\clock.pmlobj:23-38          CLOCK 的 .dom/.month/.year/.date/.time
+--     common\functions\dbchangesinit.pmlfnc:50,60-73    函数里 !!clock() 及其成员的用法
+--
+-- 未实机验证（必须知道）：本文件只做过静态检查与逐条出处对照，**没有在 PDMS 里跑过**。
+--   待实机确认：(1) `alpha file` / `output` 在 define function 里的可执行性；
+--   (2) 产物行分隔符；(3) 在 Paragon 之外（Design）运行时 collectAllFor 的 dbType 范围。
+--   替代路径（若上面任一条不成立）见同目录 README.txt「导出数据库（目录/规格）」一节。
+------------------------------------------------------------------------------
+
+
+-- ---------------------------------------------------------------------------
+-- 日期文本（头尾注释用；dbparse 只用于溯源、不解析 —— _recon §5.3 坑 24）
+-- ---------------------------------------------------------------------------
+define function !!pkpmjwddbdate() is STRING
+
+   !clock = !!clock()
+   return !clock.dom.string() & '  ' & !clock.month & ' ' & !clock.year.string() & ' ' & !clock.time
+
+endfunction
+-- End of function !!pkpmjwddbdate
+
+
+-- ---------------------------------------------------------------------------
+-- 容器直接子元素按类型计数：返回 'TYPE=n TYPE=n …'（按首次出现顺序）
+-- 只用 .mCount() / .members[i] / .type —— 不需要预知任何类型码
+-- ---------------------------------------------------------------------------
+define function !!pkpmjwddbcounts(!container is DBREF) is STRING
+
+   !names = object ARRAY()
+   !counts = object ARRAY()
+   !n = 0
+   do !i from 1 to !container.mCount()
+      !t = !container.members[!i].type
+      !k = 0
+      do !j from 1 to !n
+         if (!k eq 0 and !names[!j] eq !t) then
+            !k = !j
+         endif
+      enddo
+      if (!k eq 0) then
+         !counts[!k] = !counts[!k] + 1
+      else
+         !n = !n + 1
+         !names[!n] = !t
+         !counts[!n] = 1
+      endif
+   enddo
+
+   !out = ''
+   do !j from 1 to !n
+      !out = !out & !names[!j] & '=' & !counts[!j].string() & ' '
+   enddo
+   return !out
+
+endfunction
+-- End of function !!pkpmjwddbcounts
+
+
+-- ---------------------------------------------------------------------------
+-- 自动遍历出导出根：全部 CATALOGUE（CATA）+ 全部 SPWLD（SPWL），空格分隔的全名
+-- ---------------------------------------------------------------------------
+define function !!pkpmjwddbroots() is STRING
+
+   !out = ''
+   !cates = !!collectAllFor('CATA', '', WORLD)
+   do !c values !cates
+      !out = !out & !c.fullName & ' '
+   enddo
+   !spwls = !!collectAllFor('SPWL', '', WORLD)
+   do !w values !spwls
+      !out = !out & !w.fullName & ' '
+   enddo
+   return !out
+
+endfunction
+-- End of function !!pkpmjwddbroots
+
+
+-- ---------------------------------------------------------------------------
+-- 按类型计数清单（预检 + 给 dbparse 的交叉核对提供地面真值）
+-- 类型码全部来自本机安装（见文件头出处）；某类型在该库不存在时得 0，不报错
+-- ---------------------------------------------------------------------------
+define function !!pkpmjwddbinventory() is STRING
+
+   !out = 'INV'
+   !out = !out & '|CATA=' & arraySize(!!collectAllFor('CATA', '', WORLD)).string()
+   !out = !out & '|SPWL=' & arraySize(!!collectAllFor('SPWL', '', WORLD)).string()
+   !out = !out & '|STSE=' & arraySize(!!collectAllFor('STSE', '', WORLD)).string()
+   !out = !out & '|STCA=' & arraySize(!!collectAllFor('STCA', '', WORLD)).string()
+   !out = !out & '|TEXT=' & arraySize(!!collectAllFor('TEXT', '', WORLD)).string()
+   !out = !out & '|DTSE=' & arraySize(!!collectAllFor('DTSE', '', WORLD)).string()
+   !out = !out & '|DATA=' & arraySize(!!collectAllFor('DATA', '', WORLD)).string()
+   !out = !out & '|PTSE=' & arraySize(!!collectAllFor('PTSE', '', WORLD)).string()
+   !out = !out & '|PLIN=' & arraySize(!!collectAllFor('PLIN', '', WORLD)).string()
+   !out = !out & '|GMSE=' & arraySize(!!collectAllFor('GMSE', '', WORLD)).string()
+   !out = !out & '|SPRF=' & arraySize(!!collectAllFor('SPRF', '', WORLD)).string()
+   !out = !out & '|SPEC=' & arraySize(!!collectAllFor('SPEC', '', WORLD)).string()
+   !out = !out & '|SELE=' & arraySize(!!collectAllFor('SELE', '', WORLD)).string()
+   !out = !out & '|SPCO=' & arraySize(!!collectAllFor('SPCO', '', WORLD)).string()
+   return !out
+
+endfunction
+-- End of function !!pkpmjwddbinventory
+
+
+-- ---------------------------------------------------------------------------
+-- 显式版：!outFile 输出文件；!itemsText 根（元素全名，空格分隔，空则自动遍历）；
+--         !options 传给核心 OUTPUT 的选项（空则用 'TABULATE 0 '）
+-- ---------------------------------------------------------------------------
+define function !!pkpmjwddbexportWith(!outFile is STRING, !itemsText is STRING, !options is STRING) is STRING
+
+   if (!outFile.unset()) then
+      return 'ERR|导出文件路径为空'
+   endif
+   if (!outFile.length() le 0) then
+      return 'ERR|导出文件路径为空'
+   endif
+
+   !items = !itemsText
+   if (!items.unset()) then
+      !items = !!pkpmjwddbroots()
+   endif
+   if (!items.length() le 0) then
+      !items = !!pkpmjwddbroots()
+   endif
+   if (!items.length() le 0) then
+      return 'ERR|没有找到可导出的根（CATA/SPWL 都是 0）；请在 PARAGON 模块打开 Catalogue 库后重跑'
+   endif
+
+   !opts = !options
+   if (!opts.unset()) then
+      !opts = 'TABULATE 0 '
+   endif
+   if (!opts.length() le 0) then
+      !opts = 'TABULATE 0 '
+   endif
+
+   !date = !!pkpmjwddbdate()
+
+   -- 打开 alpha 文件：核心把 OUTPUT 的正文写进它（rptoutput.pmlfrm:2887 同写法）
+   alpha file "$!outFile" over
+   handle ANY
+      return 'ERR|打不开输出文件（ALPHA FILE）： ' & !outFile & ' | ' & !!error.text
+   endhandle
+
+   -- 头部 6 行：逐字取自 rptoutput.pmlfrm:724-729（标号固定 /PKPKERR；
+   -- 读方 dbparse 丢弃 LABEL/handle 段，契约 §l.5 规则 2/8）
+   writealphafile '$S-  -- Synonym translation OFF '
+   writealphafile '-- ----------------------------------------------------------------'
+   writealphafile '-- Data Listing    Date : $!date '
+   writealphafile ''
+   writealphafile 'ONERROR GOLABEL /PKPKERR'
+   writealphafile ''
+
+   -- 正文：交给核心（INPUT BEGIN/END/FINISH 也由核心写，本函数不模仿）
+   output $!opts $!items
+   handle (2, 731)
+      -- 无效引用/属性：与 rptoutput.pmlfrm:707-710 同样的忽略策略
+   endhandle
+
+   -- 尾部 9 行：逐字取自 rptoutput.pmlfrm:3586-3596 + 调用方注释行 :744
+   writealphafile '-- Switch synonyms back on if an error occurs.'
+   writealphafile 'LABEL /PKPKERR'
+   writealphafile 'handle ANY'
+   writealphafile '$S+'
+   writealphafile 'RETURN ERROR'
+   writealphafile 'endhandle'
+   writealphafile ''
+   writealphafile '-- End Data Listing    Date : $!date '
+   writealphafile '$S+  -- Synonym translation ON '
+   writealphafile '-- ----------------------------------------------------------------'
+   writealphafile ''
+
+   alpha file end
+
+   -- 回读校验（pfpipeconsistencycheck.pmlobj:119-120 同做法）
+   !file = object FILE(!outFile)
+   if (!file.exists().not()) then
+      return 'ERR|文件未生成： ' & !outFile
+   endif
+   !size = !file.size()
+   !head = !file.readFile(3)
+   !first = ''
+   if (arraySize(!head) gt 0) then
+      !first = !head[1]
+   endif
+   !firstOk = FALSE
+   if (!first eq '$S-  -- Synonym translation OFF ') then
+      !firstOk = TRUE
+   endif
+   if (!first eq '$S-  -- Synonym translation OFF') then
+      !firstOk = TRUE
+   endif
+
+   !res = 'OK|file=' & !outFile
+   !res = !res & '|bytes=' & !size.string()
+   !res = !res & '|roots=' & !items
+   !res = !res & '|cata=' & arraySize(!!collectAllFor('CATA', '', WORLD)).string()
+   !res = !res & '|spwl=' & arraySize(!!collectAllFor('SPWL', '', WORLD)).string()
+   !res = !res & '|sprf=' & arraySize(!!collectAllFor('SPRF', '', WORLD)).string()
+   !res = !res & '|spco=' & arraySize(!!collectAllFor('SPCO', '', WORLD)).string()
+   !res = !res & '|first=' & !first
+   if (!firstOk) then
+      !res = 'WARN|首行不是 $S- 头|' & !res
+   endif
+   return !res
+
+endfunction
+-- End of function !!pkpmjwddbexportWith
+
+
+-- ---------------------------------------------------------------------------
+-- 缺省入口：自动遍历根 + 缺省选项
+-- ---------------------------------------------------------------------------
+define function !!pkpmjwddbexport(!outFile is STRING) is STRING
+
+   return !!pkpmjwddbexportWith(!outFile, '', '')
+
+endfunction
+-- End of function !!pkpmjwddbexport
+
+-- End of file pkpmjwddbexport.pmlfnc

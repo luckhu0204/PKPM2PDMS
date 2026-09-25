@@ -1,0 +1,38 @@
+=== 0. 手工构造的小模型：JSON 往返 ===
+  [OK] JSON 往返字节一致 (1157 bytes)
+  [OK] tuple 往返 
+  [OK] 小模型 validate() 无问题 []
+  [OK] 零长度构件被 E- 抓到 
+  [OK] 多边形<3 顶点被 E- 抓到 
+  [OK] Resolution 默认 status=unresolved 
+  [OK] CONTRACT_VERSION 1.0
+
+=== 1. 真实 JWD：按契约公式装配 Model 并 validate() ===
+  counts = {'levels': 5, 'joints': 382, 'sections': 28, 'members': {'beam': 598, 'column': 200, 'brace': 13}, 'members_total': 811, 'slabs': 222, 'slabs_holes': 29, 'slabs_with_thickness': 80, 'walls': 0, 'loads': {'beam-line': 77, 'joint-point': 44}, 'loads_total': 121}
+  [OK] 计数与侦察报告一致 {'levels': 5, 'joints': 382, 'members_total': 811, 'slabs': 222, 'slabs_holes': 29, 'loads_total': 121, 'sections': 28}
+  [OK] 构件分类计数 {'beam': 598, 'column': 200, 'brace': 13}
+  [OK] 荷载分类计数 
+  validate: E-0  W-6
+     W-MEM-SHORT x 5
+     W-MEM-ZRANGE x 1
+  [OK] 真实 JWD 上无 E- 项（契约不变式成立） 
+  [OK] HDiff2=6650 的异常支撑落在 W-MEM-ZRANGE 
+  [OK] 极短梁落在 W-MEM-SHORT 
+
+=== 2. ShapeVal 解码规则 + §e 候选键规则 ===
+  Kind=1    n=14  dims[0]={'B': 300.0, 'H': 600.0}
+  Kind=2    n=2   dims[0]={'Tw': 10.0, 'H': 500.0, 'B1': 250.0, 'T1': 16.0, 'B2': 250.0, 'T2': 16.0}
+  Kind=3    n=1   dims[0]={'d': 20.0}
+  Kind=26   n=8   dims[0]={'family': 39, 'subtype': 1, 'H': 450.0, 'B': 200.0, 'tf': 14.0, 'tw': 9.0}
+  Kind=303  n=3   dims[0]={'family': 77, 'spec_str': 'B250*10.00', 'd': 250.0, 'b': 250.0, 'lib_family': 6}
+  303: 薄壁方钢管: B25       key=6-B250*10.00     -> /RECT_SQUARE6728_2002-SPEC/B250*10.00
+  303: 热轧无缝圆钢管:         key=1-D194X8.0       -> /TUBE_TUBE-SPEC/D194X8.0
+  303: 薄壁方钢管: B20       key=6-B200*10.00     -> /RECT_SQUARE6728_2002-SPEC/B200*10.00
+  [OK] Kind=303 的 <库族码>-<规格串> 全部命中原件 
+  Kind=26 共 8：只按 Name 命中 7 个（未中 ['[18a']）；叠加 <子类型>-<Name> 候选后未中 0 个 []
+  [OK] Kind=26 只用 Name 时 [18a 未命中（需子类型前缀） 
+  [OK] Kind=26 用 {Name, <子类型>-<Name>} 两个候选键后 8/8 命中 
+  [OK] [18a -> 2-[18a -> /C_LIGHT-SPEC/CL18a 
+
+=== 结论 ===
+FAIL 项: 0 

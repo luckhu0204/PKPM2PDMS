@@ -1,0 +1,1106 @@
+==============================================================================
+collect_to_workspace.py —— 成品归集到工作区（只新增 / 不覆盖 / 不删除 / 不碰 G 盘）
+==============================================================================
+开始时间       : 2026-09-25 19:53:42
+插件包源目录   : D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出
+交付目录(目标) : D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件
+安装程序源目录 : D:\AI_Work\PKPM数据解析\安装包程序（exe 在其 dist\ 下，安装说明.txt 在其根下）
+本次参数       : list_only=False
+跳过规则       : __pycache__/test\_dev/test\_acc_tmp 及同类临时目录、_备份_待删_*、
+                 *.pyc/*.pyo、交付脚本运行日志（只影响复制，不做任何删除）
+写入的文件     : <目标>\插件包\...、<目标>\安装程序\...、交付清单.txt、从这里开始.txt
+                 两个 txt 由本脚本生成，UTF-8 带 BOM + CRLF
+
+------------------------------------------------------------------------------
+【1】目标现状
+------------------------------------------------------------------------------
+目标目录已存在：D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件   （763 个文件 / 187,121,843 B (178.45 MiB)）
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\安装程序
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\SHA256哈希清单.txt
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\交付清单.txt
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\从这里开始.txt
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\安装程序\PKPM-JWD_安装程序_v1.exe
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\安装程序\PKPM-JWD_引擎_v1.exe
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\安装程序\安装说明.txt
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\deliver
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\docs
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\engine
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\install
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\pdms
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\pdms-net
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\spec
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\test
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\计划
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\README.txt
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\deliver\README.txt
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\deliver\collect_to_workspace.py
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\deliver\copy_to_plugin.py
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\docs\README.txt
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\docs\交付报告.md
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\docs\交付清单.md
+    D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\插件包\docs\使用说明.md
+    ...（共 31 项，仅列前 25 项）
+
+【刷新模式 --refresh】目标已存在：新增缺失文件、覆盖与源不一致的文件；
+  从不删除——目标多出的文件逐条记 STALE，留待人工处理。
+
+------------------------------------------------------------------------------
+【2】扫描插件包（将逐字节复制；先列清单再动手）
+------------------------------------------------------------------------------
+待复制文件数：799 个；合计 165,034,560 B (157.39 MiB)
+跳过目录 10 个 / 跳过文件 2 个（详见下方与交付清单）
+    SKIP-DIR  _备份_待删_20260924  <- 待删备份暂存区（非交付物）（10 文件）
+    SKIP-DIR  deliver\__pycache__  <- 缓存/临时目录（2 文件）
+    SKIP-DIR  engine\__pycache__  <- 缓存/临时目录（13 文件）
+    SKIP-DIR  engine\dist\_pybuild  <- 缓存/临时目录（15 文件）
+    SKIP-DIR  pdms-net\_selftest  <- 缓存/临时目录（35431 文件）
+    SKIP-DIR  test\__pycache__  <- 缓存/临时目录（20 文件）
+    SKIP-DIR  test\_acc_tmp  <- 缓存/临时目录（32 文件）
+    SKIP-DIR  test\_dev  <- 缓存/临时目录（本次任务点名跳过）（148 文件）
+    SKIP-DIR  test\_s3_cli\__pycache__  <- 缓存/临时目录（2 文件）
+    SKIP-DIR  test\_s6_scratch  <- 缓存/临时目录（26 文件）
+    SKIP-FILE deliver\_collect_to_workspace_log.txt  <- 交付脚本自己的运行日志
+    SKIP-FILE deliver\_copy_to_plugin_log.txt  <- 交付脚本自己的运行日志
+  将复制的文件（源相对路径 | 字节 -> 目标 <交付目录>\插件包\<同相对路径>）：
+    deliver\collect_to_workspace.py  |  50,197 B
+    deliver\copy_to_plugin.py  |  22,492 B
+    deliver\README.txt  |  1,130 B
+    docs\README.txt  |  1,510 B
+    docs\交付报告.md  |  93,803 B
+    docs\交付清单.md  |  14,741 B
+    docs\使用说明.md  |  19,622 B
+    docs\截面映射说明.md  |  41,269 B
+    docs\推断项_Kind3圆形截面.md  |  6,628 B
+    docs\数据库转化说明.md  |  19,075 B
+    docs\格式规范_JWD.md  |  25,253 B
+    docs\格式规范_PDT.md  |  16,158 B
+    docs\转化表说明.md  |  13,392 B
+    engine\canonical.py  |  33,504 B
+    engine\cli.py  |  126,688 B
+    engine\dbmacro.py  |  49,720 B
+    engine\dbparse.py  |  62,416 B
+    engine\dist\pkpmjwd_engine.exe  |  8,866,520 B
+    engine\dist\run_engine.cmd  |  910 B
+    engine\gui.py  |  40,245 B
+    engine\jwd_read.py  |  42,098 B
+    engine\jwd_write.py  |  83,457 B
+    engine\macgen.py  |  44,421 B
+    engine\pdms_dump.py  |  32,508 B
+    engine\pdt_read.py  |  40,636 B
+    engine\pdt_write.py  |  46,382 B
+    engine\README.txt  |  3,636 B
+    engine\secmap.py  |  37,452 B
+    engine\secmap_extra.txt  |  4,100 B
+    engine\section_table.csv  |  4,835,597 B
+    engine\section_table.meta.json  |  1,416 B
+    engine\sectionlib.py  |  107,281 B
+    install\install.ps1  |  14,421 B
+    install\README.txt  |  1,492 B
+    install\uninstall.ps1  |  10,121 B
+    pdms-net\build.cmd  |  1,641 B
+    pdms-net\deploy\deploy_pkpmjwd.py  |  10,004 B
+    pdms-net\deploy\undeploy_pkpmjwd.py  |  4,240 B
+    pdms-net\dist\PKPMJWD.dll  |  40,960 B
+    pdms-net\dist\pkpmjwd.uic  |  1,090 B
+    pdms-net\ENGINE_IO.md  |  12,668 B
+    pdms-net\EngineRunner.cs  |  9,388 B
+    pdms-net\PKLog.cs  |  2,022 B
+    pdms-net\pkpmjwd.uic  |  1,090 B
+    pdms-net\PKPMJWDAddin.cs  |  6,507 B
+    pdms-net\PKPMJWDForm.cs  |  31,951 B
+    pdms-net\PmlBridge.cs  |  5,153 B
+    pdms-net\README.txt  |  11,550 B
+    pdms\pkpmjwd.pmlfrm  |  9,912 B
+    pdms\pkpmjwddbexport.pmlfnc  |  13,213 B
+    pdms\pkpmjwdexport.pmlfnc  |  19,708 B
+    pdms\pkpmjwdrun.mac  |  1,589 B
+    pdms\pkpmjwduniquename.pmlfnc  |  10,050 B
+    pdms\README.txt  |  13,451 B
+    README.txt  |  2,692 B
+    spec\CONTRACT.md  |  205,757 B
+    spec\out\README.txt  |  1,028 B
+    spec\README.txt  |  2,021 B
+    test\_acc_check_override.py  |  2,730 B
+    test\_acc_check_override.txt  |  1,283 B
+    test\_acc_check_smoke.py  |  2,015 B
+    test\_acc_check_smoke.txt  |  6,980 B
+    test\_acc_negative_check.py  |  2,374 B
+    test\_acc_patch_extra.py  |  3,698 B
+    test\_acc_pkg_check_deliverables.txt  |  5,230 B
+    test\_acc_pkg_check_dump_grammar.txt  |  1,332 B
+    test\_acc_pkg_check_dump_to_jwd.txt  |  11,703 B
+    test\_acc_pkg_check_jwd_write_roundtrip.txt  |  6,949 B
+    test\_acc_pkg_check_markdown_tables.txt  |  325 B
+    test\_acc_pkg_check_pml.txt  |  760 B
+    test\_acc_pkg_test_contract_selfcheck.txt  |  2,287 B
+    test\_acc_probe.py  |  2,554 B
+    test\_acc_probe10.py  |  1,592 B
+    test\_acc_probe11.py  |  2,895 B
+    test\_acc_probe3.py  |  3,050 B
+    test\_acc_probe4.py  |  2,445 B
+    test\_acc_probe5.py  |  2,177 B
+    test\_acc_probe6.py  |  4,753 B
+    test\_acc_probe7.py  |  5,269 B
+    test\_acc_probe8.py  |  3,886 B
+    test\_acc_probe9.py  |  1,486 B
+    test\_acc_probe_cat.py  |  1,725 B
+    test\_acc_probe_cat2.py  |  1,883 B
+    test\_acc_probe_cat2.txt  |  306 B
+    test\_acc_probe_cat3.py  |  1,707 B
+    test\_acc_probe_cat3.txt  |  3,152 B
+    test\_acc_probe_cat4.py  |  2,181 B
+    test\_acc_probe_cat4.txt  |  22,484 B
+    test\_acc_probe_circle.py  |  2,112 B
+    test\_acc_probe_circle.txt  |  10,005 B
+    test\_acc_probe_dbout.py  |  1,412 B
+    test\_acc_probe_dbout.txt  |  1,978 B
+    test\_acc_probe_jwd.py  |  1,634 B
+    test\_acc_probe_jwd.txt  |  12,523 B
+    test\_acc_probe_pdtsec.py  |  1,626 B
+    test\_acc_probe_pdtsec.txt  |  4,307 B
+    test\_acc_probe_round.py  |  1,583 B
+    test\_acc_probe_round.txt  |  23,839 B
+    test\_acc_probe_unres.py  |  1,241 B
+    test\_acc_probe_wrn.py  |  2,087 B
+    test\_acc_probe_wrn.txt  |  6,513 B
+    test\_acc_r2_out\_probe1.txt  |  20,920 B
+    test\_acc_r2_out\_probe2.txt  |  132,253 B
+    test\_acc_r2_out\_probe4.json  |  38 B
+    test\_acc_r2_out\_r2_final.txt  |  30,249 B
+    test\_acc_r2_out\_r2_run1.txt  |  1,315 B
+    test\_acc_r2_out\_r2_run2.txt  |  29,955 B
+    test\_acc_r2_out\_r2_run3.txt  |  28,422 B
+    test\_acc_r2_out\_r2_run4.txt  |  28,324 B
+    test\_acc_r2_out\_r2_run5.txt  |  28,334 B
+    test\_acc_r2_out\_r2_run6.txt  |  28,037 B
+    test\_acc_r2_out\closure2.mac  |  13,814 B
+    test\_acc_r2_out\closure2.report.json  |  9,561 B
+    test\_acc_r2_out\db2jwd.report.json  |  567,549 B
+    test\_acc_r2_out\db2jwd_from_jwd2db.jwd  |  569,344 B
+    test\_acc_r2_out\db2pdt.report.json  |  4,749,490 B
+    test\_acc_r2_out\db2pdt_from_pdt2db.pdt  |  8,329 B
+    test\_acc_r2_out\db_table.csv  |  9,701,321 B
+    test\_acc_r2_out\dbsections.report.json  |  14,971 B
+    test\_acc_r2_out\frombuiltin.csv  |  4,815,297 B
+    test\_acc_r2_out\frombuiltin.json  |  4,819,648 B
+    test\_acc_r2_out\frombuiltin.report.json  |  1,390 B
+    test\_acc_r2_out\jwd2db.mac  |  30,067 B
+    test\_acc_r2_out\jwd2db.report.json  |  64,549 B
+    test\_acc_r2_out\jwd2pdms.mac  |  240,659 B
+    test\_acc_r2_out\jwd2pdms.report.json  |  61,684 B
+    test\_acc_r2_out\jwd2pdt.pdt  |  343,863 B
+    test\_acc_r2_out\jwd2pdt.report.json  |  109,046 B
+    test\_acc_r2_out\pdt2db.mac  |  21,904 B
+    test\_acc_r2_out\pdt2db.report.json  |  52,038 B
+    test\_acc_r2_out\pdt2pdms.mac  |  313,632 B
+    test\_acc_r2_out\pdt2pdms.report.json  |  50,244 B
+    test\_acc_r2_probe.py  |  4,872 B
+    test\_acc_r2_probe10.py  |  1,897 B
+    test\_acc_r2_probe11.py  |  2,816 B
+    test\_acc_r2_probe12.py  |  996 B
+    test\_acc_r2_probe13.py  |  798 B
+    test\_acc_r2_probe14.py  |  778 B
+    test\_acc_r2_probe2.py  |  1,886 B
+    test\_acc_r2_probe3.py  |  1,374 B
+    test\_acc_r2_probe4.py  |  3,977 B
+    test\_acc_r2_probe5.py  |  594 B
+    test\_acc_r2_probe6.py  |  2,986 B
+    test\_acc_r2_probe7.py  |  2,884 B
+    test\_acc_r2_probe8.py  |  4,920 B
+    test\_acc_r2_probe9.py  |  7,315 B
+    test\_acc_r2_regress.txt  |  12,181 B
+    test\_acc_r3_out\_r3_final.txt  |  11,332 B
+    test\_acc_r3_out\_r3_run1.txt  |  11,258 B
+    test\_acc_r3_out\r3.mac  |  384,970 B
+    test\_acc_r3_out\r3.report.json  |  62,717 B
+    test\_acc_r3_out\r3_jwd2pdms.mac  |  384,970 B
+    test\_acc_r3_out\r3_jwd2pdms.mac.report.json  |  62,797 B
+    test\_acc_r3_out\r3_pdt2pdms.mac  |  508,625 B
+    test\_acc_r3_out\r3_pdt2pdms.mac.report.json  |  91,011 B
+    test\_acc_r3_out\sandbox\DesignAddins.xml  |  88 B
+    test\_acc_r3_out\sandbox\DesignCustomization.xml  |  132 B
+    test\_acc_r3_out\sandbox_idem\DesignAddins.xml  |  88 B
+    test\_acc_r3_out\sandbox_idem\DesignAddins.xml.pkpmjwd-bak  |  88 B
+    test\_acc_r3_out\sandbox_idem\DesignCustomization.xml  |  132 B
+    test\_acc_r3_out\sandbox_idem\DesignCustomization.xml.pkpmjwd-bak  |  132 B
+    test\_acc_r3_out\sandbox_idem\PKPMJWD\_uninstalled_20260925-061322\engine_path.txt  |  26 B
+    test\_acc_r3_out\sandbox_idem\PKPMJWD\_uninstalled_20260925-061322\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sandbox_idem\PKPMJWD\_uninstalled_20260925-061322\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sandbox_idem\PKPMJWD\_uninstalled_20260925-061322\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\DesignAddins.xml  |  135 B
+    test\_acc_r3_out\sb17\DesignAddins.xml.pkpmjwd-bak  |  135 B
+    test\_acc_r3_out\sb17\DesignCustomization.xml  |  149 B
+    test\_acc_r3_out\sb17\DesignCustomization.xml.pkpmjwd-bak  |  149 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-061937\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-061937\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-061937\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-061937\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062037\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062037\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062037\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062037\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062040\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062040\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062040\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062040\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062042\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062042\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062042\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062042\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062126\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062126\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062126\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062126\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062129\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062129\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062129\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062129\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062132\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062132\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062132\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062132\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062155\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062155\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062155\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062155\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062158\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062158\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062158\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062158\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062201\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062201\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062201\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062201\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062214\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062214\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062214\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062214\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062303\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062303\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062303\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062303\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062330\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062330\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062330\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062330\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062401\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062401\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062401\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062401\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062404\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062404\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062404\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062404\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062406\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062406\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062406\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062406\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062420\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062420\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062420\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062420\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062535\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062535\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062535\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062535\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\pkpmjwduniquename.pmlfnc  |  9,562 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\engine_path.txt  |  34 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\PKPMJWD.dll  |  40,960 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\pkpmjwd.uic  |  1,090 B
+    test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\pkpmjwduniquename.pmlfnc  |  10,050 B
+    test\_acc_r3_probe1.py  |  4,141 B
+    test\_acc_r3_probe2.py  |  6,121 B
+    test\_acc_r3_probe3.py  |  1,007 B
+    test\_acc_r3_probe4.py  |  754 B
+    test\_acc_r3_probe5.py  |  928 B
+    test\_acc_run1.txt  |  12,170 B
+    test\_acc_run2.txt  |  12,181 B
+    test\_acc_run_final.txt  |  12,181 B
+    test\_acceptance_out\_last_run.txt  |  12,926 B
+    test\_acceptance_out\_r2_all_help.txt  |  8,197 B
+    test\_acceptance_out\_r2_cli_help.txt  |  1,541 B
+    test\_acceptance_out\_r2_h_db2jwd.txt  |  551 B
+    test\_acceptance_out\_r2_h_db2pdt.txt  |  746 B
+    test\_acceptance_out\_r2_h_dbsections.txt  |  857 B
+    test\_acceptance_out\_r2_h_jwd2db.txt  |  1,393 B
+    test\_acceptance_out\_r2_h_jwd2pdt.txt  |  806 B
+    test\_acceptance_out\_r2_h_pdms2pdt.txt  |  920 B
+    test\_acceptance_out\_r2_h_pdt2db.txt  |  1,385 B
+    test\_acceptance_out\_r2_h_pdt2jwd.txt  |  487 B
+    test\_acceptance_out\_r2_h_pdt2pdms.txt  |  1,048 B
+    test\_acceptance_out\_run_relaxed.txt  |  12,359 B
+    test\_acceptance_out\_run_strict.txt  |  12,926 B
+    test\_acceptance_out\_s6_cli_h1.txt  |  1,047 B
+    test\_acceptance_out\_s6_cli_h2.txt  |  720 B
+    test\_acceptance_out\_s6_cli_h3.txt  |  369 B
+    test\_acceptance_out\_s6_cli_help.txt  |  670 B
+    test\_acceptance_out\_s6_deliverables.txt  |  5,230 B
+    test\_acceptance_out\_s6_dryrun.txt  |  2,424 B
+    test\_acceptance_out\_s6_md1.txt  |  57 B
+    test\_acceptance_out\_s6_md2.txt  |  61 B
+    test\_acceptance_out\_s6_md3.txt  |  63 B
+    test\_acceptance_out\_s6_md4.txt  |  57 B
+    test\_acceptance_out\_s6_md4b.txt  |  57 B
+    test\_acceptance_out\_s6_md5.txt  |  57 B
+    test\_acceptance_out\_s6_md6.txt  |  69 B
+    test\_acceptance_out\_s6_md_final.txt  |  364 B
+    test\_acceptance_out\_s6_mdcheck.txt  |  482 B
+    test\_acceptance_out\_s6_rerun.txt  |  12,181 B
+    test\_acceptance_out\acc_fixture.jwd  |  569,344 B
+    test\_acceptance_out\acc_fixture.report.json  |  13,034 B
+    test\_acceptance_out\acc_fixture_dump.txt  |  880 B
+    test\_acceptance_out\JLCJ2.mac  |  384,970 B
+    test\_acceptance_out\JLCJ2.report.json  |  62,795 B
+    test\_acceptance_out\JLCJ2.roundtrip.jwd  |  798,720 B
+    test\_acceptance_r2_out\_r2_doc_rerun.txt  |  27,137 B
+    test\_acceptance_r2_out\r2_closure_jwd2db.mac  |  18,867 B
+    test\_acceptance_r2_out\r2_closure_jwd2db.report.json  |  10,187 B
+    test\_acceptance_r2_out\r2_closure_pdt2db.mac  |  11,109 B
+    test\_acceptance_r2_out\r2_closure_pdt2db.report.json  |  9,223 B
+    test\_acceptance_r2_out\r2_db2jwd.jwd  |  569,344 B
+    test\_acceptance_r2_out\r2_db2jwd.report.json  |  23,043 B
+    test\_acceptance_r2_out\r2_db2pdt.pdt  |  8,327 B
+    test\_acceptance_r2_out\r2_db2pdt.report.json  |  18,637 B
+    test\_acceptance_r2_out\r2_db_table.csv  |  9,701,321 B
+    test\_acceptance_r2_out\r2_dbsections.report.json  |  15,010 B
+    test\_acceptance_r2_out\r2_from_builtin.csv  |  4,835,597 B
+    test\_acceptance_r2_out\r2_from_builtin.json  |  4,837,644 B
+    test\_acceptance_r2_out\r2_from_builtin.report.json  |  1,417 B
+    test\_acceptance_r2_out\r2_jwd2db.mac  |  33,924 B
+    test\_acceptance_r2_out\r2_jwd2db.report.json  |  65,538 B
+    test\_acceptance_r2_out\r2_jwd2db_clean.mac  |  35,354 B
+    test\_acceptance_r2_out\r2_jwd2db_clean.report.json  |  65,794 B
+    test\_acceptance_r2_out\r2_jwd2pdms.mac  |  384,970 B
+    test\_acceptance_r2_out\r2_jwd2pdms.report.json  |  62,804 B
+    test\_acceptance_r2_out\r2_jwd2pdt.pdt  |  346,734 B
+    test\_acceptance_r2_out\r2_jwd2pdt.report.json  |  109,849 B
+    test\_acceptance_r2_out\r2_pdt2db.mac  |  14,730 B
+    test\_acceptance_r2_out\r2_pdt2db.report.json  |  92,502 B
+    test\_acceptance_r2_out\r2_pdt2pdms.mac  |  508,625 B
+    test\_acceptance_r2_out\r2_pdt2pdms.report.json  |  91,018 B
+    test\_db2jwd_out.txt  |  13,817 B
+    test\_db_out\closure.json  |  82,966 B
+    test\_db_out\fixture_gbk.txt  |  1,102 B
+    test\_db_out\from_jwd.mac  |  10,368 B
+    test\_db_out\from_pdt.mac  |  5,280 B
+    test\_db_out\selftest_db.mac  |  2,849,041 B
+    test\_dbg_db2pdt.txt  |  1,877 B
+    test\_dbg_fences.py  |  531 B
+    test\_dbg_out.txt  |  683 B
+    test\_deliverables_out.txt  |  7,004 B
+    test\_dll_probe.txt  |  1,895 B
+    test\_dump_chain_out.txt  |  12,194 B
+    test\_fingerprint.txt  |  1,325 B
+    test\_fixture_specs.txt  |  1,197 B
+    test\_grammar_out.txt  |  1,332 B
+    test\_jwd_read_stub.py  |  7,920 B
+    test\_jwdread_avail.txt  |  573 B
+    test\_nav2.txt  |  11,341 B
+    test\_nav3.txt  |  6,776 B
+    test\_nav_out.txt  |  10,015 B
+    test\_pdtw_out.txt  |  17,315 B
+    test\_probe5_out.txt  |  7,260 B
+    test\_probe6_out.txt  |  4,073 B
+    test\_probe7_out.txt  |  3,659 B
+    test\_r2_pkg_check_db2jwd_sections.txt  |  13,817 B
+    test\_r2_pkg_check_sectionlib_roundtrip.txt  |  219,035 B
+    test\_r2_pkg_check_v2_contract.txt  |  2,445 B
+    test\_r2_pkg_check_v2_db.txt  |  13,253 B
+    test\_r2_pkg_pdt_write_selfcheck.txt  |  17,152 B
+    test\_r2_probe_dedup.py  |  701 B
+    test\_r2_probe_dllpairs.py  |  2,191 B
+    test\_r2_probe_dllpairs.txt  |  4,351 B
+    test\_r2_probe_srcdll.py  |  2,223 B
+    test\_r2_probe_srcdll.txt  |  13,129 B
+    test\_r2_probe_tables.py  |  2,659 B
+    test\_r2_probe_tables.txt  |  6,511 B
+    test\_r2_probe_variant.py  |  2,920 B
+    test\_r2_probe_variant.txt  |  2,691 B
+    test\_r2_probe_variant2.py  |  2,718 B
+    test\_r2_probe_variant2.txt  |  284 B
+    test\_r2_run1.txt  |  27,081 B
+    test\_r2_run_final.txt  |  27,081 B
+    test\_r3_m2.txt  |  5,235 B
+    test\_r3_pkg_check_db2jwd_sections.txt  |  13,817 B
+    test\_r3_pkg_check_sectionlib_roundtrip.txt  |  219,072 B
+    test\_r3_pkg_check_v2_contract.txt  |  2,445 B
+    test\_r3_pkg_check_v2_db.txt  |  13,253 B
+    test\_r3_pkg_pdt_write_selfcheck.txt  |  17,326 B
+    test\_r3_probe_err.py  |  403 B
+    test\_r3_probe_fixes.py  |  7,252 B
+    test\_r3_probe_fixes.txt  |  2,188 B
+    test\_r3_probe_grep.py  |  411 B
+    test\_r3_probe_grep2.py  |  647 B
+    test\_r3_probe_identity.py  |  1,136 B
+    test\_r3_probe_ids.py  |  1,722 B
+    test\_r3_probe_ofchains.py  |  2,333 B
+    test\_r3_probe_ofchains.txt  |  4,517 B
+    test\_r3_probe_rtcmp.py  |  1,066 B
+    test\_r3_probe_secs.py  |  1,221 B
+    test\_r3_probe_secs.txt  |  2,840 B
+    test\_r3_run_final.txt  |  27,137 B
+    test\_r3_v1_regress.txt  |  12,181 B
+    test\_r4_collect_log.txt  |  97,048 B
+    test\_r4_collect_log2.txt  |  50,481 B
+    test\_r4_patch_docs.py  |  3,710 B
+    test\_r4_probe_after.py  |  1,890 B
+    test\_r4_probe_after.txt  |  1,167 B
+    test\_r4_probe_call.py  |  692 B
+    test\_r4_probe_collector.py  |  761 B
+    test\_r4_probe_delivery.py  |  2,636 B
+    test\_r4_probe_delivery.txt  |  9,240 B
+    test\_r4_probe_doc1.py  |  539 B
+    test\_r4_probe_docs.py  |  798 B
+    test\_r4_probe_docs.txt  |  8,289 B
+    test\_r4_probe_log.py  |  525 B
+    test\_r4_probe_macfmt.py  |  520 B
+    test\_r4_probe_r2fail.py  |  355 B
+    test\_r4_probe_rootfiles.py  |  676 B
+    test\_r4_probe_rootfiles.txt  |  7,111 B
+    test\_r4_probe_v1fail.py  |  250 B
+    test\_r4_r2_regress.txt  |  27,627 B
+    test\_r4_r2_regress2.txt  |  27,137 B
+    test\_r4_run_final.txt  |  9,939 B
+    test\_r4_run_final2.txt  |  9,939 B
+    test\_r4_v1_regress.txt  |  12,846 B
+    test\_r4_v1_regress2.txt  |  12,181 B
+    test\_r5_collect_log.txt  |  0 B
+    test\_r5_patch_pmlfnc.py  |  3,362 B
+    test\_r5_patch_pmlfnc2.py  |  1,124 B
+    test\_r5_patch_pmlfnc2_out.txt  |  164 B
+    test\_r5_patch_pmlfnc_out.txt  |  276 B
+    test\_r5_probe_exist.py  |  466 B
+    test\_r5_probe_exist.txt  |  941 B
+    test\_r5_probe_line89.py  |  629 B
+    test\_r5_probe_line89.txt  |  1,191 B
+    test\_r5_probe_mac.py  |  961 B
+    test\_r5_probe_v3c.py  |  303 B
+    test\_r5_r2_regress.txt  |  27,137 B
+    test\_r5_run_final.txt  |  10,026 B
+    test\_r5_v1_regress.txt  |  12,181 B
+    test\_r5_v3contract.txt  |  2,883 B
+    test\_r5_v3contract2.txt  |  2,804 B
+    test\_refs.txt  |  5,451 B
+    test\_rt_out.txt  |  6,949 B
+    test\_rt_out\db2jwd_closure.json  |  51,499 B
+    test\_rt_out\db2jwd_losses.json  |  4,036 B
+    test\_rt_out\db_sections.jwd  |  802,816 B
+    test\_rt_out\db_sections_dict.jwd  |  569,344 B
+    test\_rt_out\db_sections_empty.jwd  |  569,344 B
+    test\_rt_out\db_sections_reid.jwd  |  569,344 B
+    test\_rt_out\db_sections_split.jwd  |  802,816 B
+    test\_rt_out\dump_ext.jwd  |  569,344 B
+    test\_rt_out\dump_ext_nojoints.jwd  |  569,344 B
+    test\_rt_out\dump_ext_prop.jwd  |  569,344 B
+    test\_rt_out\dump_min.jwd  |  569,344 B
+    test\_rt_out\fixture_dump_ext.gbk.txt  |  1,319 B
+    test\_rt_out\fixture_dump_min.gbk.txt  |  726 B
+    test\_rt_out\JLCJ2.real.jwd  |  798,720 B
+    test\_rt_out\JLCJ2.roundtrip.jwd  |  786,432 B
+    test\_s10_probes\_check_readme_enc.py  |  571 B
+    test\_s10_probes\_dryrun_s10.log  |  2,595 B
+    test\_s10_probes\_fix_gbk_chars.py  |  1,209 B
+    test\_s10_probes\_patch_form.py  |  3,070 B
+    test\_s10_probes\_patch_hdrnote.py  |  1,001 B
+    test\_s10_probes\_patch_readme.py  |  7,330 B
+    test\_s10_probes\_patch_two.py  |  1,354 B
+    test\_s10_probes\_peek.py  |  1,456 B
+    test\_s10_probes\_probe_cata.py  |  1,395 B
+    test\_s10_probes\_probe_clock.py  |  1,428 B
+    test\_s10_probes\_probe_datatext.py  |  1,223 B
+    test\_s10_probes\_probe_date.py  |  1,709 B
+    test\_s10_probes\_probe_dbcmd.py  |  2,565 B
+    test\_s10_probes\_probe_dbtypes.py  |  1,765 B
+    test\_s10_probes\_verify_citations.py  |  2,165 B
+    test\_s10_probes\_verify_headfoot.py  |  1,866 B
+    test\_s12_probes\_final_check12.py  |  3,849 B
+    test\_s12_probes\_patch_readme12.py  |  4,182 B
+    test\_s12_probes\_patch_uniquify.py  |  7,796 B
+    test\_s12_probes\_probe_elsehandle.py  |  1,166 B
+    test\_s12_probes\_probe_func_ctx.py  |  1,635 B
+    test\_s12_probes\_probe_nucroom.py  |  527 B
+    test\_s12_probes\_probe_objarray.py  |  813 B
+    test\_s12_probes\_probe_pdollar.py  |  875 B
+    test\_s12_probes\_probe_return.py  |  1,735 B
+    test\_s12_probes\_probe_varexist.py  |  1,160 B
+    test\_s2_probes_20260924\_check_continuation.py  |  667 B
+    test\_s2_probes_20260924\_ddl_block.py  |  18,211 B
+    test\_s2_probes_20260924\_dump_pml.py  |  538 B
+    test\_s2_probes_20260924\_final_check.py  |  2,232 B
+    test\_s2_probes_20260924\_fix_indent.py  |  3,694 B
+    test\_s2_probes_20260924\_fix_ops.py  |  3,001 B
+    test\_s2_probes_20260924\_fix_pathtype.py  |  570 B
+    test\_s2_probes_20260924\_fix_return.py  |  1,204 B
+    test\_s2_probes_20260924\_fix_unset.py  |  1,285 B
+    test\_s2_probes_20260924\_norm_cmp.py  |  1,175 B
+    test\_s2_probes_20260924\_probe_cmdtype_out.txt  |  5,065 B
+    test\_s2_probes_20260924\_probe_io2_out.txt  |  12,372 B
+    test\_s2_probes_20260924\_probe_io_out.txt  |  13,268 B
+    test\_s2_probes_20260924\_probe_macro_out.txt  |  1,171 B
+    test\_s2_probes_20260924\_probe_nav_out.txt  |  7,840 B
+    test\_s2_probes_20260924\_probe_uic.py  |  843 B
+    test\_s2_probes_20260924\_probe_uic10.py  |  1,195 B
+    test\_s2_probes_20260924\_probe_uic11.py  |  818 B
+    test\_s2_probes_20260924\_probe_uic12.py  |  730 B
+    test\_s2_probes_20260924\_probe_uic13.py  |  1,285 B
+    test\_s2_probes_20260924\_probe_uic14.py  |  1,791 B
+    test\_s2_probes_20260924\_probe_uic15.py  |  1,844 B
+    test\_s2_probes_20260924\_probe_uic16.py  |  1,680 B
+    test\_s2_probes_20260924\_probe_uic17.py  |  1,585 B
+    test\_s2_probes_20260924\_probe_uic18.py  |  816 B
+    test\_s2_probes_20260924\_probe_uic19.py  |  2,249 B
+    test\_s2_probes_20260924\_probe_uic2.py  |  1,017 B
+    test\_s2_probes_20260924\_probe_uic20.py  |  1,748 B
+    test\_s2_probes_20260924\_probe_uic21.py  |  1,149 B
+    test\_s2_probes_20260924\_probe_uic22.py  |  769 B
+    test\_s2_probes_20260924\_probe_uic23.py  |  1,807 B
+    test\_s2_probes_20260924\_probe_uic24.py  |  1,076 B
+    test\_s2_probes_20260924\_probe_uic25.py  |  1,542 B
+    test\_s2_probes_20260924\_probe_uic26.py  |  1,505 B
+    test\_s2_probes_20260924\_probe_uic27.py  |  1,648 B
+    test\_s2_probes_20260924\_probe_uic3.py  |  1,088 B
+    test\_s2_probes_20260924\_probe_uic3.txt  |  445 B
+    test\_s2_probes_20260924\_probe_uic4.py  |  429 B
+    test\_s2_probes_20260924\_probe_uic4.txt  |  1,936 B
+    test\_s2_probes_20260924\_probe_uic5.py  |  885 B
+    test\_s2_probes_20260924\_probe_uic6.py  |  1,015 B
+    test\_s2_probes_20260924\_probe_uic7.py  |  1,036 B
+    test\_s2_probes_20260924\_probe_uic8.py  |  1,129 B
+    test\_s2_probes_20260924\_probe_uic9.py  |  888 B
+    test\_s2_probes_20260924\_sandbox\design.uic.orig  |  6,008 B
+    test\_s2_probes_20260924\_sandbox\dryrun2.log  |  1,610 B
+    test\_s2_probes_20260924\_sandbox\final_dryrun.log  |  2,424 B
+    test\_s2_probes_20260924\_sandbox\install2.log  |  2,500 B
+    test\_s2_probes_20260924\_sandbox\install3.log  |  4,111 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX\design.uic  |  6,599 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX\design.uic.bak_pkpmjwd_20260924_002826  |  6,008 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX\PMLLIB\pkpmjwd\pkpmjwd.pmlfrm  |  6,023 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX\PMLLIB\pkpmjwd\pkpmjwdexport.pmlfnc  |  19,560 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX\PMLLIB\pkpmjwd\pkpmjwdrun.mac  |  870 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\design.uic  |  6,008 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\design.uic.bak_pkpmjwd_20260924_002929  |  6,008 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\design.uic.bak_uninstall_20260924_002952  |  6,595 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\PMLLIB\_removed_pkpmjwd_20260924_002952\pkpmjwd.pmlfrm  |  6,023 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\PMLLIB\_removed_pkpmjwd_20260924_002952\pkpmjwdexport.pmlfnc  |  19,560 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\PMLLIB\_removed_pkpmjwd_20260924_002952\pkpmjwdrun.mac  |  870 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\design.uic  |  6,008 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\design.uic.bak_pkpmjwd_20260924_003312  |  6,008 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\design.uic.bak_uninstall_20260924_003323  |  6,595 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\PMLLIB\_removed_pkpmjwd_20260924_003323\pkpmjwd.pmlfrm  |  6,023 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\PMLLIB\_removed_pkpmjwd_20260924_003323\pkpmjwdexport.pmlfnc  |  19,708 B
+    test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\PMLLIB\_removed_pkpmjwd_20260924_003323\pkpmjwdrun.mac  |  870 B
+    test\_s2_probes_20260924\_sandbox\uninst.log  |  1,993 B
+    test\_s2_probes_20260924\_sandbox\uninst3.log  |  2,173 B
+    test\_s2_probes_20260924\_sandbox\uninst_dry.log  |  1,517 B
+    test\_s2_probes_20260924\_sandbox_after_uninstall.py  |  1,102 B
+    test\_s2_probes_20260924\_sandbox_verify.py  |  2,026 B
+    test\_s2_probes_20260924\_show_ops.py  |  690 B
+    test\_s2_probes_20260924\_stray_empty_from_failed_move.txt  |  0 B
+    test\_s2_probes_20260924\_tidy.py  |  2,351 B
+    test\_s2_probes_20260924\README.txt  |  2,516 B
+    test\_s3_cli\check_cli.py  |  14,392 B
+    test\_s3_cli\check_gui.py  |  11,553 B
+    test\_s3_cli\check_r3_engine.py  |  8,237 B
+    test\_s3_cli\check_r3_macro.py  |  6,750 B
+    test\_s3_cli\check_reports.py  |  6,300 B
+    test\_s3_cli\check_v2_artifacts.py  |  5,463 B
+    test\_s3_cli\check_v2_cli.py  |  21,186 B
+    test\_s3_cli\check_v2_gui.py  |  9,364 B
+    test\_s3_cli\make_requests.py  |  1,788 B
+    test\_s3_cli\probe_family.py  |  2,230 B
+    test\_s3_cli\probe_inputs.py  |  1,904 B
+    test\_s3_cli\probe_v2.py  |  2,263 B
+    test\_s3_cli\run_required.py  |  4,236 B
+    test\_selfcheck_out.txt  |  18,142 B
+    test\_summary_out.txt  |  185 B
+    test\_summary_v2_out.txt  |  272 B
+    test\_v2_build_out.txt  |  1,568 B
+    test\_v2_calls.txt  |  332 B
+    test\_v2_check_out.txt  |  2,459 B
+    test\_v2_db_dtset.txt  |  1,632 B
+    test\_v2_db_params.txt  |  14,569 B
+    test\_v2_db_source.txt  |  6,780 B
+    test\_v2_exr_out.txt  |  2,570 B
+    test\_v2_probe_a.txt  |  18,681 B
+    test\_v2_shapes_out.txt  |  18,681 B
+    test\_v2_slots.txt  |  4,513 B
+    test\_v3_check_out.txt  |  2,581 B
+    test\_v3_csc_check\_baseline\aveva_root.json  |  98,577 B
+    test\_v3_csc_check\_baseline\g_plugin.json  |  150,204 B
+    test\_v3_csc_check\_csc_probe.txt  |  885 B
+    test\_v3_csc_check\build.cmd  |  878 B
+    test\_v3_csc_check\stub_pkpmjwd.cs  |  966 B
+    test\_v3_csc_check\stub_pkpmjwd.dll  |  4,096 B
+    test\_verbatim.txt  |  8,311 B
+    test\_wr_sample.txt  |  22,195 B
+    test\acceptance.py  |  75,187 B
+    test\acceptance_r2.py  |  80,500 B
+    test\acceptance_r3.py  |  45,270 B
+    test\build_section_table.py  |  15,139 B
+    test\check_db2jwd_sections.py  |  34,995 B
+    test\check_deliverables.py  |  9,714 B
+    test\check_dump_grammar.py  |  6,007 B
+    test\check_dump_to_jwd.py  |  24,073 B
+    test\check_encoding_package2.py  |  901 B
+    test\check_encoding_package8.py  |  1,206 B
+    test\check_jwd_write_roundtrip.py  |  23,560 B
+    test\check_markdown_tables.py  |  1,334 B
+    test\check_pml.py  |  8,872 B
+    test\check_sectionlib_roundtrip.py  |  29,850 B
+    test\check_uniquify_logic.py  |  8,155 B
+    test\check_v2_contract.py  |  12,114 B
+    test\check_v2_db.py  |  26,262 B
+    test\check_v3_contract.py  |  9,026 B
+    test\check_v3_csc_probe.py  |  6,717 B
+    test\check_v3_notouch.py  |  3,822 B
+    test\contract_nav.py  |  748 B
+    test\diff_pdt.py  |  770 B
+    test\fixture_dump_ext.txt  |  1,290 B
+    test\fixture_dump_min.txt  |  706 B
+    test\fixture_secmap_dup.txt  |  254 B
+    test\fixture_secmap_extra.txt  |  108 B
+    test\gbk_crlf_convert.py  |  1,356 B
+    test\gen_ddl_block.py  |  1,260 B
+    test\grep_out.py  |  562 B
+    test\make_gbk.py  |  2,822 B
+    test\out\_cli_selfcheck_out.txt  |  8,921 B
+    test\out\_ev1.txt  |  729 B
+    test\out\_ev2.txt  |  1,726 B
+    test\out\_ev3.txt  |  1,284 B
+    test\out\_ev4.txt  |  1,316 B
+    test\out\_ev5a.txt  |  1,293 B
+    test\out\_ev5b.txt  |  1,409 B
+    test\out\_ev6a.txt  |  589 B
+    test\out\_ev6b.txt  |  1,107 B
+    test\out\_exe_probe.csv  |  4,835,597 B
+    test\out\_exe_probe.report.json  |  1,385 B
+    test\out\_exe_probe2.csv  |  4,835,597 B
+    test\out\_exe_probe2.report.json  |  1,386 B
+    test\out\_exe_request.json  |  363 B
+    test\out\_exe_request.mac  |  33,924 B
+    test\out\_exe_request.report.json  |  65,444 B
+    test\out\_exe_request_out.txt  |  1,759 B
+    test\out\_exe_stdout.txt  |  568 B
+    test\out\_frag.txt  |  255 B
+    test\out\_gui_selfcheck_out.txt  |  4,379 B
+    test\out\_help.txt  |  670 B
+    test\out\_r3_build.txt  |  86 B
+    test\out\_r3_engine_out.txt  |  2,754 B
+    test\out\_r3_ev1.txt  |  1,159 B
+    test\out\_r3_ev2.txt  |  717 B
+    test\out\_r3_macro_out.txt  |  3,241 B
+    test\out\_req_bad.json  |  12 B
+    test\out\_req_bad_engine.json  |  73 B
+    test\out\_req_probe.json  |  118 B
+    test\out\_req_probe_engine.csv  |  4,835,597 B
+    test\out\_req_probe_engine.json  |  167 B
+    test\out\_req_probe_engine.report.json  |  1,401 B
+    test\out\_req_r3_jwd2pdms.json  |  355 B
+    test\out\_req_r3_pdt2pdms.json  |  358 B
+    test\out\_v2_acceptance.txt  |  12,181 B
+    test\out\_v2_artifacts_out.txt  |  2,902 B
+    test\out\_v2_cli_check.txt  |  9,304 B
+    test\out\_v2_cli_out.txt  |  9,304 B
+    test\out\_v2_gui_check.txt  |  2,574 B
+    test\out\_v2_gui_out.txt  |  2,574 B
+    test\out\_v2_required_commands.txt  |  15,418 B
+    test\out\_v2_run_out.txt  |  15,349 B
+    test\out\_v3_check_out.txt  |  2,581 B
+    test\out\_v3_notouch_out.txt  |  228 B
+    test\out\_wrapper_probe.csv  |  4,835,597 B
+    test\out\_wrapper_probe.report.json  |  1,398 B
+    test\out\cli_bad_dump.txt  |  58 B
+    test\out\cli_broken.jwd  |  24,576 B
+    test\out\cli_broken.report.json  |  5,374 B
+    test\out\cli_dump_nounits.gbk.txt  |  716 B
+    test\out\cli_extra_probe.txt  |  30 B
+    test\out\cli_fixture.jwd  |  569,344 B
+    test\out\cli_fixture.report.json  |  13,522 B
+    test\out\cli_fixture_dump_min.gbk.txt  |  726 B
+    test\out\cli_fixture_m.jwd  |  569,344 B
+    test\out\cli_fixture_m.report.json  |  14,199 B
+    test\out\cli_fixture_mm.jwd  |  569,344 B
+    test\out\cli_fixture_mm.report.json  |  13,617 B
+    test\out\cli_not_macro.txt  |  36 B
+    test\out\cli_not_sqlite.jwd  |  20 B
+    test\out\cli_sample.mac  |  388,023 B
+    test\out\cli_sample.report.json  |  62,634 B
+    test\out\cli_sample2.mac  |  390,566 B
+    test\out\cli_sample2.report.json  |  62,629 B
+    test\out\db2pdt.pdt  |  222,986 B
+    test\out\db2pdt_sections.pdt  |  13,619 B
+    test\out\db2pdt_sections_only.pdt  |  13,379 B
+    test\out\dbsections_builtin.json  |  4,819,648 B
+    test\out\dbsections_builtin.report.json  |  1,389 B
+    test\out\dbsections_from_cat.csv  |  9,701,321 B
+    test\out\dbsections_from_cat.report.json  |  14,974 B
+    test\out\from_cat.jwd  |  1,011,712 B
+    test\out\from_cat.pdt  |  222,988 B
+    test\out\from_cat.report.json  |  1,563,875 B
+    test\out\from_cat_db2pdt.report.json  |  2,113,021 B
+    test\out\from_dump.pdt  |  11,619 B
+    test\out\from_dump.report.json  |  13,181 B
+    test\out\from_jwd.pdt  |  343,856 B
+    test\out\from_jwd.report.json  |  109,039 B
+    test\out\gui_never.report.json  |  765 B
+    test\out\gui_sample.mac  |  384,970 B
+    test\out\gui_sample.report.json  |  62,627 B
+    test\out\gui_sample_noBrace.mac  |  378,848 B
+    test\out\gui_sample_noBrace.report.json  |  61,205 B
+    test\out\gui_sample_pdt.json  |  459,195 B
+    test\out\gui_sample_pdt.report.json  |  87,657 B
+    test\out\gui_thread.mac  |  384,970 B
+    test\out\gui_thread.report.json  |  62,627 B
+    test\out\gui_v2_db.mac  |  33,068 B
+    test\out\gui_v2_db.report.json  |  65,359 B
+    test\out\gui_v2_from_cat.jwd  |  1,011,712 B
+    test\out\gui_v2_from_cat.report.json  |  1,563,911 B
+    test\out\gui_v2_jwd.pdt  |  346,717 B
+    test\out\gui_v2_jwd.report.json  |  109,834 B
+    test\out\gui_v2_sections.csv  |  4,835,597 B
+    test\out\gui_v2_sections.report.json  |  1,399 B
+    test\out\jwd2pdt_roundtrip.pdt  |  346,675 B
+    test\out\never.report.json  |  826 B
+    test\out\never3.report.json  |  826 B
+    test\out\never4.report.json  |  3,367 B
+    test\out\never5.report.json  |  856 B
+    test\out\never6.report.json  |  838 B
+    test\out\never_db.report.json  |  61,553 B
+    test\out\never_v2_a.report.json  |  4,084 B
+    test\out\never_v2_b.report.json  |  856 B
+    test\out\never_v2_c.report.json  |  61,578 B
+    test\out\never_v2_d.report.json  |  851 B
+    test\out\never_v2_e.report.json  |  805 B
+    test\out\never_v2_f.report.json  |  3,248 B
+    test\out\never_v2_g.report.json  |  3,301 B
+    test\out\noSecmapDir\1_PM.pdt  |  808,069 B
+    test\out\noSecmapDir\sample_pdt_nomap.json  |  455,754 B
+    test\out\noSecmapDir\sample_pdt_nomap.report.json  |  59,008 B
+    test\out\own_tmp_20260924\_tmp_dbs.csv  |  4,815,297 B
+    test\out\own_tmp_20260924\_tmp_dbs.report.json  |  1,376 B
+    test\out\own_tmp_20260924\req_probe_stray\_req_probe.csv  |  4,835,597 B
+    test\out\own_tmp_20260924\req_probe_stray\_req_probe.report.json  |  1,424 B
+    test\out\pdt2pdt_idempotent.pdt  |  499,502 B
+    test\out\pdt2pdt_roundtrip.pdt  |  499,502 B
+    test\out\r3.mac  |  384,970 B
+    test\out\r3.report.json  |  62,613 B
+    test\out\r3_pdt.mac  |  508,618 B
+    test\out\r3_pdt.report.json  |  90,768 B
+    test\out\sample.mac  |  239,399 B
+    test\out\sample.report.json  |  59,742 B
+    test\out\sample_db.mac  |  30,067 B
+    test\out\sample_db.report.json  |  64,468 B
+    test\out\sample_db_clean.mac  |  30,434 B
+    test\out\sample_db_clean.report.json  |  64,703 B
+    test\out\sample_jwd.pdt  |  343,858 B
+    test\out\sample_jwd.report.json  |  109,041 B
+    test\out\sample_jwd_sections.pdt  |  13,561 B
+    test\out\sample_jwd_sections.report.json  |  108,875 B
+    test\out\sample_pdt.json  |  455,757 B
+    test\out\sample_pdt.mac  |  313,625 B
+    test\out\sample_pdt.report.json  |  50,079 B
+    test\out\sample_pdt2jwd.jwd  |  913,408 B
+    test\out\sample_pdt2jwd.report.json  |  59,325 B
+    test\out\sample_pdt_db.mac  |  21,904 B
+    test\out\sample_pdt_db.report.json  |  52,037 B
+    test\out\sample_pdt_to.jwd  |  913,408 B
+    test\out\sample_pdt_to.report.json  |  59,324 B
+    test\out\sections_builtin.csv  |  4,835,597 B
+    test\out\sections_builtin.report.json  |  1,400 B
+    test\out\sections_from_macro.json  |  8,805,872 B
+    test\out\sections_from_macro.report.json  |  14,977 B
+    test\out\zz.report.json  |  439 B
+    test\pdt_area_check.py  |  1,190 B
+    test\pdt_dll_probe.py  |  1,657 B
+    test\pdt_dll_probe2.py  |  919 B
+    test\pdt_notes_dump.py  |  800 B
+    test\pdt_secmap_probe.py  |  8,105 B
+    test\pdt_secmap_probe2.py  |  2,056 B
+    test\pdt_secmap_probe3.py  |  2,802 B
+    test\pdt_secmap_probe4.py  |  2,389 B
+    test\pdt_secmap_probe5.py  |  6,018 B
+    test\pdt_secmap_probe6.py  |  4,343 B
+    test\pdt_secmap_probe7.py  |  2,855 B
+    test\pdt_secmap_selfcheck.py  |  19,054 B
+    test\pdt_verbatim_probe.py  |  3,327 B
+    test\pdt_write_selfcheck.py  |  35,580 B
+    test\probe_fingerprint.py  |  2,187 B
+    test\probe_fixture_specs.py  |  1,224 B
+    test\probe_jwd_read_avail.py  |  792 B
+    test\probe_kind26_keys.py  |  1,451 B
+    test\probe_samples.py  |  4,150 B
+    test\probe_samples2.py  |  2,591 B
+    test\probe_v2_db_dtset.py  |  2,309 B
+    test\probe_v2_db_params.py  |  3,820 B
+    test\probe_v2_db_source.py  |  6,692 B
+    test\probe_v2_exr_wrap.py  |  3,286 B
+    test\probe_v2_kind303_slots.py  |  1,134 B
+    test\probe_v2_shapes.py  |  4,996 B
+    test\probe_v2_slots.py  |  5,374 B
+    test\probe_v2_table_keys.py  |  4,019 B
+    test\probe_wr_sample.py  |  13,926 B
+    test\README.txt  |  5,286 B
+    test\scan_pdt_write_refs.py  |  871 B
+    test\show_from.py  |  429 B
+    test\show_lines.py  |  406 B
+    test\splice_ddl.py  |  831 B
+    test\summary.py  |  501 B
+    test\summary_out.py  |  568 B
+    test\summary_v2.py  |  549 B
+    test\test_contract_selfcheck.py  |  12,564 B
+    test\v2_calls_scan.py  |  852 B
+    计划\计划_JWD导入导出.md  |  25,099 B
+
+------------------------------------------------------------------------------
+【3】安装程序文件（先列清单再动手）
+------------------------------------------------------------------------------
+    发现但【未复制】（备份）：D:\AI_Work\PKPM数据解析\安装包程序\dist\PKPM-JWD_安装程序_v1.exe.备份_20260924_093316
+    发现但【未复制】（备份）：D:\AI_Work\PKPM数据解析\安装包程序\dist\PKPM-JWD_安装程序_v1.exe.备份_20260924_100353
+    发现但【未复制】（备份）：D:\AI_Work\PKPM数据解析\安装包程序\dist\PKPM-JWD_安装程序_v1.exe.备份_20260924_101820
+    发现但【未复制】（备份）：D:\AI_Work\PKPM数据解析\安装包程序\dist\PKPM-JWD_引擎_v1.exe.备份_20260924_093317
+    发现但【未复制】（备份）：D:\AI_Work\PKPM数据解析\安装包程序\dist\PKPM-JWD_引擎_v1.exe.备份_20260924_100400
+    发现但【未复制】（备份）：D:\AI_Work\PKPM数据解析\安装包程序\dist\PKPM-JWD_引擎_v1.exe.备份_20260924_101827
+    安装说明.txt 不在 dist 下，取自其实际位置：D:\AI_Work\PKPM数据解析\安装包程序\安装说明.txt
+    COPY D:\AI_Work\PKPM数据解析\安装包程序\dist\PKPM-JWD_安装程序_v1.exe
+      -> D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\安装程序\PKPM-JWD_安装程序_v1.exe  (11,287,373 B)
+    COPY D:\AI_Work\PKPM数据解析\安装包程序\dist\PKPM-JWD_引擎_v1.exe
+      -> D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\安装程序\PKPM-JWD_引擎_v1.exe  (11,563,018 B)
+    COPY D:\AI_Work\PKPM数据解析\安装包程序\安装说明.txt
+      -> D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\安装程序\安装说明.txt  (5,344 B)
+
+------------------------------------------------------------------------------
+【4】复制插件包（刷新模式：added/updated/same，从不删除）
+------------------------------------------------------------------------------
+  UPDATED  插件包\engine\macgen.py  <- 
+  UPDATED  插件包\pdms-net\dist\PKPMJWD.dll  <- 
+  UPDATED  插件包\pdms-net\README.txt  <- 
+  UPDATED  插件包\pdms\pkpmjwduniquename.pmlfnc  <- 
+  UPDATED  插件包\spec\CONTRACT.md  <- 
+  UPDATED  插件包\test\_acc_r3_out\r3_jwd2pdms.mac  <- 
+  UPDATED  插件包\test\_acc_r3_out\r3_jwd2pdms.mac.report.json  <- 
+  UPDATED  插件包\test\_acc_r3_out\r3_pdt2pdms.mac  <- 
+  UPDATED  插件包\test\_acc_r3_out\r3_pdt2pdms.mac.report.json  <- 
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\engine_path.txt
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\PKPMJWD.dll
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\pkpmjwd.uic
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\pkpmjwduniquename.pmlfnc
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\engine_path.txt
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\PKPMJWD.dll
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\pkpmjwd.uic
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\pkpmjwduniquename.pmlfnc
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\engine_path.txt
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\PKPMJWD.dll
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\pkpmjwd.uic
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\pkpmjwduniquename.pmlfnc
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\engine_path.txt
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\PKPMJWD.dll
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\pkpmjwd.uic
+  ADDED    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\pkpmjwduniquename.pmlfnc
+  UPDATED  插件包\test\_acceptance_out\acc_fixture.report.json  <- 
+  UPDATED  插件包\test\_acceptance_out\JLCJ2.mac  <- 
+  UPDATED  插件包\test\_acceptance_out\JLCJ2.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_closure_jwd2db.mac  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_closure_jwd2db.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_closure_pdt2db.mac  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_closure_pdt2db.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_db2jwd.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_db2pdt.pdt  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_db2pdt.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_dbsections.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_from_builtin.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_jwd2db.mac  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_jwd2db.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_jwd2db_clean.mac  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_jwd2db_clean.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_jwd2pdms.mac  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_jwd2pdms.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_jwd2pdt.pdt  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_jwd2pdt.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_pdt2db.mac  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_pdt2db.report.json  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_pdt2pdms.mac  <- 
+  UPDATED  插件包\test\_acceptance_r2_out\r2_pdt2pdms.report.json  <- 
+  UPDATED  插件包\test\_r4_collect_log2.txt  <- 
+  UPDATED  插件包\test\_r4_probe_after.txt  <- 
+  ADDED    插件包\test\_r4_probe_call.py
+  ADDED    插件包\test\_r4_probe_macfmt.py
+  ADDED    插件包\test\_r4_probe_r2fail.py
+  ADDED    插件包\test\_r4_probe_v1fail.py
+  ADDED    插件包\test\_r4_r2_regress.txt
+  ADDED    插件包\test\_r4_r2_regress2.txt
+  ADDED    插件包\test\_r4_run_final.txt
+  ADDED    插件包\test\_r4_run_final2.txt
+  ADDED    插件包\test\_r4_v1_regress.txt
+  ADDED    插件包\test\_r4_v1_regress2.txt
+  ADDED    插件包\test\_r5_collect_log.txt
+  ADDED    插件包\test\_r5_patch_pmlfnc.py
+  ADDED    插件包\test\_r5_patch_pmlfnc2.py
+  ADDED    插件包\test\_r5_patch_pmlfnc2_out.txt
+  ADDED    插件包\test\_r5_patch_pmlfnc_out.txt
+  ADDED    插件包\test\_r5_probe_exist.py
+  ADDED    插件包\test\_r5_probe_exist.txt
+  ADDED    插件包\test\_r5_probe_line89.py
+  ADDED    插件包\test\_r5_probe_line89.txt
+  ADDED    插件包\test\_r5_probe_mac.py
+  ADDED    插件包\test\_r5_probe_v3c.py
+  ADDED    插件包\test\_r5_r2_regress.txt
+  ADDED    插件包\test\_r5_run_final.txt
+  ADDED    插件包\test\_r5_v1_regress.txt
+  ADDED    插件包\test\_r5_v3contract.txt
+  ADDED    插件包\test\_r5_v3contract2.txt
+  UPDATED  插件包\test\acceptance.py  <- 
+  UPDATED  插件包\test\acceptance_r2.py  <- 
+  UPDATED  插件包\test\acceptance_r3.py  <- 
+  UPDATED  插件包\test\check_v3_contract.py  <- 
+
+------------------------------------------------------------------------------
+【5】复制安装程序
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+【6】逐文件校验（字节数 + SHA256，源 vs 目标）
+------------------------------------------------------------------------------
+  OK   插件包\engine\macgen.py  |  44,421 B  |  d8ffe3279a8bf90c7fafee17ae2b88e77e3a114d138a040987fd881533991fdf
+  OK   插件包\pdms-net\dist\PKPMJWD.dll  |  40,960 B  |  af1f6f5e2d025677ebdbaf3161cdf014e51c899fc8ae10a4b34114c4b16209fc
+  OK   插件包\pdms-net\README.txt  |  11,550 B  |  1f0bf285054abf2a1f50eed9ef473f6b1285da2dc4f8e72293e53e86b1d5053b
+  OK   插件包\pdms\pkpmjwduniquename.pmlfnc  |  10,050 B  |  7905a010b8e4f406d406f5aaa2b59b6cffd1df1d8a8e64d1553e3ffdebd207a5
+  OK   插件包\spec\CONTRACT.md  |  205,757 B  |  c7cca4b78b813ed4dee5e7b0aaf436d0d6637986652702e1243a8e218bb08389
+  OK   插件包\test\_acc_r3_out\r3_jwd2pdms.mac  |  384,970 B  |  4199094c839df7aca56114edf3f5720ec9baf286ed780efebd381512c6b5177d
+  OK   插件包\test\_acc_r3_out\r3_jwd2pdms.mac.report.json  |  62,797 B  |  d2a6c61a2fe23e775b6bfd5b788e09598e2a57dbfe68245939c6a91dc8c2d869
+  OK   插件包\test\_acc_r3_out\r3_pdt2pdms.mac  |  508,625 B  |  1021ce1d31625054b27c59393601f7375e651a356378e5ba35a6452fa8df1d35
+  OK   插件包\test\_acc_r3_out\r3_pdt2pdms.mac.report.json  |  91,011 B  |  74767d466fa391f05c7c59a5df2c4fb5a5dd1f74dc37a1e92146869561068c09
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\PKPMJWD.dll  |  40,960 B  |  f1f1ca4cb2a973d5a0967086b236f9ffb4d4eab2d83da08f3c08f4858e170177
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\PKPMJWD.dll  |  40,960 B  |  a36af7b4998bff945b473ad00e86a8bcd7cc0e5efba12c65b0c3f08a1df102c2
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\PKPMJWD.dll  |  40,960 B  |  ef75713aa9c1dd3546cea841b2def8982951a842993278b15a803df581f198c9
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\PKPMJWD.dll  |  40,960 B  |  af1f6f5e2d025677ebdbaf3161cdf014e51c899fc8ae10a4b34114c4b16209fc
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+  OK   插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\pkpmjwduniquename.pmlfnc  |  10,050 B  |  7905a010b8e4f406d406f5aaa2b59b6cffd1df1d8a8e64d1553e3ffdebd207a5
+  OK   插件包\test\_acceptance_out\acc_fixture.report.json  |  13,034 B  |  a34ff967762e96212cc844a2fef77348ed517bdbdd7ed78ae0a9b633175c8d59
+  OK   插件包\test\_acceptance_out\JLCJ2.mac  |  384,970 B  |  0bd47b047d13ad8f95c6237c38e3b0389129f36ab6fd5a379aac62be78fcd6d8
+  OK   插件包\test\_acceptance_out\JLCJ2.report.json  |  62,795 B  |  db29b22a31bc41ab4518fc3913b04007b37d4da71ac67f3b7906e85549cbaa33
+  OK   插件包\test\_acceptance_r2_out\r2_closure_jwd2db.mac  |  18,867 B  |  ad62bd979da0503d44f5e32f0a54399b4cf425e42c5050cdbfe0c1003342b8f8
+  OK   插件包\test\_acceptance_r2_out\r2_closure_jwd2db.report.json  |  10,187 B  |  6b3346ae6eb5bad42e47a6111cb336983d23ece84211d65c96274b3dae8dd5bb
+  OK   插件包\test\_acceptance_r2_out\r2_closure_pdt2db.mac  |  11,109 B  |  a70eea8ccb9d7197ec2619ee6aad54a3e3d84d8f843fa077f09d7612c5588c84
+  OK   插件包\test\_acceptance_r2_out\r2_closure_pdt2db.report.json  |  9,223 B  |  e72a000c9fac009a47358bff4c70199cb85d829d5ef638b542de6702d04e9900
+  OK   插件包\test\_acceptance_r2_out\r2_db2jwd.report.json  |  23,043 B  |  eef00c3f257b707a66d2dc5d6d872937d3fffae701f48b03f16903d4938cc458
+  OK   插件包\test\_acceptance_r2_out\r2_db2pdt.pdt  |  8,327 B  |  2b283bb17104c8f0c117f7b2f491abb87dfb43e7ee08ce2582cdedce64a21ddc
+  OK   插件包\test\_acceptance_r2_out\r2_db2pdt.report.json  |  18,637 B  |  20a668af6024145a53ad301079d55e40bb2f7197e53a1630947db7d11aceddfe
+  OK   插件包\test\_acceptance_r2_out\r2_dbsections.report.json  |  15,010 B  |  e8e158c34d783e4eff2701295fe6e6052e188e05f39a5456c8496a1d89d45ea4
+  OK   插件包\test\_acceptance_r2_out\r2_from_builtin.report.json  |  1,417 B  |  c5c84c0ffe4dc71a7dfd62e1cea45b5dba8a3122639f9dd06c2888e5741e3ba8
+  OK   插件包\test\_acceptance_r2_out\r2_jwd2db.mac  |  33,924 B  |  86e7e4cd4aa791274183e9261ff0db2ce00c2ce232bbd75746ce264e0a9c3952
+  OK   插件包\test\_acceptance_r2_out\r2_jwd2db.report.json  |  65,538 B  |  8efcef7d141a706764540256a7d47534afd46acab4ff2b72f7da5c745f159824
+  OK   插件包\test\_acceptance_r2_out\r2_jwd2db_clean.mac  |  35,354 B  |  6e5f812e2a9d4be0415569b7e0292a7c8924bc7b970422ddc5cd66cf4fc5998e
+  OK   插件包\test\_acceptance_r2_out\r2_jwd2db_clean.report.json  |  65,794 B  |  7c4fe8d9fb259f61a38eb9336fc9e067df4d035b87c12b67644f9f465fbf522e
+  OK   插件包\test\_acceptance_r2_out\r2_jwd2pdms.mac  |  384,970 B  |  3ea8f1309a0d73aaa9cd9c8326902f4e749558de390e10c58d446051c722402b
+  OK   插件包\test\_acceptance_r2_out\r2_jwd2pdms.report.json  |  62,804 B  |  41b8b0b2fe5cb0df83420369022d31602d72435ec0404e3dda047220cc214912
+  OK   插件包\test\_acceptance_r2_out\r2_jwd2pdt.pdt  |  346,734 B  |  20fd3d2ca27f87dc5e2cb01b09ba1f8d48bf0e963b3d8b5344970d4b18b1789b
+  OK   插件包\test\_acceptance_r2_out\r2_jwd2pdt.report.json  |  109,849 B  |  c61fe441b520705c03ee78989a71b6696dd35e34da927aaa9dcb16c285b12102
+  OK   插件包\test\_acceptance_r2_out\r2_pdt2db.mac  |  14,730 B  |  316784e66aef2fcbcf30d58a9197a1744572d5d2b15df7f9c93e5e1a57e753f4
+  OK   插件包\test\_acceptance_r2_out\r2_pdt2db.report.json  |  92,502 B  |  4b6f5be6ebba160f08de4ae3b7a5c92544bc7ff060b66305a084d3f6f4d3d207
+  OK   插件包\test\_acceptance_r2_out\r2_pdt2pdms.mac  |  508,625 B  |  ef9744070b7035855a7922f34e926f580da47900bf8856159fd3e698c57a79a7
+  OK   插件包\test\_acceptance_r2_out\r2_pdt2pdms.report.json  |  91,018 B  |  98d8668163c2883e887e18c8ddea6d67b93043fdd59907189f6a82310908bc5a
+  OK   插件包\test\_r4_collect_log2.txt  |  50,481 B  |  4b19300b57480e51c38a972fcabd3ea0e3555a74d7164b6f63e18d0f13e7a9c3
+  OK   插件包\test\_r4_probe_after.txt  |  1,167 B  |  232ccc8e28c2ec5fd1fa482d60833193e3704e2303e0a395c1b60f106edfab45
+  OK   插件包\test\_r4_probe_call.py  |  692 B  |  8d8793a4a4685622f97ba59a28fdc1a469cf5799627fb2b274ecc3b805be5389
+  OK   插件包\test\_r4_probe_macfmt.py  |  520 B  |  956b9d8d4ce31b3b233258de6cb019b1b699bce2ef0e26432e871117c311d4a8
+  OK   插件包\test\_r4_probe_r2fail.py  |  355 B  |  39689e18ad2f161884d544cd9b0a7ece268061ec865c8bd02738d48bb6410957
+  OK   插件包\test\_r4_probe_v1fail.py  |  250 B  |  9a13d3c190165a677dcb742565c8deecd07fcaaed255f72b6eb661365d5a0f5d
+  OK   插件包\test\_r4_r2_regress.txt  |  27,627 B  |  a1e3e8363d6719865c8a8641e65887b090fdcd9993b0aafb0ede7fe64d6233d7
+  OK   插件包\test\_r4_r2_regress2.txt  |  27,137 B  |  82fc5cb62049c7e65c60fd365f733d14bf3febc1231c31135c59a9e8ec45ea1e
+  OK   插件包\test\_r4_run_final.txt  |  9,939 B  |  091b8b0e56b57de45011b3d31e2e7792e3a9377f05a26cf175116d069c94e2df
+  OK   插件包\test\_r4_run_final2.txt  |  9,939 B  |  091b8b0e56b57de45011b3d31e2e7792e3a9377f05a26cf175116d069c94e2df
+  OK   插件包\test\_r4_v1_regress.txt  |  12,846 B  |  c2151872287839788e497789be78a358779727cda0f81d714ba230d9d3314a10
+  OK   插件包\test\_r4_v1_regress2.txt  |  12,181 B  |  66f6802c0c82d7465d50a6828c3256e37cbab26c5ca8b1184ab10beafaf60de6
+  FAIL 插件包\test\_r5_collect_log.txt  <- 字节数不一致 源=57640 目标=49417；SHA256不一致 源=f00d5ef2648449e16e848c9c19170085751d29bc9b976e6b52303c5db18785c7 目标=2e1981a3194d7ab7e4287dac861af1aaf71dc9588f5eff5172edc45ba15784ba
+  OK   插件包\test\_r5_patch_pmlfnc.py  |  3,362 B  |  ba95511ba40233d4e329bf73b1b3e2a484a70d25c0af17ac881911bd8c34de73
+  OK   插件包\test\_r5_patch_pmlfnc2.py  |  1,124 B  |  90b1e690cdabf48feaa4768129613869f0ac9713be7e6cecae6f4e05fa18c7f2
+  OK   插件包\test\_r5_patch_pmlfnc2_out.txt  |  164 B  |  75cda4f983c8e5eaa5b7039d2f0cb4187f643e04393ed365a7683594eebad11e
+  OK   插件包\test\_r5_patch_pmlfnc_out.txt  |  276 B  |  20a137e7787b54cdf11a8a04e4bf4beb94235dc3ab2d1cc5bde7c1b49a758ee6
+  OK   插件包\test\_r5_probe_exist.py  |  466 B  |  9493c9e517634f7920260271ce638db75dbfa885af232a3a10eb92b03c200516
+  OK   插件包\test\_r5_probe_exist.txt  |  941 B  |  f089d990abf2f117ee28eefd38d826f1c1b917d4e966198d8f333e9561c3a842
+  OK   插件包\test\_r5_probe_line89.py  |  629 B  |  c182b54c1eb8d1c30d8c0529002cb73a83d7efe8a0d282a71d71da5cc463dbbd
+  OK   插件包\test\_r5_probe_line89.txt  |  1,191 B  |  ef512fee8d11b122114386bcfce92d79bf4d19b67095ad984e4a8e620f3aa472
+  OK   插件包\test\_r5_probe_mac.py  |  961 B  |  c6bef233fc15f1bff32645b03c122351a62e59c39f6c8ad2f5ad9fd604086194
+  OK   插件包\test\_r5_probe_v3c.py  |  303 B  |  e6e6fd561667be7e2e41f1911578d6ee9c04eec68291d0f79c40a0527042a580
+  OK   插件包\test\_r5_r2_regress.txt  |  27,137 B  |  38228b11d129bb2f23200e4751a1ed3b7a139c27aad4493f610a6e8e899136bc
+  OK   插件包\test\_r5_run_final.txt  |  10,026 B  |  062e204550f81c932cd2da471ec0573cf02f10141b4ab719f15252070341162c
+  OK   插件包\test\_r5_v1_regress.txt  |  12,181 B  |  66f6802c0c82d7465d50a6828c3256e37cbab26c5ca8b1184ab10beafaf60de6
+  OK   插件包\test\_r5_v3contract.txt  |  2,883 B  |  91de4272bd03220d76f6d79471c7d506496ad57be78c2929f92981d876daf3cb
+  OK   插件包\test\_r5_v3contract2.txt  |  2,804 B  |  ffc8c00789a16bd84d0e953f354d3cb8eddeb43e421a87daddaec53f8ae1ad97
+  OK   插件包\test\acceptance.py  |  75,187 B  |  0fd1f92ab43278c421aae87da0d226473dd3df574f337b7cc0df9f447a8c0b90
+  OK   插件包\test\acceptance_r2.py  |  80,500 B  |  cf4732e2e15ef2db1e81939c463f7f97cff5e8ca6c0057cef7360b3ac024d5e9
+  OK   插件包\test\acceptance_r3.py  |  45,270 B  |  a864a90aca9e2631c1b6afd37ea23791e0acf665beb253676b0c3a7658574a55
+  OK   插件包\test\check_v3_contract.py  |  9,026 B  |  2d3a41eb5c29f01fcd06a9fa37e6fcd13bd3eabdb988b9d47a4fc724bdf56ee3
+
+------------------------------------------------------------------------------
+【7】生成交付清单.txt / 从这里开始.txt / SHA256哈希清单.txt（UTF-8 带 BOM + CRLF；刷新模式覆盖本脚本自己的生成物）
+------------------------------------------------------------------------------
+  REFRESH  D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\从这里开始.txt  (2,085 B)
+  REFRESH  D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\交付清单.txt  (19,217 B)
+  REFRESH  D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\SHA256哈希清单.txt  (103,391 B)
+  校验     从这里开始.txt  |  2,085 B  |  SHA256 eae426b0d517631c82d03492c251ea38a092fdc2b1632c4fe456661003ea7df2
+  校验     交付清单.txt  |  19,217 B  |  SHA256 b1e7025179b891b4dbdff27aedcf763bb880285a1714c4d18ffbe2832f9898c1
+  校验     SHA256哈希清单.txt  |  103,391 B  |  SHA256 9376f1922017fb50b7902656b961e108e6f766f29d8d2429cb89e22f017ccb59
+
+==============================================================================
+【最终目录树（两层深）】D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件
+==============================================================================
+├─ 安装程序\   <- 3 个文件 / 22,855,735 B (21.80 MiB)（递归）
+│    ├─ PKPM-JWD_安装程序_v1.exe   11,287,373 B
+│    ├─ PKPM-JWD_引擎_v1.exe   11,563,018 B
+│    └─ 安装说明.txt   5,344 B
+├─ 插件包\   <- 799 个文件 / 165,083,977 B (157.44 MiB)（递归）
+│    ├─ deliver\   (3 文件 / 73,819 B (72.1 KiB) 递归)
+│    ├─ docs\   (10 文件 / 251,451 B (245.6 KiB) 递归)
+│    ├─ engine\   (19 文件 / 14,458,987 B (13.79 MiB) 递归)
+│    ├─ install\   (3 文件 / 26,034 B (25.4 KiB) 递归)
+│    ├─ pdms\   (6 文件 / 67,923 B (66.3 KiB) 递归)
+│    ├─ pdms-net\   (13 文件 / 138,264 B (135.0 KiB) 递归)
+│    ├─ spec\   (3 文件 / 208,806 B (203.9 KiB) 递归)
+│    ├─ test\   (740 文件 / 149,830,902 B (142.89 MiB) 递归)
+│    ├─ 计划\   (1 文件 / 25,099 B (24.5 KiB) 递归)
+│    └─ README.txt   2,692 B
+├─ SHA256哈希清单.txt   103,391 B
+├─ 交付清单.txt   19,217 B
+└─ 从这里开始.txt   2,085 B
+------------------------------------------------------------------------------
+合计：805 个文件 / 188,064,405 B (179.35 MiB)
+
+==============================================================================
+【8】结论
+==============================================================================
+插件包        : 复制 81 个文件（跳过目录 10、跳过文件 2）；added=42 updated=39 same=721
+安装程序      : 复制 0 个文件
+生成的说明    : 交付清单.txt、从这里开始.txt、SHA256哈希清单.txt
+校验通过      : 80 / 81
+冲突未覆盖    : 0 个；复制错误 0 个
+校验不一致    : 1 个
+    ! 插件包\test\_r5_collect_log.txt  <- 字节数不一致 源=57640 目标=49417；SHA256不一致 源=f00d5ef2648449e16e848c9c19170085751d29bc9b976e6b52303c5db18785c7 目标=2e1981a3194d7ab7e4287dac861af1aaf71dc9588f5eff5172edc45ba15784ba
+删除动作      : 无（脚本不含任何删除/移动/改名调用；未写 G 盘任何路径）
+校验结论      : PROBLEM（有冲突/错误/校验不一致，未覆盖任何既有文件）
+退出码        : 3
+日志          : D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\deliver\_collect_to_workspace_log.txt
+结束时间      : 2026-09-25 19:53:47
+==============================================================================

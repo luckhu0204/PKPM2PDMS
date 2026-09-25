@@ -1,0 +1,137 @@
+total lines = 2075
+--- headings ---
+    1 # PKPM-JWD导入导出 —— 唯一接口契约（CONTRACT v2.0 = v1.0 + 修订 R2）
+   18 ## 0. 本契约的地位、证据与变更
+   20 ### 0.1 三份侦察报告是**结论来源**，本文件是**可执行条款**
+   38 ### 0.2 本文件自己跑过的核对（不是转述）
+   61 ### 0.3 变更规则
+   67 ### 0.4 契约变更记录（每次变更在此追加一条；含授权方与证据）
+   90 ## (a) 规范模型 API（`engine/canonical.py`）
+   92 ### a.1 单位与坐标系（全项目统一，模块之间不得再换算）
+   99 ### a.2 数据类（字段名与 `jwd_format.md` §8 一致；单位 mm / 度）
+  134 ### a.3 `Level` 的两种形态（同一数据类，用 `height` 区分）
+  148 ### a.4 `Section.dims` / `Section.params` 的**唯一**解码规则
+  184 ### a.5 由来源表推导的精确公式（`read_*` 必须照此实现）
+  204 ### a.6 `Model.to_json() / from_json()`
+  216 ### a.7 `Model.validate() -> list[str]`
+  257 ### a.8 `Wall` 为什么在契约里（与 §8 的差异声明）
+  267 ### a.9 `Model.notes` 的用途
+  275 ## (b) 各模块函数签名（实施包之间**只允许**通过这些交互）
+  277 ### b.1 一览表
+  300 ### b.2 `read_jwd(path: str) -> Model`
+  328 ### b.3 `write_jwd(model: Model, path: str) -> dict`
+  376 ### b.4 `read_pdt(path: str) -> Model`
+  393 ### b.5 模块间"不许互相 import"的边界
+  401 ### b.6 `MacOptions` 字段（`macgen.generate_macro(model, opts)` 的 `opts`）
+  419 ## (c) PDMS 导出文本格式 `#PKPM-JWD-PDMSDUMP 1.0`
+  424 ### c.1 编码、换行、缺省单位（先说清）
+  436 ### c.2 文法（EBNF，`SP`=空格，`CRLF`=`\r\n`）
+  470 ### c.3 解析规则（读方**必须**按此实现，且有歧义处已在此定死）
+  506 ### c.4 最小示例（**可直接用作两端联调夹具**）
+  540 ### c.5 写方（PML 侧）生成规则（与 §c.3 一一对应）
+  554 ## (d) PDMS 实体层级与命名（与现有插件同构）
+  556 ### d.1 树形（**必须**照此实现，两套导入器的结果才能互换）
+  579 ### d.2 构件命名（**契约冻结**）
+  594 ### d.3 宏里允许出现的 PDMS 语法（**逐条带本机出处**，禁止自造）
+  620 ### d.4 `macgen.generate_macro` 的输出骨架（`MacOptions.unit` 决定数值缩放）
+  682 ## (e) 截面解析优先级（**三个方向共用，必须唯一**）
+  684 ### e.1 四级优先级（严格按序，命中即止）
+  697 ### e.1a 推断族（`status='inferred'`，变更记录 §0.4-1）
+  719 ### e.2 匹配文件的解析容错（用户原件实测，C1 输出）
+  731 ### e.3 用户参数化族映射表（第 3 级；**只列有证据的**）
+  748 ### e.4 补充映射文件 `engine/secmap_extra.txt`（**独立文件，禁止改用户原件**）
+  767 #### e.4a 指令行 `@FAMILY <kind> = <族键|none>`（变更记录 §0.4-3）
+  778 ### e.5 `Resolution.reason` 的写法（未解析必须可解释）
+  789 ### e.5a `Resolution.evidence`（`status='inferred'` 必填）
+  803 ### e.6 `SectionMap` 的三个方法
+  822 ## (f) 命令行与图形界面签名
+  824 ### f.1 三个子命令（**签名冻结**；§m.1〔R2〕是完整命令矩阵，本节三条不变）
+  855 ### f.2 退出码（**冻结**）
+  864 ### f.3 `engine/gui.py`（tkinter，仅标准库）
+  874 ## (g) 编码与产物纪律
+  904 ## (h) 报告策略（`report.json`）
+  967 ## (i) 范围边界（**明令不做**）
+  983 ## (j) `.pdt` 写出契约（`engine/pdt_write.py`）〔R2 §0.4-4/5/6〕
+  990 ### j.1 签名与选项（**冻结**）
+ 1022 ### j.2 文件级纪律（**冻结**，全部以样本为据）
+ 1039 ### j.3 全局 ID 编码（**冻结**）
+ 1063 ### j.4 逐段写出规范（模板逐字；`\u2420` 表示**不写行尾空白**）
+ 1091 ### j.5 `EXI` / `EXR` 的精确构造（计数自洽，**冻结**）
+ 1120 ### j.6 荷载：**只写段头，体内为空**〔R2 §9.3〕
+ 1151 ### j.7 无法表达的对象：**占位 + 报告，绝不丢构件**
+ 1170 ### j.8 与 DLL 格式串的**已知差异**（必须知道，不得"改正"）
+ 1188 ### j.9 材料内置表（`opts.materials` 缺省值）
+ 1202 ### j.10 往返验收（可执行，对应计划 §9.4-9）
+ 1214 ## (k) 截面转化核心（`engine/sectionlib.py`）〔R2 §0.4-4〕
+ 1221 ### k.1 数据类（**冻结**）
+ 1272 ### k.2 内置转化表 `engine/section_table.csv`（**冻结的数据文件**）
+ 1315 ### k.3 编解码四件套（**冻结**）
+ 1356 ### k.4 PDMS 侧：`to_pdms` / `from_pdms`（**优先级唯一**）
+ 1376 ### k.5 信息损失申报（`loss_report(direction)`）
+ 1401 ## (l) PDMS 目录/规格宏：生成与解析（`engine/dbmacro.py` / `engine/dbparse.py`）〔R2 §0.4-4/7〕
+ 1403 ### l.1 安全约束（**硬，实现必须自校验**）
+ 1417 ### l.2 `DbOptions`（**冻结**字段）
+ 1431 ### l.3 生成结构（**冻结骨架**）
+ 1534 ### l.4 编码与唯一名（**冻结**）
+ 1544 ### l.5 `parse_db_macro(text) -> SectionTable` / `parse_db_macro_file(path) -> SectionTable`
+ 1584 ### l.6 反向：`db2jwd` / `db2pdt`（落点与闭环）
+ 1589 # engine/jwd_write.py（新增，v1 的 write_jwd 不动）
+ 1591 # engine/pdt_write.py（§j.1 已给）
+ 1627 ## (m) 命令行（v2 最终形态）〔R2 §0.4-4〕
+ 1629 ### m.1 子命令矩阵（v1 的三条见 §f.1，**不变**；下面是 v2 全量）
+ 1652 ### m.2 退出码
+ 1657 ### m.3 报告扩展（在 §h 的结构上**追加** `db` 键，v1 键位不变）
+ 1684 ## (n) R2 安全约束与范围增补（§i 的追加，不改 v1 条款）
+ 1701 ## §12 仍存歧义 / 未证实清单（实施必须按此处置，**不得**自行拍板）
+ 1735 ## 附录 A：最小示例（dump / 宏 / report.json）
+ 1743 ## 附录 B：本契约引用的证据（文件:行）
+ 1745 ### B.1 本机 PDMS 安装（`D:\AVEVA\Plant\PDMS12.1.SP4\PMLLIB\`，本次亲自读取）
+ 1767 ### B.2 用户原件（`G:\工作\PDMS相关\00 PDMS插件\02 实用插件\PKPM导入导出插件\`，本次只读实测）
+ 1776 ## 附录 C：本次会话实际执行的核对（可复现）
+ 1813 ## 附录 D：R2 证据（逐字表 + 夹具）
+ 1815 ### D.1 `PDMSxCA_Addin121.dll` 内 `.pdt` 的格式串（本次 C7 实测：按偏移取 UTF-16LE、NUL 截断）
+ 1840 ### D.2 样本 `1_PM.pdt` 的逐段行式（本次 C7 实测；`|` 后为样本行号）
+ 1883 ### D.3 内置转化表（本次 C10 实测输出）
+ 1902 ### D.4 目录宏最小示例（`dbmacro` 的产物形状 / `dbparse` 的夹具）
+ 2038 ### D.5 R2 侦察报告的章节索引（实施者的阅读顺序）
+ 2048 ## 附录 E：R2 自检命令与输出（可复现）
+--- keyword hits ---
+### inferred
+   74 | 1 | 2026-09-24 | 新增 `status='inferred'`（§e.1a/§e.3）：`Kind=3` 单尺寸截面按**证据**判为圆形族 `/USER_CIRCLE-SPEC/Circle_Profile` + `DESP <d>`；`
+  120 | `Resolution` | `spec_path:str=""`, `desp_params:list[float]=[]`, `status:str="unresolved"`, `reason:str=""`, `pkpm_name:str=""`,
+  671 2b. 推断截面（`status='inferred'`，§e.1a）：**既写 `SPREF`/`SPRE` 也写 `DESP`**（数值见第 3 条），
+  674 推断结论必须在 `report.sections.detail[].status='inferred'` 与 `evidence` 里机器可见（§h）。
+  690 3b) 否则按 §e.3 的**推断族**（数据驱动，见 §e.1a）                     → status='inferred'   source='family'
+  697 ### e.1a 推断族（`status='inferred'`，变更记录 §0.4-1）
+  700 按 §e.3 的**推断表**给出规格 → `status='inferred'`、`source='family'`、`desp_params` 按该族参数序给出。
+  701 * 与 `resolved`/`parametric` 的差别**只在认识论上**：`inferred` 是"有证据的判定"而非"原件里写明的映射"，
+  702 因此它必须（a）在 `report.sections.detail` 里 `status='inferred'` 且 `evidence` 非空、
+  706 * `ok`/`use_desp` 语义：`inferred` 视为"有规格"（`Resolution.ok` 为真），且按其 `desp_params` 出 `DESP`。
+  789 ### e.5a `Resolution.evidence`（`status='inferred'` 必填）
+  801 `reason` 在 `inferred` 时写**残余风险与改法**（不是"缺什么证据"）。
+  925 "resolved": 23, "parametric": 5, "inferred": 1, "unresolved": 0, "total": 28,
+  933 "status":"inferred", "source":"family", "pkpm_name":"CIRCLE",
+  955 顶层计数 `resolved/parametric/inferred/unresolved` 四类**都要给出**（§e.1a：`inferred` 不得
+  956 混进 `resolved`——不确定性必须机器可见）；`inferred` 条目 `evidence` **必须非空**。
+ 1368 2. 否则 `secmap` 给定时调 `secmap.SectionMap.resolve(...)`（**复用 §e 的四级优先级**，含 `inferred`），
+ 1610 | `CIRCLE` 族 | ✅（仅模板） | `Kind=3`，`d` 取 `DPRO`（300） | §12#5（`inferred`） |
+ 1712 | 5 | `Kind=3` 族别 | **`inferred`：圆形（实心圆钢，`dim=直径`）→ `/USER_CIRCLE-SPEC/Circle_Profile` + `DESP <d>`**（变更记录 §0.4-1，编排方授权） | 证据与残余风险
+### sectionlib
+   13 > §(j) `.pdt` 写出契约 · §(k) 截面库核心 `sectionlib` · §(l) PDMS 目录/规格宏生成与解析 ·
+   77 | 4 | 2026-09-24 | **R2 三项追加需求落地**：新增 §(j) `.pdt` 写出、§(k) 截面库核心 `sectionlib`、§(l) 目录/规格宏双向（`dbmacro`/`dbparse`）、§(m) 命令行 v2、§(n) 安
+ 1010 `kind`/`mat`/`name`/`dims`/`shapeval` 已由 `sectionlib` 填好）→ **`db2pdt` 的唯一入口**。
+ 1075 | j.4.7 | `$DEFFRAMESECTION` | 每条 5 行：`    ID=<id>, NAME=<name>, SHAPE=<shape>` / `       KIND=<k>, B1=<b1>, B2=0, H1=<h1>, H2=0, 
+ 1214 ## (k) 截面转化核心（`engine/sectionlib.py`）〔R2 §0.4-4〕
+ 1276 `sectionlib` **只读**，不得改写。重跑生成器必须**字节一致**（幂等）。
+ 1595 **由 `SectionTable` 生成 `sections`**：`sectionlib.SectionTable.to_jwd_sections()`（k.1）。
+ 1598 三张（`Kind`/`ShapeVal`/`Name`/`Mat` 由 `sectionlib.encode_shapeval` 回算），其余表**建而空**
+ 2043 | `sectionlib.py` | `db_pkpm_sections.md` §2（族码表）、§3（`$DEFFRAMESECTION`）、§4（`.jwd` 编码）、§5（映射与损失）；本契约 §a.4/§k；D.3 |
+ 2073 * **未实现** R2 的四个新模块（`pdt_write`/`sectionlib`/`dbmacro`/`dbparse`）与 6 个新子命令——
+### dbparse
+   77 | 4 | 2026-09-24 | **R2 三项追加需求落地**：新增 §(j) `.pdt` 写出、§(k) 截面库核心 `sectionlib`、§(l) 目录/规格宏双向（`dbmacro`/`dbparse`）、§(m) 命令行 v2、§(n) 安
+ 1216 > 这是 R2 的**新核心**：其它新模块（`pdt_write`/`dbmacro`/`dbparse`/CLI）都依赖它。
+ 1401 ## (l) PDMS 目录/规格宏：生成与解析（`engine/dbmacro.py` / `engine/dbparse.py`）〔R2 §0.4-4/7〕
+ 1451 * 缩进：每层 +2 空格（与样本同风格）；**缩进不参与语义**，`dbparse` 必须忽略。
+ 1902 ### D.4 目录宏最小示例（`dbmacro` 的产物形状 / `dbparse` 的夹具）
+ 2045 | `dbparse.py` | `db_pdms_catalogue.md` §1.4（词法细节）、§2（外键）、§4（族/名/参数）、§5.2/§5.3（解析流程 + 24 条坑）、§7（分级清单）；本契约 §l.5 |
+ 2073 * **未实现** R2 的四个新模块（`pdt_write`/`sectionlib`/`dbmacro`/`dbparse`）与 6 个新子命令——

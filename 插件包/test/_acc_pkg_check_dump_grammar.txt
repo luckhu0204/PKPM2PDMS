@@ -1,0 +1,18 @@
+=== 契约 §c.4 夹具解析 ===
+  [OK] 层级前三级 /PKPM_JWD / /JLCJ2 / /MAINFRAME
+  [OK] FRMW 三个分组 ['/STL_FRAME/EL1', '/FLOOR&WALL', '/GRID']
+  [OK] SCTN 共 3 条 
+  [OK] desp 可为 0 个（COLUMN 1） 
+  [OK] 从尾部定位几何（COLUMN 1） ('400', '400', '-2000') -> ('400', '400', '-1000')
+  [OK] desp 长度由尾部 10 token 反推（COLUMN 2） ['600']
+  [OK] desp 与几何不混淆（COLUMN 2） ('600', '600', '-2000') U
+  [OK] BEAM 记录 {'frmw': '/STL_FRAME/EL1', 'sbfr': '/BEAM', 'name': '/BM_1', 'ctype': 'BEAM', 'spref': '/H_INTERNATIONAL-SPEC/HN300X150', 'desp': [], 'poss': ('400', '400', '-1000'), 'pose': ('6400', '400', '-1000'), 'ori': 'E', 'jusl': 'lbos', 'meml': 'lbos', 'bangle': '0'}
+  [OK] 父级归属正确 
+  [OK] PANE 名称与板厚 
+  [OK] PANE 顶点 4 个 [('400', '400', '-1000'), ('6400', '400', '-1000'), ('6400', '4400', '-1000'), ('400', '4400', '-1000')]
+  [OK] PANE 尾部 ~ spref ori sjus ['/USER_RECT-SPEC/Rectangle_Profile', 'YNZU', 'dbot']
+  [OK] STWALL 名称/规格/高度 
+  [OK] STWALL 底边与可选厚度 {'name': '/W_1', 'spre': '/Concrete_Wall-SPEC/WALL-300', 'height': '3000', 'p1': ('0', '0', '-2000'), 'p2': ('6000', '0', '-2000'), 'thick': '300'}
+  [OK] 短记录（<14 token）应判 E-PARSE（长度校验位） len=11
+
+FAIL 项: 0 

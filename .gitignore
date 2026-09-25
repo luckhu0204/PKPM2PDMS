@@ -1,0 +1,23 @@
+# 编译产物走 Release 附件，不入 git 树（本机约定 2026-09-21）
+*.exe
+*.dll
+*.py[cod]
+*.zip
+*.log
+dist/
+
+# Python 运行产物
+__pycache__/
+
+# 测试生成产物（可由验收脚本重新生成）
+插件包/test/out/
+插件包/test/_acc_*/
+插件包/test/_acceptance_*/
+插件包/test/_r4_*
+插件包/test/own_tmp*/
+PDMS原生插件/_selftest/_sandbox*/
+PDMS原生插件/_selftest/_rootsim/
+
+# 编辑器/系统
+Thumbs.db
+.DS_Store

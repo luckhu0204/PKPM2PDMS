@@ -1,0 +1,204 @@
+
+=== A. 1_PM.pdt 逐段行式（repr） ===
+bytes=808069  CRLF=9677  LF=9677  BOM=False
+physical_lines=9678 (split 后 9678)
+--- L1..L8 文件头
+    1|';File I:\\氯化因局部设备变动20250227\\PDMS\\1_PM.pdt saved 3/19/2025 8:4:27'
+    2|''
+    3|'$VERSION'
+    4|'   4.2.0'
+    5|''
+    6|'$DESIGNPARA'
+    7|'    0.000, 0.000, 3.000, 1.000, 2.000, 0.000, 0.000, 1.000, 0.000, 0.000, 1.000, 1.000, 1.000, 1.000, 0.000, 0.000, 1.000, 1.000, 1.000, 3.000'
+    8|'    7.000, 0.050, 3.000, 2.000, 15.000, 2.000, 3.000, 0.050, 0.050, 0.800, 0.700, 0.156, 1.050, -0.000, 0.000, 0.000, 100.000, 0.000, 0.000, 0.000'
+--- L56..L61 $STORY 头两条
+   56|'    0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 4.000, 0.000, 0.000, 1.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000'
+   57|''
+   58|'$STORY'
+   59|'    ID=1, NUB=1'
+   60|'       NO=1, HI=8300, BL=-1300, TL=7000, WID=15200.00, LEN=49400.00, HEI=12000.00'
+   61|'    ID=2, NUB=1'
+--- L68..L76 $STORY 尾 + $NODECOOR 头两条
+   68|'       NO=1, HI=9500, BL=27300, TL=36800, WID=17200.00, LEN=19600.00, HEI=9500.00'
+   69|''
+   70|'$NODECOOR'
+   71|'    ID= 3807, X= 1580.00, Y= 15200.00, Z= 11700.00, FLOORID= 2'
+   72|'       EXR= 2 ,10005, 2 ,10012, 2e+06'
+   73|'    ID= 3907, X= 47350.00, Y= 9750.00, Z= 7000.00, FLOORID= 1'
+   74|'       EXR= 2 ,10005, 1 ,10012, 1e+06'
+   75|'    ID= 4007, X= 29800.00, Y= 8700.00, Z= 27300.00, FLOORID= 4'
+   76|'       EXR= 2 ,10005, 4 ,10012, 4e+06'
+--- L2364..L2372 $DEFFRAMESECTION 头
+ 2364|'    ID=171608, NODES=4707, NODEE=43607'
+ 2365|''
+ 2366|'$DEFFRAMESECTION'
+ 2367|'    ID=609, NAME=矩750X750, SHAPE=1'
+ 2368|'       KIND=1, B1=750, B2=0, H1=750, H2=0, B3=0, H3=0'
+ 2369|'       T1=0, T2=0, T3=0, T4=0, T5=0, T6=0'
+ 2370|'       M=6, RI=0.000, RJ=0.000, UA=0.000, NAME1='
+ 2371|'       EXI=1, 10011, 609'
+ 2372|'    ID=709, NAME=矩800X1000, SHAPE=1'
+--- L2526..L2546 $DEFWASLABSECTION/$DEFMATERIAL/$SETELEMENT 头
+ 2526|'       EXI=1, 10011, 3709'
+ 2527|''
+ 2528|'$DEFWASLABSECTION'
+ 2529|'    ID=183711, NAME=T600, TYPE=1, T1=600.00, T2=0.00'
+ 2530|'    ID=184611, NAME=T120, TYPE=1, T1=120.00, T2=0.00'
+ 2531|'    ID=185611, NAME=T120, TYPE=1, T1=120.00, T2=0.00'
+ 2532|'    ID=210611, NAME=T100, TYPE=1, T1=100.00, T2=0.00'
+ 2533|''
+ 2534|'$DEFMATERIAL'
+ 2535|'    ID=110, NAME=C30, TYPE=262, ES=3e+04, PR=0.2, EXC=1e-05, DS=26'
+ 2536|'    ID=210, NAME=Q235, TYPE=261, ES=2.1e+05, PR=0.3, EXC=1e-05, DS=78'
+ 2537|'    ID=310, NAME=C30, TYPE=262, ES=3e+04, PR=0.2, EXC=1e-05, DS=25'
+ 2538|'    ID=410, NAME=Q235, TYPE=261, ES=2.1e+05, PR=0.3, EXC=0.00012, DS=78.5'
+ 2539|'    ID=510, NAME=Q345, TYPE=261, ES=2.1e+05, PR=0.3, EXC=0.00012, DS=78.5'
+ 2540|''
+ 2541|'$SETELEMENT'
+ 2542|'    ID=65908, TYPE=2, NETID=65908, SECTID=1509, MATID1=310, MATID2=-9999, ECS1=0.000, ECS2=0.000, ECS3=0.000, ECE1=0.000, ECE2=0.000, ECE3=0.000, ANG=0.000'
+ 2543|'       EXI=3, 10011, 65908, 10013, 30, 10014, 0 '
+ 2544|'       EXR=19, -1004, 0.000, -1003, 0.000, -1002, 0.000, -1001, 0.000, -119, 1.000, -84, 1.000, -68, 3.000, -67, 1.000, -57, 2.000, -44, 1.000'
+ 2545|'        -43, 80302.000, -42, 192.000, -41, 2.000, -40, 3.000, 10001, 1.000, 10002, 0.000, 10003, 1.000, 10005, 3.000, 10012, 3000441.000 '
+ 2546|'    ID=66008, TYPE=2, NETID=66008, SECTID=1909, MATID1=310, MATID2=-9999, ECS1=0.000, ECS2=0.000, ECS3=0.000, ECE1=0.000, ECE2=0.000, ECE3=0.000, ANG=0.000'
+--- L2552..L2562 柱构件（TYPE=1）与 EXI/EXR
+ 2552|'       EXR=19, -1004, 0.000, -1003, 0.000, -1002, 0.000, -1001, 0.000, -119, 1.000, -84, 1.000, -68, 1.000, -67, 1.000, -57, 1.489, -44, 1.000'
+ 2553|'        -43, 68981.000, -42, 157.000, -41, 2.000, -40, 1.000, 10001, 0.000, 10002, 0.000, 10003, 1.000, 10005, 1.000, 10012, 1000160.000 '
+ 2554|'    ID=66208, TYPE=2, NETID=66208, SECTID=1809, MATID1=310, MATID2=-9999, ECS1=0.000, ECS2=0.000, ECS3=0.000, ECE1=0.000, ECE2=0.000, ECE3=0.000, ANG=0.000'
+ 2555|'       EXI=3, 10011, 66208, 10013, 30, 10014, 0 '
+ 2556|'       EXR=19, -1004, 0.000, -1003, 0.000, -1002, 0.000, -1001, 0.000, -119, 1.000, -84, 1.000, -68, 4.000, -67, 1.000, -57, 1.260, -44, 1.000'
+ 2557|'        -43, 16192.000, -42, 19.000, -41, 2.000, -40, 4.000, 10001, 0.000, 10002, 0.000, 10003, 0.000, 10005, 4.000, 10012, 4000020.000 '
+ 2558|'    ID=66308, TYPE=1, NETID=66308, SECTID=609, MATID1=310, MATID2=-9999, ECS1=0.000, ECS2=0.000, ECS3=0.000, ECE1=0.000, ECE2=0.000, ECE3=0.000, ANG=0.000'
+ 2559|'       EXI=3, 10011, 66308, 10013, 30, 10014, 0 '
+ 2560|'       EXR=17, -1004, 0.000, -1003, 0.000, -1002, 0.000, -1001, 0.000, -119, 1.000, -68, 2.000, -67, 1.000, -44, 1.000, -43, 43351.000, -42, 15.000'
+ 2561|'        -41, 1.000, -40, 2.000, 10001, 0.000, 10002, 0.000, 10003, 0.000, 10005, 2.000, 10012, 2000320.000 '
+ 2562|'    ID=66408, TYPE=2, NETID=66408, SECTID=1409, MATID1=310, MATID2=-9999, ECS1=225.000, ECS2=0.000, ECS3=0.000, ECE1=225.000, ECE2=0.000, ECE3=0.000, ANG=0.000'
+--- L6726..L6736 $SETWALL 头
+ 6726|'        -43, 129276.000, -42, 78.000, -41, 2.000, -40, 5.000, 10001, 0.000, 10002, 0.000, 10003, 0.000, 10005, 5.000, 10012, 5000141.000 '
+ 6727|''
+ 6728|'$SETWALL'
+ 6729|'    ID=183805, TYPE=5, SECTID=183711, MATID=310, MATID2=0, HOLEID=-9999, EC=0.0'
+ 6730|'       NUB=4, NETID= 73308, 153408, 66908, 102208 '
+ 6731|'       EXI=3, 10011, 183805, 10013, 30, 10014, 0 '
+ 6732|'       EXR=15, -84, 1, -82, 1, -73, 1, -71, 1e+04, -68, 1, -67, 1, -64, 0.6, -63, 0.3, -44, 1, -43, 1.14e+05'
+ 6733|'        -42, 3, -41, 5, -40, 1, 10005, 1, 10012, 1e+06 '
+ 6734|'    ID=184005, TYPE=5, SECTID=183711, MATID=310, MATID2=0, HOLEID=-9999, EC=0.0'
+ 6735|'       NUB=4, NETID= 124708, 156408, 118508, 102208 '
+ 6736|'       EXI=3, 10011, 184005, 10013, 30, 10014, 0 '
+--- L6748..L6756 $SETSLAB 头
+ 6748|'        -42, 1, -41, 5, -40, 1, 10005, 1, 10012, 1e+06 '
+ 6749|''
+ 6750|'$SETSLAB'
+ 6751|'    ID=184706, TYPE=6, SECTID=184611, MATID=310, MATID2=0, HOLEID=-9999, EC=0.0'
+ 6752|'       NUB=4, NETID= 109508, 79908, 98608, 144608 '
+ 6753|'       EXI=3, 10011, 184706, 10013, 30, 10014, 0 '
+ 6754|'       EXR=9, -68, 2, -44, 1, -43, 4.37e+04, -42, 79, -41, 6, -40, 2, 10005, 2, 10012, 2e+06, 10217, 0 '
+ 6755|'    ID=185006, TYPE=6, SECTID=184611, MATID=310, MATID2=0, HOLEID=-9999, EC=0.0'
+ 6756|'       NUB=4, NETID= 77308, 74808, 104208, 128908 '
+--- L8074..L8082 $RIGID 头
+ 8074|'       EXR=9, -68, 3, -44, 1, -43, 1.27e+05, -42, 4, -41, 6, -40, 3, 10005, 3, 10012, 3e+06, 10217, 0 '
+ 8075|''
+ 8076|'$RIGID'
+ 8077|'    ID=1, FLOORID=1, NUB=101'
+ 8078|'       SLABID= 188106, 239506, 190806, 242206, 193506, 244906, 196206, 247606, 198906, 250306, 201606, 253006, 204006, 255406, 206706, 258106, 209406, 260506, 212206, 263206'
+ 8079|'           214906, 265906, 217606, 268606, 220606, 271006, 222706, 273106, 225106, 275506, 227506, 277906, 229906, 280306, 232306, 282706, 234706, 185706, 237106, 188406'
+ 8080|'           239806, 191106, 242506, 193806, 245206, 196506, 247906, 199206, 250606, 201906, 253306, 204606, 256006, 207306, 258706, 210006, 261106, 212806, 263806, 215506'
+ 8081|'           266506, 218506, 269506, 221506, 271906, 223606, 274006, 226006, 276406, 228406, 278806, 230806, 281206, 233206, 283606, 235606, 186606, 238006, 189306, 240706'
+ 8082|'           192006, 243406, 194706, 246106, 197406, 248806, 200106, 251506, 202806, 254206, 205506, 256906, 208206, 259306, 210706, 261706, 213406, 264406, 216106, 267106'
+--- L8102..L8114 $DEADLOAD 分组头与 $DEFNODELOAD
+ 8102|'           256606, 207906 '
+ 8103|''
+ 8104|'$DEADLOAD'
+ 8105|'$DEFNODELOAD'
+ 8106|'    ID=6012, KIND=1, EX=0.0, EY=0.0, EZ=0.0, PX=0.000, PY=0.000, PZ=150.000, MX=0.000, MY=0.000, MZ=0.000'
+ 8107|'    ID=11012, KIND=1, EX=0.0, EY=0.0, EZ=0.0, PX=0.000, PY=0.000, PZ=150.000, MX=0.000, MY=0.000, MZ=0.000'
+ 8108|'    ID=36012, KIND=1, EX=0.0, EY=0.0, EZ=0.0, PX=0.000, PY=0.000, PZ=150.000, MX=0.000, MY=0.000, MZ=0.000'
+ 8109|'    ID=43112, KIND=1, EX=0.0, EY=0.0, EZ=0.0, PX=0.000, PY=0.000, PZ=150.000, MX=0.000, MY=0.000, MZ=0.000'
+ 8110|''
+ 8111|'$SETNODELOAD'
+ 8112|'    ID=5907, NUB=1, LOADID= 6012 '
+ 8113|'    ID=10907, NUB=1, LOADID= 11012 '
+ 8114|'    ID=35907, NUB=1, LOADID= 36012 '
+--- L9675..L9677 $END
+ 9675|''
+ 9676|''
+ 9677|'$END'
+
+=== A2. 空行/节头位置 ===
+节头 25 个：
+  L3      $VERSION
+  L6      $DESIGNPARA
+  L58     $STORY
+  L70     $NODECOOR
+  L1306   $NET
+  L2366   $DEFFRAMESECTION
+  L2528   $DEFWASLABSECTION
+  L2534   $DEFMATERIAL
+  L2541   $SETELEMENT
+  L6728   $SETWALL
+  L6750   $SETSLAB
+  L8076   $RIGID
+  L8104   $DEADLOAD
+  L8105   $DEFNODELOAD
+  L8111   $SETNODELOAD
+  L8117   $DEFLINELOAD
+  L8201   $SETLINELOAD
+  L8263   $DEFSLABLOAD
+  L8596   $SETSLABLOAD
+  L8933   $LIVELOAD
+  L8934   $DEFLINELOAD
+  L8978   $SETLINELOAD
+  L9010   $DEFSLABLOAD
+  L9343   $SETSLABLOAD
+  L9677   $END
+
+=== B. PDMSxCA_Addin121.dll 内的 .pdt 格式串（按偏移取 UTF-16LE，NUL 截断） ===
+dll bytes=218624
+  0x02029F  '       EXR= {0} ᔀ,{0}, {1} ─\r\n       EXI= {0} ⤀        {0}, {1:G3} ᬀ,{0}, {1:G3} 耀ₗ\u2000\u2000\u2000䤀䐀㴀笀\u3000紀Ⰰ\u2000一䄀䴀䔀㴀笀\u3100紀Ⰰ\u2000吀夀倀䔀㴀笀㈀紀Ⰰ\u2000䔀匀㴀笀㌀㨀䜀㈀紀Ⰰ\u2000倀刀㴀笀㐀㨀䜀㈀紀Ⰰ\u2000䔀堀䌀㴀笀㔀㨀䜀㔀紀Ⰰ\u2000䐀匀㴀笀㘀㨀䜀㔀紀'
+  0x020344  '    ID={0}, NAME={1}, TYPE={2}, ES={3:G2}, PR={4:G2}, EXC={5:G5}, DS={6:G5}䄀    ID={0}, NODES={1}, NODEE={2}甀    ID= {0}, X= {1:F2}, Y= {2:F2}, Z= {3:F2}, FLOORID= {4}─Pm<SPAS>转PDMS的信息提示́ ܀NUM̀,ऀ$NETᄀ'
+  0x0203DC  '    ID={0}, NODES={1}, NODEE={2}甀    ID= {0}, X= {1:F2}, Y= {2:F2}, Z= {3:F2}, FLOORID= {4}─Pm<SPAS>转PDMS的信息提示́ ܀NUM̀,ऀ$NETᄀ$SETWALL℀$DEFFRAMESECTIONᄀ$SETSLABऀTYPEᜀ$DESIGNPARAᜀ$SETELEMENTഀ$STORYᤀ$DEFM'
+  0x02041E  '    ID= {0}, X= {1:F2}, Y= {2:F2}, Z= {3:F2}, FLOORID= {4}─Pm<SPAS>转PDMS的信息提示́ ܀NUM̀,ऀ$NETᄀ$SETWALL℀$DEFFRAMESECTIONᄀ$SETSLABऀTYPEᜀ$DESIGNPARAᜀ$SETELEMENTഀ$STORYᤀ$DEFMATERIALᤀ$SETSLABLOADᄀ$VERSIONጀ$NO'
+  0x033B1C  '    ID={0}, NAME={1}, SHAPE={2}\r\nἀ        {0:F3},耀₃\u2000\u2000\u2000\u2000\u2000\u2000䬀䤀一䐀㴀笀\u3000紀Ⰰ\u2000䈀\u3100㴀笀\u3100紀Ⰰ\u2000䈀㈀㴀笀㈀紀Ⰰ\u2000䠀\u3100㴀笀㌀紀Ⰰ\u2000䠀㈀㴀笀㐀紀Ⰰ\u2000䈀㌀㴀笀㔀紀Ⰰ\u2000䠀㌀㴀笀㘀紀ഀ\u0a00'
+  0x033B81  '       KIND={0}, B1={1}, B2={2}, H1={3}, H2={4}, B3={5}, H3={6}\r\n漀       T1={0}, T2={1}, T3={2}, T4={3}, T5={4}, T6={5}\r\n开       M={0}, RI={1}, RJ={2}, UA={3}, NAME1={4}ༀ{0}-{1}܁TOSऀTOAXऀLTOC\u0b00普I25bँI2'
+  0x033C05  '       T1={0}, T2={1}, T3={2}, T4={3}, T5={4}, T6={5}\r\n开       M={0}, RI={1}, RJ={2}, UA={3}, NAME1={4}ༀ{0}-{1}܁TOSऀTOAXऀLTOC\u0b00普I25bँI25b\u0b00NETID耀\u209d\u2000\u2000\u2000䤀䐀㴀笀\u3000紀Ⰰ\u2000吀夀倀䔀㴀笀\u3100紀Ⰰ\u2000匀䔀䌀吀䤀䐀㴀笀㈀紀Ⰰ\u2000䴀䄀吀䤀䐀㴀笀㌀紀Ⰰ\u2000䴀䄀吀䤀䐀㈀㴀笀㐀紀Ⰰ\u2000'
+  0x033C75  '       M={0}, RI={1}, RJ={2}, UA={3}, NAME1={4}ༀ{0}-{1}܁TOSऀTOAXऀLTOC\u0b00普I25bँI25b\u0b00NETID耀\u209d\u2000\u2000\u2000䤀䐀㴀笀\u3000紀Ⰰ\u2000吀夀倀䔀㴀笀\u3100紀Ⰰ\u2000匀䔀䌀吀䤀䐀㴀笀㈀紀Ⰰ\u2000䴀䄀吀䤀䐀㴀笀㌀紀Ⰰ\u2000䴀䄀吀䤀䐀㈀㴀笀㐀紀Ⰰ\u2000䠀伀䰀䔀䤀䐀㴀笀㔀紀Ⰰ\u2000䔀䌀㴀笀㘀㨀䘀\u3100紀'
+  0x033D24  '    ID={0}, TYPE={1}, SECTID={2}, MATID={3}, MATID2={4}, HOLEID={5}, EC={6:F1}ऀ {0}\u0b00 {0},\u3100\r\n       NUB={0}, NETID=ԀNO⬀    ID={0}, NUB={1}\r\n耀ₓ\u2000\u2000\u2000\u2000\u2000\u2000一伀㴀笀\u3000紀Ⰰ\u2000䠀䤀㴀笀\u3100紀Ⰰ\u2000䈀䰀㴀笀㈀紀Ⰰ\u2000吀䰀㴀笀㌀紀Ⰰ\u2000圀䤀䐀㴀笀㐀㨀䜀㈀紀Ⰰ\u2000䰀䔀一㴀笀㔀㨀䜀㈀'
+  0x033E3D  '       NO={0}, HI={1}, BL={2}, TL={3}, WID={4:G2}, LEN={5:G2}, HEI={6:G2}椀    ID={0}, NAME={1}, TYPE={2}, T1={3:F2}, T2={4:F2}ᴀ   {0}.{1}.{2}ⴀ       NUB={0}, NETID='
+  0x0202DB  '       EXI= {0} ⤀        {0}, {1:G3} ᬀ,{0}, {1:G3} 耀ₗ\u2000\u2000\u2000䤀䐀㴀笀\u3000紀Ⰰ\u2000一䄀䴀䔀㴀笀\u3100紀Ⰰ\u2000吀夀倀䔀㴀笀㈀紀Ⰰ\u2000䔀匀㴀笀㌀㨀䜀㈀紀Ⰰ\u2000倀刀㴀笀㐀㨀䜀㈀紀Ⰰ\u2000䔀堀䌀㴀笀㔀㨀䜀㔀紀Ⰰ\u2000䐀匀㴀笀㘀㨀䜀㔀紀'
+  0x0202C1  ',{0}, {1} ─\r\n       EXI= {0} ⤀        {0}, {1:G3} ᬀ,{0}, {1:G3} 耀ₗ\u2000\u2000\u2000䤀䐀㴀笀\u3000紀Ⰰ\u2000一䄀䴀䔀㴀笀\u3100紀Ⰰ\u2000吀夀倀䔀㴀笀㈀紀Ⰰ\u2000䔀匀㴀笀㌀㨀䜀㈀紀Ⰰ\u2000倀刀㴀笀㐀㨀䜀㈀紀Ⰰ\u2000䔀堀䌀㴀笀㔀㨀䜀㔀紀Ⰰ\u2000䐀匀㴀笀㘀㨀䜀㔀紀'
+  0x020183  '    ID={0}, TYPE={1}, NETID={2}, SECTID={3}, MATID1={4}, MATID2={5}, ECS1={6}, ECS2={7}, ECS3={8}, ECE1={9}, ECE2={10}, ECE3={11}, ANG={12}─\r\n       EXR= {0} ᔀ,{0}, {1} ─\r\n       EXI= {0} ⤀        {0}'
+  0x02012E  ' {0:F3},ጀ {0:F3}\r\nᜀ    {0:F3},܀EXIԀID܀EXR脀‗\u2000\u2000\u2000䤀䐀㴀笀\u3000紀Ⰰ\u2000吀夀倀䔀㴀笀\u3100紀Ⰰ\u2000一䔀吀䤀䐀㴀笀㈀紀Ⰰ\u2000匀䔀䌀吀䤀䐀㴀笀㌀紀Ⰰ\u2000䴀䄀吀䤀䐀\u3100㴀笀㐀紀Ⰰ\u2000䴀䄀吀䤀䐀㈀㴀笀㔀紀Ⰰ\u2000䔀䌀匀\u3100㴀笀㘀紀Ⰰ\u2000䔀䌀匀㈀㴀笀㜀紀Ⰰ\u2000䔀䌀匀㌀㴀笀㠀紀Ⰰ\u2000䔀䌀䔀\u3100㴀笀㤀紀Ⰰ\u2000䔀䌀䔀㈀㴀笀\u3100\u3000紀Ⰰ\u2000䔀䌀䔀㌀㴀笀\u3100\u3100紀Ⰰ\u2000䄀一䜀㴀笀\u3100㈀紀'
+  0x020154  '    {0:F3},܀EXIԀID܀EXR脀‗\u2000\u2000\u2000䤀䐀㴀笀\u3000紀Ⰰ\u2000吀夀倀䔀㴀笀\u3100紀Ⰰ\u2000一䔀吀䤀䐀㴀笀㈀紀Ⰰ\u2000匀䔀䌀吀䤀䐀㴀笀㌀紀Ⰰ\u2000䴀䄀吀䤀䐀\u3100㴀笀㐀紀Ⰰ\u2000䴀䄀吀䤀䐀㈀㴀笀㔀紀Ⰰ\u2000䔀䌀匀\u3100㴀笀㘀紀Ⰰ\u2000䔀䌀匀㈀㴀笀㜀紀Ⰰ\u2000䔀䌀匀㌀㴀笀㠀紀Ⰰ\u2000䔀䌀䔀\u3100㴀笀㤀紀Ⰰ\u2000䔀䌀䔀㈀㴀笀\u3100\u3000紀Ⰰ\u2000䔀䌀䔀㌀㴀笀\u3100\u3100紀Ⰰ\u2000䄀一䜀㴀笀\u3100㈀紀'
+  0x02007E  'SPCOMPONENT 3 OF SELEC 1 OF SPECIFICATION /Concrete_Wall-SPECଁ-Wallଁ转换完成!ଁCFGV4ༀ打开授权失败!ᄁ {0:F3},ጀ {0:F3}\r\nᜀ    {0:F3},܀EXIԀID܀EXR脀‗\u2000\u2000\u2000䤀䐀㴀笀\u3000紀Ⰰ\u2000吀夀倀䔀㴀笀\u3100紀Ⰰ\u2000一䔀吀䤀䐀㴀笀㈀紀Ⰰ\u2000匀䔀䌀吀䤀䐀㴀笀㌀紀Ⰰ\u2000䴀䄀吀䤀䐀\u3100㴀笀㐀紀Ⰰ\u2000䴀䄀吀䤀䐀㈀㴀笀㔀紀Ⰰ\u2000䔀'
+  0x020042  '-Slabᜁ/WALL_01/ELጀ/WA_01/EL̀1笀SPCOMPONENT 3 OF SELEC 1 OF SPECIFICATION /Concrete_Wall-SPECଁ-Wallଁ转换完成!ଁCFGV4ༀ打开授权失败!ᄁ {0:F3},ጀ {0:F3}\r\nᜀ    {0:F3},܀EXIԀID܀EXR脀‗\u2000\u2000\u2000䤀䐀㴀笀\u3000紀Ⰰ\u2000吀夀倀䔀㴀笀\u3100紀Ⰰ\u2000一䔀吀䤀䐀㴀笀㈀紀Ⰰ\u2000匀䔀䌀吀䤀䐀㴀'
+
+=== C. pkpm_pdms_section_table.csv ===
+bytes=1791903  BOM=efbbbf  CRLF=3177
+rows=3176  cols=38
+columns=['pkpm_name', 'family_cn', 'family_code', 'shapeval_encoding', 'pdms_spec_path', 'pdms_catalogue', 'param_count', 'param_names', 'is_parametric', 'source', 'confidence', 'conflict', 'param_nonnumeric', 'name_variants', 'dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'pdms_spec_owner', 'pdms_sprfile', 'pdms_stcategory', 'pdms_specification', 'para_values', 'stcategory_param_count', 'stcategory_params', 'in_matching_file', 'in_dll_table', 'in_pdms_macro', 'in_userstl_lib', 'in_pdt_sample', 'in_jwd_sample', 'jwd_kind', 'jwd_shapeval', 'pdt_shape', 'pdt_kind', 'pdt_b1', 'pdt_h1', 'pdt_name1']
+  pkpm_name          n=3176 unique=2836
+  pdms_spec_path     n=3176 unique=3176
+  family_code        n=3176 unique=25
+  pdms_catalogue     n=3176 unique=3
+  is_parametric      n=3176 unique=2
+  confidence         n=3176 unique=3
+  source             n=3176 unique=10
+  pdms_stcategory    n=3176 unique=58
+family_code=0/empty rows: 841
+pdms_spec_path empty rows: 0
+pdms_spec_path starts with "/": 3176
+is_parametric values: ['false', 'true']
+confidence values: ['high', 'low', 'medium']
+source values (top 15): ['macro', 'macro+match', 'macro+match+dll_carry_rejected', 'macro+match+dll_carry_validated', 'macro+match+dll_carry_validated+userstl', 'macro+match+dll_explicit', 'macro+match+dll_explicit+jwd', 'macro+match+dll_explicit+jwd+pdt', 'macro+match+dll_explicit+userstl', 'match']
+pdms_catalogue values: ['', '/PKPM_STSS', '/PKPM_USER']
+family_code values: ['', '2', '3', '15', '16', '17', '18', '20', '21', '22', '23', '24', '31', '32', '33', '36', '37', '38', '39', '40', '66', '71', '72', '73', '77']
+
+组合唯一性：
+  (family_code, pkpm_name) unique=2836 / 3176
+  同一 pdms_spec_path 对应多个 PKPM 名: 0 组，例如 []
+
+样例行（挑 3 条）：
+  {"pkpm_name": "H", "family_cn": "用户参数化截面 | Variable Size", "family_code": "16", "shapeval_encoding": "16", "pdms_spec_path": "/USER_H-SPEC/H_Profile", "pdms_catalogue": "/PKPM_USER", "param_count": "6", "param_names": "B1|B2|H|Tw|T1|T2", "is_parametric": "true", "source": "macro+match+dll_explicit", "confidence": "high", "conflict": "", "param_nonnumeric": "", "name_variants": "sprfile=/H_Profile ; match=H ; dll=H", "dll_code_source": "dll_explicit", "dll_table_entry": "H", "family_desc_en": "Variable Size", "family_label_basis": "matching-file // DESC + matching-file // group", "pdms_spec_own
+  {"pkpm_name": "RECT", "family_cn": "用户参数化截面 | Variable Size", "family_code": "", "shapeval_encoding": "", "pdms_spec_path": "/USER_RECT-SPEC/Rectangle_Profile", "pdms_catalogue": "/PKPM_USER", "param_count": "1", "param_names": "Parameter 1", "is_parametric": "true", "source": "macro+match+dll_carry_rejected", "confidence": "medium", "conflict": "DLL code not recoverable (string-dedup) and carry-value rejected by spec-owner cross-check", "param_nonnumeric": "", "name_variants": "sprfile=/Rectangle_Profile ; match=RECT ; dll=RECT", "dll_code_source": "dll_carry_rejected", "dll_table_entry": "RE
+  {"pkpm_name": "HN400X200", "family_cn": "Hot Roll GB/T11263-1998", "family_code": "39", "shapeval_encoding": "39,400,200", "pdms_spec_path": "/H_INTERNATIONAL-SPEC/HN400X200", "pdms_catalogue": "/PKPM_STSS", "param_count": "13", "param_names": "h(mm)|b(mm)|tw(mm)|tf(mm)|r(mm)|A(cm2)|g(kg/m)|Ix(cm4)|Wx(cm3)|ix(cm)|Iy(cm4)|Wy(cm3)|iy(cm)", "is_parametric": "false", "source": "macro+match+dll_explicit+jwd+pdt", "confidence": "high", "conflict": "", "param_nonnumeric": "", "name_variants": "sprfile=/HN400X200 ; match=HN400X200 ; dll=HN400X200 ; jwd=HN400X200", "dll_code_source": "dll_explicit", "d
+
+DONE

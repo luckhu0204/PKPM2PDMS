@@ -1,0 +1,32 @@
+read_jwd: counts = {'levels': 5, 'joints': 382, 'sections': 28, 'members': {'beam': 598, 'column': 200, 'brace': 13}, 'members_total': 811, 'slabs': 222, 'slabs_holes': 29, 'slabs_with_thickness': 80, 'walls': 0, 'loads': {'beam-line': 77, 'joint-point': 44}, 'loads_total': 121}
+SectionMap: 原件 2836 行 + 补充 3 行；warnings=0
+used_sections = 24
+   id=1116   kind=1    table=col    name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [600.0, 600.0]
+   id=1380   kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [300.0, 600.0]
+   id=1927   kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [400.0, 800.0]
+   id=2180   kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [300.0, 800.0]
+   id=2474   kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [300.0, 500.0]
+   id=2540   kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [300.0, 700.0]
+   id=3166   kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [200.0, 400.0]
+   id=3985   kind=303  table=col    name='薄壁方钢管: B25'       -> resolved   shapeval /RECT_SQUARE6728_2002-SPEC/B250*10.00 
+   id=4080   kind=2    table=beam   name=''                 -> parametric family   /USER_H-SPEC/H_Profile [250.0, 250.0, 500.0, 10.0, 16.0, 16.0]
+   id=4495   kind=26   table=beam   name='HN300X150'        -> resolved   name     /H_INTERNATIONAL-SPEC/HN300X150 
+   id=4567   kind=1    table=col    name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [500.0, 500.0]
+   id=21323  kind=26   table=beam   name='HN350X175'        -> resolved   name     /H_INTERNATIONAL-SPEC/HN350X175 
+   id=22900  kind=26   table=beam   name='HN200X100'        -> resolved   name     /H_INTERNATIONAL-SPEC/HN200X100 
+   id=26489  kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [300.0, 450.0]
+   id=27784  kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [300.0, 400.0]
+   id=28088  kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [400.0, 700.0]
+   id=29683  kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [300.0, 550.0]
+   id=31319  kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [250.0, 600.0]
+   id=31412  kind=1    table=beam   name=''                 -> parametric family   /USER_RECT-SPEC/Rectangle_Profile [250.0, 400.0]
+   id=32335  kind=3    table=brace  name=''                 -> unresolved none     - 
+   id=43770  kind=26   table=beam   name='HN500X200'        -> resolved   name     /H_INTERNATIONAL-SPEC/HN500X200 
+   id=62091  kind=26   table=beam   name='HN400X200'        -> resolved   name     /H_INTERNATIONAL-SPEC/HN400X200 
+   id=62767  kind=26   table=beam   name='HW200X200'        -> resolved   name     /H_INTERNATIONAL-SPEC/HW200X200 
+   id=62965  kind=303  table=brace  name='薄壁方钢管: B20'       -> resolved   shapeval /RECT_SQUARE6728_2002-SPEC/B200*10.00 
+resolve 状态统计（被引用截面）: {'parametric': 15, 'resolved': 8, 'unresolved': 1}
+Kind=26: 6 个；Name 命中 6
+Kind=303: 2 个；全部命中 True
+unresolved（被引用）: [(32335, 3, '', ['3#20'])]
+DONE (read-only)

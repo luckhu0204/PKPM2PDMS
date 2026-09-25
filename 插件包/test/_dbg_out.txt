@@ -1,0 +1,11 @@
+'define function !!pkpmjwdUniquename(!base is STRING) is STRING'
+'  if (defined(!!pkpmjwdRenames)) then           -- ↑ defined()：nucdesogwall.pmlobj:206'
+"    !!pkpmjwdRenames.append('FAIL||')           -- ↑ .append()：GRIDDESIGN.pmlfrm:986"
+'    var !probe EXIST /$!cand                    -- ↑ 占用探测写法①：abaarealib.pmlfrm:107-114'
+'      handle (2,109)                            --   (2,109) = Undefined name ⇒ 可用'
+'          return !cand                          --   handle 内 return：abaarea.pmlfrm:527 同形态'
+'      endhandle'
+"  !!pkpmjwdRenames.append('FAIL|' & !base & '|' & !base & 're99')"
+---
+sig in b: True
+has eq-op: True

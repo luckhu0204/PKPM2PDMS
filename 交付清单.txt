@@ -1,0 +1,970 @@
+﻿==========================================================================
+ 交付清单 —— PKPM-JWD 导入导出（工作区归集版 · R3 更新）
+==========================================================================
+更新时间   : 2026-09-25 20:39:25（由 插件包\deliver\collect_r3.py 重新生成）
+插件包版本 : v2.0（契约 CONTRACT v3 = v1 + R2 + R3；CONTRACT_VERSION 常量 = "1.0"）
+版本依据   : docs/使用说明.md 头部『版本：v2.0』；spec/CONTRACT.md 的 CONTRACT_VERSION = "1.0"；spec/CONTRACT.md:1『CONTRACT v3 = v1 + R2 + R3』
+R3 新增    : ① PDMS 原生插件（.NET Add-in + PML 混写，见"PDMS原生插件\"与插件包\pdms-net\）
+             ② 宏内重名唯一化（!!pkpmjwdUniquename：占用名自动加 re/re2/… 后缀，
+                改名记录进 report.renames —— pdms\pkpmjwduniquename.pmlfnc + docs\重名处理说明.md）
+             ③ 引擎独立可执行 engine\dist\pkpmjwd_engine.exe（PyInstaller，免 Python 环境）
+编码       : 复制件为原样字节复制。开工前实测：pdms\ 下 5 个 .pmlfrm/.pmlfnc/.mac 全部
+             GBK 可解码、无 BOM、纯 CRLF；pdms-net\build.cmd 纯 ASCII + CRLF；pkpmjwd.uic
+             UTF-8 无 BOM + LF（与在用 tgtext.uic 逐字节同构，pdms-net\README.txt §8）。
+             本清单与 从这里开始.txt 为 UTF-8 带 BOM + CRLF。
+
+--------------------------------------------------------------------------
+一、这里有什么
+--------------------------------------------------------------------------
+  插件包\          源码完整包（832 个文件 / 165,422,933 B (157.76 MiB)，R3 同步，逐文件 SHA256 见第四节）
+    engine\        Python 转换引擎（只用标准库）：cli.py 12 子命令 + gui.py 五页签 +
+                   读/写/宏/数据库模块 + section_table.csv（4.8MB 截面字典）
+    engine\dist\   pkpmjwd_engine.exe（PyInstaller 独立引擎，8,866,520 B）+ run_engine.cmd
+                   （构建中间目录 _pybuild 按临时目录跳过，未复制）
+    pdms\          PDMS 侧 PML（GBK 无 BOM + CRLF）：pkpmjwd.pmlfrm / pkpmjwdexport.pmlfnc /
+                   pkpmjwddbexport.pmlfnc / pkpmjwduniquename.pmlfnc（R3 重名唯一化）/ pkpmjwdrun.mac
+    pdms-net\      R3 原生插件源码树（与"PDMS原生插件\"同内容，随包同步的一份）
+    install\       install.ps1 / uninstall.ps1（legacy PML 路线；窗体导出功能仍依赖它）
+    docs\          使用说明.md（先读）+ 原生插件说明.md + 重名处理说明.md（R3 新增）+
+                   格式规范_JWD/PDT + 数据库转化说明 + 转化表说明 + 截面映射说明 + 交付清单/报告
+    spec\          CONTRACT.md —— 唯一接口契约（v1 + R2 + R3）
+    test\          测试与证据（acceptance.py / acceptance_r2.py / acceptance_r3.py 及各检查）
+    deliver\       交付脚本（copy_to_plugin.py / collect_to_workspace.py / collect_r3.py）
+  PDMS原生插件\    pdms-net 整树（29 个文件 / 202,794 B (198.0 KiB)）：
+    *.cs ×5        IAddin 入口 / WinForms 窗体 / .NET↔PML 桥 / 引擎进程调用 / 日志
+    build.cmd      编译命令（C#3 / x86 / CLR2，源码内注释标参照行；本交付未执行它）
+    pkpmjwd.uic    菜单/工具条定义（与 tgtext.uic 同构；UTF-8 无 BOM + LF）
+    dist\          编译产物 PKPMJWD.dll（40,960 B，CLR v2.0.50727 / x86）+ pkpmjwd.uic 副本
+    deploy\        deploy_pkpmjwd.py / undeploy_pkpmjwd.py（缺省 dry-run、只加不删、可回滚）
+    _selftest\     沙箱自检脚本与沙箱（verify_dll.ps1 / sandbox_test.py 等，可复核可复跑）
+  交付清单.txt     本文件；从这里开始.txt 快速上手
+  _备份_被覆盖_20260925_203926\   本次覆盖前移出的旧文件备份（2 个，未删除）
+
+--------------------------------------------------------------------------
+二、怎么用（主用法 = PDMS 内菜单；安装务必在 PDMS 停机时）
+--------------------------------------------------------------------------
+  【第一步：装原生插件（R3 主路线，PDMS 停机时）】
+        cd /d <本目录>\PDMS原生插件\deploy
+        python deploy_pkpmjwd.py               <- dry-run：打印"将要改变的全部对象"，不落盘
+        python deploy_pkpmjwd.py --execute     <- 确认清单无误后真执行（PDMS 必须已停机！）
+    改动 5 步（只加不删、幂等、可回滚）：备份两个 XML（.pkpmjwd-bak）-> DesignAddins.xml
+    追加 <string>PKPMJWD</string> -> DesignCustomization.xml 追加 <CustomizationFile/>（最易漏）
+    -> 复制 dist\PKPMJWD.dll、dist\pkpmjwd.uic 到 <PDMS根>\ -> 写 PKPMJWD\engine_path.txt 与
+    pml\pkpmjwduniquename.pmlfnc。
+  【第二步（可选）：装 legacy PML（原生窗体的导出功能需要）】
+        powershell -NoProfile -ExecutionPolicy Bypass -File 插件包\install\install.ps1 -DryRun
+        powershell -NoProfile -ExecutionPolicy Bypass -File 插件包\install\install.ps1
+  【第三步：完全退出并重启 PDMS】-> DESIGN 模块菜单栏出现「PKPM JWD」->「PKPM JWD 导入导出」
+    打开原生窗体（主用法）：一窗三向——转换（jwd2pdt/pdt2jwd 等）、建 PDMS 模型（jwd2pdms/
+    pdt2pdms，宏自动 $M 执行、宏内重名自动加 re 后缀）、截面库（jwd2db/pdt2db 生成目录/规格宏）、
+    导出（pdms2jwd/pdms2pdt，经 PML !!pkpmjwdexport 取 PDMSDUMP 文本）；执行完看摘要与 report.json。
+  【备用】外置命令行：python engine\cli.py --help（12 子命令）；免 Python：
+    engine\dist\pkpmjwd_engine.exe；桌面图形界面：python engine\gui.py（五页签）。
+  【卸载】原生插件：python undeploy_pkpmjwd.py（先 dry-run；XML 从 .pkpmjwd-bak 逐字节复原、
+    4 个安装文件移入 _uninstalled_<时间>\，不删除）；legacy：install\uninstall.ps1（先 -DryRun）。
+  注：截面匹配文件用你自己的《PKPM转PDMS截面匹配文件.txt》（按交付纪律不随包分发）。
+
+--------------------------------------------------------------------------
+三、版本与注意事项
+--------------------------------------------------------------------------
+  1. ★ 本交付【未部署】★：从未执行 deploy/build/install 脚本、从未启动 PDMS、从未注册 DLL、
+     从未改写 D:\AVEVA 下任何文件、从未写 G 盘（收尾有 G 盘两次指纹自证）。
+  2. 安装脚本只在沙箱验证过（deploy/undeploy 沙箱 FAILS: 0；install.ps1 只 -DryRun 过）；
+     菜单/窗体在真实 PDMS 里的效果【未实机验证】——首次安装先用 dry-run 看清单。
+  3. 安装程序\ 下两个 exe 是 2026-09-24 的 v1 图形入口；R3 功能以源码版 + 独立引擎 exe 为准。
+  4. 荷载不做（R2 §9.3）；板/墙 3 条占位规格按自己的等级库核对替换（使用说明 §10.4）。
+
+--------------------------------------------------------------------------
+四、逐文件清单（同步后逐一比对：字节数 + SHA256，全部一致才汇总为 PASS）
+--------------------------------------------------------------------------
+  插件包：832 个文件 / 165,422,933 B (157.76 MiB)；PDMS原生插件：29 个文件 / 202,794 B (198.0 KiB)
+  跳过未复制（仍保留在工作区，未删除）：
+    [插件包] _备份_待删_20260924  <- 待删备份暂存区（非交付物）（10 文件）
+    [插件包] deliver\__pycache__  <- 缓存/临时目录（3 文件）
+    [插件包] engine\__pycache__  <- 缓存/临时目录（13 文件）
+    [插件包] engine\dist\_pybuild  <- PyInstaller 构建中间产物（临时）（15 文件）
+    [插件包] pdms-net\_selftest\_rootsim\PKPM-JWD-sim  <- 目录联接/符号链接（不跟随，防循环）（0 文件）
+    [插件包] pdms-net\_selftest\_rootsim\pdms-net  <- 目录联接/符号链接（不跟随，防循环）（0 文件）
+    [插件包] test\__pycache__  <- 缓存/临时目录（20 文件）
+    [插件包] test\_acc_tmp  <- 缓存/临时目录（32 文件）
+    [插件包] test\_dev  <- 开发探针目录（前次任务点名跳过）（148 文件）
+    [插件包] test\_s3_cli\__pycache__  <- 缓存/临时目录（2 文件）
+    [插件包] test\_s6_scratch  <- 缓存/临时目录（26 文件）
+    [PDMS原生插件] _selftest\_rootsim\PKPM-JWD-sim  <- 目录联接/符号链接（不跟随，防循环）（0 文件）
+    [PDMS原生插件] _selftest\_rootsim\pdms-net  <- 目录联接/符号链接（不跟随，防循环）（0 文件）
+
+  逐文件（相对路径 | 字节 | SHA256）：
+    插件包\README.txt  |  2,692 B  |  a39f1bf907d29804468e096ebfd67274a8e6fce706c0ed9493dbf8687ea2ce1f
+    插件包\deliver\README.txt  |  1,130 B  |  10aa621c0fd8ca229fcae23e8c814314bda91f827325d2b536d274eefa4821ec
+    插件包\deliver\collect_r3.py  |  42,381 B  |  e3f4ba7cab7f8a4d38f62c869e37d521d376774b4674afcb493d5ae9c5c163aa
+    插件包\deliver\collect_to_workspace.py  |  50,197 B  |  9a1020fca683424dd98609649eb385496dc24b4b3b6e0889b1ae2eea06e6c075
+    插件包\deliver\copy_to_plugin.py  |  22,492 B  |  97a0210a5930956017ecb85046b6864806923782df35cb5f0333ba5c87d9792d
+    插件包\docs\README.txt  |  1,510 B  |  26fe3a11f34e8754670c6cee3a61f8309b6b8464484a0f477770b3e9265ac7c2
+    插件包\docs\交付报告.md  |  115,312 B  |  dff37df0bc2cc850c9b7e21b13f04b0ac9e3673b39b9718c348991c90c59d734
+    插件包\docs\交付清单.md  |  21,153 B  |  f0cbb67e156c1f956345f4b35844a5e7bfaf6bca5f6d926a44594d32298d2e13
+    插件包\docs\使用说明.md  |  16,551 B  |  f9bae355d5fbc08d1a0e904e1e62ea0abaa18093cb29f2df9683ffe8d0c63027
+    插件包\docs\原生插件说明.md  |  12,681 B  |  7b60867d8be887d03092d78d39cb824f21d3bb62b19fdc1333a0642a6158a154
+    插件包\docs\截面映射说明.md  |  41,269 B  |  200a6e5d856c25bf089990b83c947282715e95bd8dd5384338c8bccaf2148ef3
+    插件包\docs\推断项_Kind3圆形截面.md  |  6,628 B  |  da869ff83a0de60ea2eab37f8852404ab09ac74e5a699d3e6fe49db168355889
+    插件包\docs\数据库转化说明.md  |  19,075 B  |  18bc5927c50ce405b9a3af8d8c6b108c1c9b6a19453b5bc9ee0894b530ef24a9
+    插件包\docs\格式规范_JWD.md  |  25,253 B  |  7b3e26c64c2e6dfd11f32873b8f27fac04f7b7f1124e5b63bb4163a1a1a01a46
+    插件包\docs\格式规范_PDT.md  |  16,158 B  |  bbcf08c292b0489d021b9d0c4eda618e1c96358d0221ad5c97897124e6c10b5e
+    插件包\docs\转化表说明.md  |  13,392 B  |  30860874784e4af27307e05ddc82628464292b6981b0bfc2e0d7918b415771c6
+    插件包\docs\重名处理说明.md  |  8,597 B  |  9e1d111f389b19bf66f4ef737e3fbabb03546a60fd2d569340b2bc9f8a2ca6ed
+    插件包\engine\README.txt  |  3,636 B  |  b8ffd8eda7aeb28cb8b30323fced3c63d47ac7b05da84aa5ac48c959e53db6af
+    插件包\engine\canonical.py  |  33,504 B  |  9917fb5ba85b1a29611150a6668ac668b364c8550e2ce075df84a5e82a8f3da9
+    插件包\engine\cli.py  |  126,688 B  |  6afe8286498c425cd9af0f159262c4e2940ae8463a91f3d087996d66ae720076
+    插件包\engine\dbmacro.py  |  49,720 B  |  c79eb55314a73e6de02018e26d50f5ed8c16aea5082b21762fac5f67eea2d061
+    插件包\engine\dbparse.py  |  62,416 B  |  72d7dd2c824655b203a8d9abe0a0d3c8052a55c8050e47f1ca94db2d8e1ee9b9
+    插件包\engine\dist\pkpmjwd_engine.exe  |  8,866,520 B  |  dfe230e94bf1a299ea0f95e2b13c3051142666e144d2f2e9ab1d5d067c6caec2
+    插件包\engine\dist\run_engine.cmd  |  910 B  |  b66ad44a5308e2ed25f20df54383d54a6e26e97982cd5004483a7af5d4d321a0
+    插件包\engine\gui.py  |  40,245 B  |  efa47a04ff40011fb18d1d869d3b1f04b00f08a4d31f9e92cc066bfe71dd9176
+    插件包\engine\jwd_read.py  |  42,098 B  |  32da5c9034076da090675db66560cee687c5934dc9fda8b99c08652b504c31f8
+    插件包\engine\jwd_write.py  |  83,457 B  |  e1ec86722a834c5f83c80b766c4399e1283426de76abe7b0b9dc4a2120798161
+    插件包\engine\macgen.py  |  44,421 B  |  d8ffe3279a8bf90c7fafee17ae2b88e77e3a114d138a040987fd881533991fdf
+    插件包\engine\pdms_dump.py  |  32,508 B  |  cf2a180f0c9d5b50f2227cbb0155f11c2ad08a52b9239218626dde7bce24c4b1
+    插件包\engine\pdt_read.py  |  40,636 B  |  6e0ec132ff6128bb7d317244c4e7b0df26610caa356510e60af204401e4c160e
+    插件包\engine\pdt_write.py  |  46,382 B  |  3448f8a473fa98001bf10b0775612ca341987da58c4944e37b631ec266be39b2
+    插件包\engine\secmap.py  |  37,452 B  |  cf9efc4b184a48179f9d4c16ce5217b92a32dbab224ddab798a4bcdb78e3983a
+    插件包\engine\secmap_extra.txt  |  4,100 B  |  81d959c0a493236d40bd2d19cadba2793bb08dba33f75a062eb49f6781f51d45
+    插件包\engine\section_table.csv  |  4,835,597 B  |  ade94b8159226b376479a362c999e968b60e11733fcd90b840a41569171fbfa5
+    插件包\engine\section_table.meta.json  |  1,416 B  |  613eeee49733d26474812098ed6122ef01402a4574b76e9cc4e0142404d85339
+    插件包\engine\sectionlib.py  |  107,281 B  |  4a35acf2798d97c9a3bb7b45fe65e4090f2d3a7eb38a8b6ba7ccf875f79ace14
+    插件包\install\README.txt  |  1,492 B  |  4b7f49d9f9baad0efc0d44da34915939cf475a03e1756155319c16b891aa2c49
+    插件包\install\install.ps1  |  14,421 B  |  a93c34e37fb942d5d01478769fa91634e2358e14d0034a2bbba8cad643e8b824
+    插件包\install\uninstall.ps1  |  10,121 B  |  e780b7d08edd72729859fa3deb5224a8edf0cf8ffb103ae34af223b05c7cb258
+    插件包\pdms-net\ENGINE_IO.md  |  12,668 B  |  c11de88ed68e128d84346260d352006619bc7d1cca02043d3249fb78ff90181c
+    插件包\pdms-net\EngineRunner.cs  |  9,388 B  |  611eb1d88cefabe3da54331563f4d8431327a191feef824d69fa048c400b7ae9
+    插件包\pdms-net\PKLog.cs  |  2,022 B  |  82582d8d9dd4bfbe4f7e02162b9a850c3b947f988b30df6b52e08f396d6516a4
+    插件包\pdms-net\PKPMJWDAddin.cs  |  6,507 B  |  98cda228734b358a2b6a31d5559384d2eaf80c1644b8365d53813ad3360fc352
+    插件包\pdms-net\PKPMJWDForm.cs  |  31,951 B  |  11249541f455e95785941cc778452769e9232f06d6343a24861ae9e3baaf68b5
+    插件包\pdms-net\PmlBridge.cs  |  5,153 B  |  2b24c72c10eeef8de64849c9959ab5d170679843ebc6a818c9200676fbca49de
+    插件包\pdms-net\README.txt  |  11,550 B  |  1f0bf285054abf2a1f50eed9ef473f6b1285da2dc4f8e72293e53e86b1d5053b
+    插件包\pdms-net\_selftest\_rootsim\build.cmd  |  1,641 B  |  112b3740ac322e64b35b2660d516f3b79dd3cb500705d1303e8efb125ea432f5
+    插件包\pdms-net\_selftest\_sandbox\DesignAddins.xml  |  1,140 B  |  43e906c81e084e51125ffefb7f26fb8cc805e41722bf7694d8abebac12124efe
+    插件包\pdms-net\_selftest\_sandbox\DesignAddins.xml.pkpmjwd-bak  |  1,140 B  |  43e906c81e084e51125ffefb7f26fb8cc805e41722bf7694d8abebac12124efe
+    插件包\pdms-net\_selftest\_sandbox\DesignCustomization.xml  |  688 B  |  d9863eb3a9b2dcc07a74daf3ab0474622c0aed1df3182d3ea14bff1e34b7dec9
+    插件包\pdms-net\_selftest\_sandbox\DesignCustomization.xml.pkpmjwd-bak  |  688 B  |  d9863eb3a9b2dcc07a74daf3ab0474622c0aed1df3182d3ea14bff1e34b7dec9
+    插件包\pdms-net\_selftest\_sandbox\PKPMJWD\_uninstalled_20260925-052827\PKPMJWD.dll  |  40,960 B  |  028f61a5f2e59181276d2cbf688034be36b5d1b40e0324956f0f10b111b104ec
+    插件包\pdms-net\_selftest\_sandbox\PKPMJWD\_uninstalled_20260925-052827\engine_path.txt  |  97 B  |  fddf68c886c6e1a64f221315ed279d6eb19b3c071ca7a62863c2ebb9828e0e6b
+    插件包\pdms-net\_selftest\_sandbox\PKPMJWD\_uninstalled_20260925-052827\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\pdms-net\_selftest\_sandbox\PKPMJWD\_uninstalled_20260925-052827\pkpmjwduniquename.pmlfnc  |  33 B  |  ce99fa6ac90a0190ea5b5116aececce756697adcb04e73d8490d1c6ffb75cb9d
+    插件包\pdms-net\_selftest\_sandbox_src\fake_engine.exe  |  7 B  |  25b2d486f51a7d2d20b56f9b959b1aab4aa2e47ea5befa48d938f7d8e8fc8082
+    插件包\pdms-net\_selftest\_sandbox_src\pkpmjwduniquename.pmlfnc  |  33 B  |  ce99fa6ac90a0190ea5b5116aececce756697adcb04e73d8490d1c6ffb75cb9d
+    插件包\pdms-net\_selftest\audit_files.py  |  2,847 B  |  3dcd46885a992199f1ec2c733e3afaf98d74791ea943f18f95f3eba40a2def89
+    插件包\pdms-net\_selftest\read_gbk.py  |  852 B  |  46c47e42233abc1f9dd5ee050be269083ffc8fe0c544a74ff99650ff0d764717
+    插件包\pdms-net\_selftest\sandbox_test.py  |  7,182 B  |  8070e061c9abb23535fa60f2d7e986d2e274406e1abbbd90b2be6caeb3444b5c
+    插件包\pdms-net\_selftest\verify_dll.ps1  |  1,761 B  |  797b4b92786b44e7cd7a5a02700d86e2703fb0a22d5566151915f3dd985d1128
+    插件包\pdms-net\_selftest\write_static.py  |  4,371 B  |  0b98bb70289cd8de5e367441eabb4582ad2de8aebfdaa698b733dbe03c52ef32
+    插件包\pdms-net\build.cmd  |  1,641 B  |  112b3740ac322e64b35b2660d516f3b79dd3cb500705d1303e8efb125ea432f5
+    插件包\pdms-net\deploy\deploy_pkpmjwd.py  |  10,004 B  |  fa50df6c94641ced5e241a97d8ecc5799a03887ef9922f07280a3ca4b548e009
+    插件包\pdms-net\deploy\undeploy_pkpmjwd.py  |  4,240 B  |  9a18d2c230cef187713488fdb52018c94edf5b91019640d01fc13a4724d0f340
+    插件包\pdms-net\dist\PKPMJWD.dll  |  40,960 B  |  45b80ca5fff037633b18a8aaf1480323fb73bfa667b637c7525a0f6d07aa40a4
+    插件包\pdms-net\dist\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\pdms-net\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\pdms\README.txt  |  13,451 B  |  6d0241f3a13d17ef55238686232c2838255301e479f5b8dd1e5fc911f980b979
+    插件包\pdms\pkpmjwd.pmlfrm  |  9,912 B  |  457577c255d84270bdbdc66dc1ecd8d2663cdd06f907a0e3b0c61eaafcd4c655
+    插件包\pdms\pkpmjwddbexport.pmlfnc  |  13,213 B  |  1f8aabc27b905b443115d316f5979c8d4bef8eca37d52693b06bf6ae54fc4b49
+    插件包\pdms\pkpmjwdexport.pmlfnc  |  19,708 B  |  3e11c3900ccd1f0501dc31bebfd76012efcb62ae96b9c2793f5a30e42582f280
+    插件包\pdms\pkpmjwdrun.mac  |  1,589 B  |  5b758c700ff949deda0976ca4c54ac3eb91354d41ce5e2ecb7001eafc347b4b2
+    插件包\pdms\pkpmjwduniquename.pmlfnc  |  10,050 B  |  7905a010b8e4f406d406f5aaa2b59b6cffd1df1d8a8e64d1553e3ffdebd207a5
+    插件包\spec\CONTRACT.md  |  205,757 B  |  c7cca4b78b813ed4dee5e7b0aaf436d0d6637986652702e1243a8e218bb08389
+    插件包\spec\README.txt  |  2,021 B  |  6f34efaf04de3d7a4ee23d46bceca98cc421aaa908aa96a7501af88e9d807c5c
+    插件包\spec\out\README.txt  |  1,028 B  |  57f9b8ada10aa6f1625895741ca2905623bcdb9901a3a33c6e31e2d8d4ecaca0
+    插件包\test\README.txt  |  5,286 B  |  49e80fa2e8993ac153c0495ec3b05c30027842b2550267373689de0d35ed0725
+    插件包\test\_acc_check_override.py  |  2,730 B  |  82bd1f29c04173a837ff3f7d7179368c6cc25d2e51708162e1582b0b64d5f7c6
+    插件包\test\_acc_check_override.txt  |  1,283 B  |  4d34a7ad55f99e8af7bae5de05a3976f92865da8654c6df8b7e64e1a15ec5c59
+    插件包\test\_acc_check_smoke.py  |  2,015 B  |  560c8bbb8aeec0809b695202bd082d1da2886558f88d743265d49571e629b3aa
+    插件包\test\_acc_check_smoke.txt  |  6,980 B  |  3e13655e8cb15b418768de0076458c0ca10fd38b1cde431f9659d1e367118c0a
+    插件包\test\_acc_negative_check.py  |  2,374 B  |  f9b0d7ea777d4420239f49f8e9f8c7ca95cb10d39a28301c264d28065166b2ab
+    插件包\test\_acc_patch_extra.py  |  3,698 B  |  75596d328451a7e2edfb567ccc8163c8eda4e70cfb720324e2163dac9f4c6fc3
+    插件包\test\_acc_pkg_check_deliverables.txt  |  5,230 B  |  44c1fc85bfac71cd36f2af68ab352a499b334e6d2119d84b838638061cb3c8af
+    插件包\test\_acc_pkg_check_dump_grammar.txt  |  1,332 B  |  e5ecd5185e855f426b0bb753ca4d55ac6061b60376c452c2c2886b8cfc7acb0f
+    插件包\test\_acc_pkg_check_dump_to_jwd.txt  |  11,703 B  |  99d257d45f9b5962050057258105eb4c23158358e0b0d67aaa98b4fce563e029
+    插件包\test\_acc_pkg_check_jwd_write_roundtrip.txt  |  6,949 B  |  94d2469020f2bb142b4ad4d696794cf5ef827b1df6fa8f1902df1463d1e9d3dd
+    插件包\test\_acc_pkg_check_markdown_tables.txt  |  325 B  |  b20c41b6f5622fc95a2789029b727e4e0674b28fa28f95c20f4fd2c7e9798a94
+    插件包\test\_acc_pkg_check_pml.txt  |  760 B  |  816efeaa5009cec1807edbe7ab320f50cfb7a025a93047582d664b19ba505096
+    插件包\test\_acc_pkg_test_contract_selfcheck.txt  |  2,287 B  |  c239f8b82b4518fb16bded46ea3811206491b3d1996aba65565847b29eb4f221
+    插件包\test\_acc_probe.py  |  2,554 B  |  f091ccbea70938dc6ea99ba53b960d0d9e0c011e24f095fb3dc7066c49f99287
+    插件包\test\_acc_probe10.py  |  1,592 B  |  bfa81cbb68cb0af357c994e02ba5a6553067f79bd355568dfd4732cdb45c4bdd
+    插件包\test\_acc_probe11.py  |  2,895 B  |  aecafbc6ed49abbdc0a8a91af5e070b123e0b588768a57a6861c12975351ad04
+    插件包\test\_acc_probe3.py  |  3,050 B  |  c57eb3d2c154984526de463f0c5ea045470183660b7c5d49fbab094d5bcd3191
+    插件包\test\_acc_probe4.py  |  2,445 B  |  854412566b8fc99a13ad65e7bc84f4671f2e81431a4a0e95e82ee79dfae90b34
+    插件包\test\_acc_probe5.py  |  2,177 B  |  7593b1def2587097cfe3a3de25fa6155856366aef753a180ee0e33a8fb23f4a7
+    插件包\test\_acc_probe6.py  |  4,753 B  |  a66c2390a629d793542a683568e7bc495f2097b6f089b8cbe6ba660c9ddd4ceb
+    插件包\test\_acc_probe7.py  |  5,269 B  |  8455739a9420d14242dc42b493a0045c27400d9764c0803c91f465ae82c7e594
+    插件包\test\_acc_probe8.py  |  3,886 B  |  d64b4220756a53e22e62cf1c2f319cb13a415681251ab4f4bac33dba8ba706ec
+    插件包\test\_acc_probe9.py  |  1,486 B  |  bb1a04b37b3145e2a6f656dc2afd92de1d86ae4d7d97fd605e099d06e8731e47
+    插件包\test\_acc_probe_cat.py  |  1,725 B  |  33cd86efac4b81e2355a9cd4a1e513a7ecc61b5c997f18d1ffdd98a28abfa2ee
+    插件包\test\_acc_probe_cat2.py  |  1,883 B  |  18bcf7f6b20fb5fe94a39e2f54665b9d759a60618479f421501e8bc415fdadf6
+    插件包\test\_acc_probe_cat2.txt  |  306 B  |  8de20103b7998fdc788dffc1c62e1fb1b23faea22922a045221f444f6e3472c7
+    插件包\test\_acc_probe_cat3.py  |  1,707 B  |  d741b1dc6ae12b4c947bfeea5e53622476cabb078842636fb45099231556500c
+    插件包\test\_acc_probe_cat3.txt  |  3,152 B  |  4fc75f6ec29b7d2268c99b1df20587381fcf30843cc6d08040612ceed067b8fd
+    插件包\test\_acc_probe_cat4.py  |  2,181 B  |  feda0389a14cca5004c8f27443b7679db404302a350b4b9829e9422629354b2e
+    插件包\test\_acc_probe_cat4.txt  |  22,484 B  |  e53e400a8262d706542f614d621e6d01e887e4776d2859c5518fd7d8b1a4c4d4
+    插件包\test\_acc_probe_circle.py  |  2,112 B  |  3f26ab8589e667218adc198f0f74cc185c9a3a32c63b67a179be676c1cbbcdd1
+    插件包\test\_acc_probe_circle.txt  |  10,005 B  |  b4484a052a06e9418599e8c1f6561d29738564388a8a7374ca532c2f1396b092
+    插件包\test\_acc_probe_dbout.py  |  1,412 B  |  83700b2c999d1fc6d604678c6a7b82f8aa8c970ace78df0ac6c44056a468cbb3
+    插件包\test\_acc_probe_dbout.txt  |  1,978 B  |  58b04cbc614ae83100f52245f38689bdec8cd31830c91ce66458057b3fed6cd8
+    插件包\test\_acc_probe_jwd.py  |  1,634 B  |  dc9f3259c780222a53311f06b61f6a44e45a46639e1d172b9759594a087af196
+    插件包\test\_acc_probe_jwd.txt  |  12,523 B  |  d00df942f5b9787618d1c4364220c987a368b8be530d01bb75443b71d5b08fbc
+    插件包\test\_acc_probe_pdtsec.py  |  1,626 B  |  86ccdc7d8a77e70555ed5856c2ed72993023cdfef21ed910df1dbeea64faa263
+    插件包\test\_acc_probe_pdtsec.txt  |  4,307 B  |  dfc15d154e4942e15cc95e07b4f46ef3932a872b1af14919c48c4f9345c0a2c3
+    插件包\test\_acc_probe_round.py  |  1,583 B  |  7ca77b17c79209d85edabbacaef133529aebb4c5add3fbc3afe42c8ef69cf3a1
+    插件包\test\_acc_probe_round.txt  |  23,839 B  |  d3a4da0dd665312a9ac0acaef76ed6fb4f96c2901bec1201b03f68a15b5fa725
+    插件包\test\_acc_probe_unres.py  |  1,241 B  |  b69d140201ab4d9fe16cc89ed0b0cf2d7c1e0e3455f624e9d4659f205f7e9e34
+    插件包\test\_acc_probe_wrn.py  |  2,087 B  |  85fe5e13965d1c4eaf728dd17fea40425647f57ad970543533e628da2b79bbbf
+    插件包\test\_acc_probe_wrn.txt  |  6,513 B  |  5af4eb27e68dc2c178da2fc392030cffbaf935ab127d2de7e7e2bcd2ca9317a2
+    插件包\test\_acc_r2_out\_probe1.txt  |  20,920 B  |  4b5efc3e8a94df54e3bead3ac95b826216c489b354b88406efb441a9611a4cbb
+    插件包\test\_acc_r2_out\_probe2.txt  |  132,253 B  |  f73ffd5d6699d142d6d476abed7a2167ec02b698b90e7403dd815ecba21773d0
+    插件包\test\_acc_r2_out\_probe4.json  |  38 B  |  6eea61ca831ce9482bbecc810c6fabfc37eb718550015da07a6eeebbd1a5272d
+    插件包\test\_acc_r2_out\_r2_final.txt  |  30,249 B  |  730b2069524b88898350ce6bc3b4e5a1a3847fe280354dbb16f1329903bb5843
+    插件包\test\_acc_r2_out\_r2_run1.txt  |  1,315 B  |  b7b5c2a45ff972b956015d2c0193bb942004b116d2db83b5c861f3b6da02c358
+    插件包\test\_acc_r2_out\_r2_run2.txt  |  29,955 B  |  3a348a1919db10f885da5d02c94bd65b5e7879e90b8233256c31df410c74be3b
+    插件包\test\_acc_r2_out\_r2_run3.txt  |  28,422 B  |  791e8f77d4a86b446601aecf9e823e05630044b03ccb990f73ea9d98d602bd1f
+    插件包\test\_acc_r2_out\_r2_run4.txt  |  28,324 B  |  095b9685719e122d0950e9c8a3124e5e83e14e7e4f469aec1070dbc2e32a76c2
+    插件包\test\_acc_r2_out\_r2_run5.txt  |  28,334 B  |  02796e095d39e595802c0539879fb8cab42eba8bbd35f9d2b2263749caf0255b
+    插件包\test\_acc_r2_out\_r2_run6.txt  |  28,037 B  |  17ddb05f5b6548ac9547adb910e0a83a6fad8bea491fb4f690b34653940c0ba3
+    插件包\test\_acc_r2_out\closure2.mac  |  13,814 B  |  77f795bf6c67355a6a0ca8b48f1ee94614efa3acbf6e2500c13dbea2a120b634
+    插件包\test\_acc_r2_out\closure2.report.json  |  9,561 B  |  e1bb33ac5b53cfd4a23ff4a7a7ba01084e94bebbc2990ea56cca379746ac1368
+    插件包\test\_acc_r2_out\db2jwd.report.json  |  567,549 B  |  c65c5af10f6f26e7a5dc007dd92979d0741fc7d7904023943081b47701672f18
+    插件包\test\_acc_r2_out\db2jwd_from_jwd2db.jwd  |  569,344 B  |  639c26489182de3be05b362cc0b1431e9da4264fdbc6bbfd772d2caef63218d3
+    插件包\test\_acc_r2_out\db2pdt.report.json  |  4,749,490 B  |  5da7f0fac5d97db70bcacefa63edd64325cfc10a88b2561277f725f4f88c62fa
+    插件包\test\_acc_r2_out\db2pdt_from_pdt2db.pdt  |  8,329 B  |  b339834f5dbf7ddb6e0d7dde21ce4b1448b1a6e544d9687b63173fa015802473
+    插件包\test\_acc_r2_out\db_table.csv  |  9,701,321 B  |  b2a20ca0a5484d7aff75dbda46adc1366df81c6ee184d5dadf623980b374d7b5
+    插件包\test\_acc_r2_out\dbsections.report.json  |  14,971 B  |  8aba77a492514cb5abbb5160b63179d155cbd7336be1471b074062d74d316f58
+    插件包\test\_acc_r2_out\frombuiltin.csv  |  4,815,297 B  |  190173988a459e5ba3f7e02f5cda2709112446dfdc77ad5f4148638c1a03004f
+    插件包\test\_acc_r2_out\frombuiltin.json  |  4,819,648 B  |  d733660b05bb694035171619b456e1985df2927d4d70bd77ec29115de591fa58
+    插件包\test\_acc_r2_out\frombuiltin.report.json  |  1,390 B  |  657895ec04587da02b67278a789f96ecdc2812819d0723cdda2a53ab5e7d9b90
+    插件包\test\_acc_r2_out\jwd2db.mac  |  30,067 B  |  021fddfffeae2a27655f002003ba7fe8af2655e2a3efc8c14534ec140e145cd4
+    插件包\test\_acc_r2_out\jwd2db.report.json  |  64,549 B  |  34a4d4d856cbe607ff648b37973fdf278da2745516b7c7cd0185649e471f8c13
+    插件包\test\_acc_r2_out\jwd2pdms.mac  |  240,659 B  |  1fb030d5e5d65e1e63abf800c3e4f57cdd21cbb26b4213b69c0998d20958df8c
+    插件包\test\_acc_r2_out\jwd2pdms.report.json  |  61,684 B  |  e70364e29f0c4e7ad7c581b697a9857bcc8f9f7c67378d907cd7d1cb4eddb693
+    插件包\test\_acc_r2_out\jwd2pdt.pdt  |  343,863 B  |  b712cd21cbf985047fbf57d8e689ee5bb1987aa2ed038a5c60bc38c462f0cd5c
+    插件包\test\_acc_r2_out\jwd2pdt.report.json  |  109,046 B  |  8fe5fbcf6ebe9f74646ec88fe63e4f5dca2009bca83ad73326b842051ef18edb
+    插件包\test\_acc_r2_out\pdt2db.mac  |  21,904 B  |  1460c0d71800b4c8b0c0b15dc773b879afb6607f9c374c4619c59144b083118a
+    插件包\test\_acc_r2_out\pdt2db.report.json  |  52,038 B  |  b82d687f81e9c449e25001343f005eb8985dbe54d5db99cef8cb02bf061b1d4a
+    插件包\test\_acc_r2_out\pdt2pdms.mac  |  313,632 B  |  076fd2e3abc5cc7ff86442cac722cc4c9b2bcebc08446f7c36634925c777f730
+    插件包\test\_acc_r2_out\pdt2pdms.report.json  |  50,244 B  |  ce295a6d080089af8b5de61f27849f3c9078775fc628ae365ca5f94182464fff
+    插件包\test\_acc_r2_probe.py  |  4,872 B  |  452395e428ecc00f05742d48138847e12d9ec6dd3e4726746d28bd5cd1f39503
+    插件包\test\_acc_r2_probe10.py  |  1,897 B  |  13211b1ba0999a0d2759bc7ddbc258807c3384d9b697c66ecb27bfe7a2e6b207
+    插件包\test\_acc_r2_probe11.py  |  2,816 B  |  3bcc6b4c1b3ae75e52c4d2d2cdd04367296fa67d3c6eaf0be188d35f4e211d36
+    插件包\test\_acc_r2_probe12.py  |  996 B  |  f0e1989e4d96589b504a29442346ed70bdce34e80837ad63f843d365b27b4551
+    插件包\test\_acc_r2_probe13.py  |  798 B  |  c7ebf57532a8d15f2618eaad731da7b12a105f852815dac2b6dde0e607a05068
+    插件包\test\_acc_r2_probe14.py  |  778 B  |  8211be7531c955f5982c1dc17238deff6f4ea36f96db46d80b5de898dbbfae9c
+    插件包\test\_acc_r2_probe2.py  |  1,886 B  |  eaef7b222e9a397783ae44ba3ff92ba225b465212cc46ddded2cff5dd04e3890
+    插件包\test\_acc_r2_probe3.py  |  1,374 B  |  1f1b49e0c301242cd7157deb01f88e061027a0253f8960e29ac57cab9148bd46
+    插件包\test\_acc_r2_probe4.py  |  3,977 B  |  55d519ed07c7ad940e1f6cd60e0cff7028bb5502dde7652c1daaa20dbc20cf5a
+    插件包\test\_acc_r2_probe5.py  |  594 B  |  3ac4aff180027ec513365f14e40bdef466e9c360df5e7638d6df196fd417e5c5
+    插件包\test\_acc_r2_probe6.py  |  2,986 B  |  410746398ad01eb2404d282116a7e9d86f9f19e1656c360a6c907b916108a5d0
+    插件包\test\_acc_r2_probe7.py  |  2,884 B  |  59a5a1c27252fd8b0c0f979a3dcfb332ec60f0d2fcde8d2854d13b98b2615090
+    插件包\test\_acc_r2_probe8.py  |  4,920 B  |  8bb70d870d9f6d56e3f791c69c848160b5377459cb410289ed1cf3f32e4dfc27
+    插件包\test\_acc_r2_probe9.py  |  7,315 B  |  cd839ffdb304d467bf645f6e181fc7ac84018108474c8194fa7e5ef2445674e4
+    插件包\test\_acc_r2_regress.txt  |  12,181 B  |  7878aecfbb1509af6cca381e906898a077c8be33828dde5a1ebea917d4cab968
+    插件包\test\_acc_r3_out\_r3_doc_rerun.txt  |  10,026 B  |  062e204550f81c932cd2da471ec0573cf02f10141b4ab719f15252070341162c
+    插件包\test\_acc_r3_out\_r3_final.txt  |  11,332 B  |  a8ec5a557e9888dfb114d09ab10571fa86fb3d67b6e7f7b2164062d3ccb5270b
+    插件包\test\_acc_r3_out\_r3_run1.txt  |  11,258 B  |  5b68979663499f458468a14258baa63b72042a365de51bc10cb9823375b78c3e
+    插件包\test\_acc_r3_out\r3.mac  |  384,970 B  |  b22c2f5058cb09da65f0a3800430afef7fdca99da2fd20343ebda36eecd390d0
+    插件包\test\_acc_r3_out\r3.report.json  |  62,717 B  |  c15180fcafb2f504e48ed65685853e7d0cd91cfd289db0df133cab465b1db9e9
+    插件包\test\_acc_r3_out\r3_jwd2pdms.mac  |  384,970 B  |  7a096ae3f7840d2affc7d7e964b81715e006d94da526dfd5effba9f8cf08dcf6
+    插件包\test\_acc_r3_out\r3_jwd2pdms.mac.report.json  |  62,797 B  |  d2a6c61a2fe23e775b6bfd5b788e09598e2a57dbfe68245939c6a91dc8c2d869
+    插件包\test\_acc_r3_out\r3_pdt2pdms.mac  |  508,625 B  |  044e018e1b720a6e2324ed2d43ebc07d8f5d63f1e0e58e7d9b97b60e17349859
+    插件包\test\_acc_r3_out\r3_pdt2pdms.mac.report.json  |  91,011 B  |  74767d466fa391f05c7c59a5df2c4fb5a5dd1f74dc37a1e92146869561068c09
+    插件包\test\_acc_r3_out\sandbox\DesignAddins.xml  |  88 B  |  21bfbf9b10706e165eebb7f4e82fdd05014068767b54e718d3584927a359ceb8
+    插件包\test\_acc_r3_out\sandbox\DesignCustomization.xml  |  132 B  |  7e78e4e2da35d957f84aa73e641c0230308c6b71dbf6ba6bf442957503da3631
+    插件包\test\_acc_r3_out\sandbox_idem\DesignAddins.xml  |  88 B  |  21bfbf9b10706e165eebb7f4e82fdd05014068767b54e718d3584927a359ceb8
+    插件包\test\_acc_r3_out\sandbox_idem\DesignAddins.xml.pkpmjwd-bak  |  88 B  |  21bfbf9b10706e165eebb7f4e82fdd05014068767b54e718d3584927a359ceb8
+    插件包\test\_acc_r3_out\sandbox_idem\DesignCustomization.xml  |  132 B  |  7e78e4e2da35d957f84aa73e641c0230308c6b71dbf6ba6bf442957503da3631
+    插件包\test\_acc_r3_out\sandbox_idem\DesignCustomization.xml.pkpmjwd-bak  |  132 B  |  7e78e4e2da35d957f84aa73e641c0230308c6b71dbf6ba6bf442957503da3631
+    插件包\test\_acc_r3_out\sandbox_idem\PKPMJWD\_uninstalled_20260925-061322\PKPMJWD.dll  |  40,960 B  |  90918639344e35091c2a3900d4486ed5b7e80e8a87cc2f426d66bff4cd1b1a18
+    插件包\test\_acc_r3_out\sandbox_idem\PKPMJWD\_uninstalled_20260925-061322\engine_path.txt  |  26 B  |  dd7a64f4e0a8aea36b9da71d8f2e3b3c6cc26cb010a27ce7ce5af64b2507714f
+    插件包\test\_acc_r3_out\sandbox_idem\PKPMJWD\_uninstalled_20260925-061322\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sandbox_idem\PKPMJWD\_uninstalled_20260925-061322\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\DesignAddins.xml  |  135 B  |  a09a95d94492e2a74dacc7dfc0ac8b480da816e9ebbbc6a95e4d7117ba6930a2
+    插件包\test\_acc_r3_out\sb17\DesignAddins.xml.pkpmjwd-bak  |  135 B  |  a09a95d94492e2a74dacc7dfc0ac8b480da816e9ebbbc6a95e4d7117ba6930a2
+    插件包\test\_acc_r3_out\sb17\DesignCustomization.xml  |  149 B  |  ccf5ee9d94b9739ec78177775885ddbec6d3bd8440ffc218b44a96dc41a6278f
+    插件包\test\_acc_r3_out\sb17\DesignCustomization.xml.pkpmjwd-bak  |  149 B  |  ccf5ee9d94b9739ec78177775885ddbec6d3bd8440ffc218b44a96dc41a6278f
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-061937\PKPMJWD.dll  |  40,960 B  |  19994ea5793d3d50f49db8671ace2069330bf7da36ba117a492ff28b9a88dba4
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-061937\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-061937\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-061937\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062037\PKPMJWD.dll  |  40,960 B  |  643506b6cecfac3cfadea1b3ffe1aece38d72fe74de88b5cbb700c4a1fef2347
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062037\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062037\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062037\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062040\PKPMJWD.dll  |  40,960 B  |  8c6b1ecf6cd76ddb950684935ab7db0c1701b32f01aadb30b58aa1cd8078f7c2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062040\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062040\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062040\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062042\PKPMJWD.dll  |  40,960 B  |  b224ef05936ae26c6a9974308c22455d6a7c62ba39b6c1562c8e008b995cbddd
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062042\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062042\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062042\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062126\PKPMJWD.dll  |  40,960 B  |  6b0186d466bff9010b023aaaaa2e21cfdc28267a1dcf38a07a653e6a455ce150
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062126\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062126\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062126\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062129\PKPMJWD.dll  |  40,960 B  |  1d6409ac21298a813d2326511ec991af6506afc12bb1977cbe24461c26716dc5
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062129\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062129\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062129\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062132\PKPMJWD.dll  |  40,960 B  |  8bd0491159f9c820261314f0a7d1973fca4e2fd07277ee2e6ae9c290146f88fe
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062132\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062132\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062132\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062155\PKPMJWD.dll  |  40,960 B  |  58f7f114ca6485def93d975a663aa16b6440dae48ea21c65bba75e919c27124d
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062155\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062155\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062155\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062158\PKPMJWD.dll  |  40,960 B  |  4dd13c2b088f5bd6d9fa7a55b0fc2fa53f700b35e7b214efb33ef5f09f1f8106
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062158\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062158\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062158\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062201\PKPMJWD.dll  |  40,960 B  |  1b181238f1dce361d3fe10cffcd1997f40399080f9056572edb0eaa1ce301f78
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062201\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062201\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062201\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062214\PKPMJWD.dll  |  40,960 B  |  5a7df6a4a1cd4196239fa426d34309c2cbff0e569562c3bbedc78c5e67fd3f89
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062214\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062214\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062214\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062303\PKPMJWD.dll  |  40,960 B  |  103810961aa4f33ee2f8fc22045127050a120fedd8d09764c6de1fbd1893359a
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062303\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062303\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062303\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062330\PKPMJWD.dll  |  40,960 B  |  730c414a8782fc8d9e562170d6dde775f4c31733802d634b63c92410ee4582ad
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062330\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062330\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062330\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062401\PKPMJWD.dll  |  40,960 B  |  bffa9de837c5f9b4f9a84b9af6675b2e154dcfbc238c2e985d4cb545812669ac
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062401\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062401\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062401\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062404\PKPMJWD.dll  |  40,960 B  |  3b2d3e2f3b7ec7fa18e563d437d4d4d4de4c1c5eb8a860f7ffaba0686212f68b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062404\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062404\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062404\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062406\PKPMJWD.dll  |  40,960 B  |  c0b109b40204a80db3c309935b00e556fbc3147bc1b04edc6f8d846451b42df2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062406\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062406\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062406\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062420\PKPMJWD.dll  |  40,960 B  |  766c381868838aea7713064f46ec4f1d0a53c95e1c324069d867f1fcb95c8dae
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062420\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062420\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062420\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062535\PKPMJWD.dll  |  40,960 B  |  5165915b37e7c4bcce1b42fd1f6b65d3238dbe62d82b2ae751d5e8aff9a12455
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062535\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062535\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-062535\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\PKPMJWD.dll  |  40,960 B  |  f1f1ca4cb2a973d5a0967086b236f9ffb4d4eab2d83da08f3c08f4858e170177
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-184612\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\PKPMJWD.dll  |  40,960 B  |  a36af7b4998bff945b473ad00e86a8bcd7cc0e5efba12c65b0c3f08a1df102c2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185245\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\PKPMJWD.dll  |  40,960 B  |  ef75713aa9c1dd3546cea841b2def8982951a842993278b15a803df581f198c9
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-185408\pkpmjwduniquename.pmlfnc  |  9,562 B  |  749d86aa6651502ee4e14115881679f3fc6e8b66f7c7a86f58531ee47365c7d2
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\PKPMJWD.dll  |  40,960 B  |  af1f6f5e2d025677ebdbaf3161cdf014e51c899fc8ae10a4b34114c4b16209fc
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195237\pkpmjwduniquename.pmlfnc  |  10,050 B  |  7905a010b8e4f406d406f5aaa2b59b6cffd1df1d8a8e64d1553e3ffdebd207a5
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195512\PKPMJWD.dll  |  40,960 B  |  5a25b7e611f7a5a926c4006f368e4d64b8bb0fecba4efd1abcbc853210a7d119
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195512\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195512\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195512\pkpmjwduniquename.pmlfnc  |  10,050 B  |  7905a010b8e4f406d406f5aaa2b59b6cffd1df1d8a8e64d1553e3ffdebd207a5
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195654\PKPMJWD.dll  |  40,960 B  |  b075f11efec83645d87d4d3e4dfa8df0e67885a00d81c26a4bea5975560efc43
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195654\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195654\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195654\pkpmjwduniquename.pmlfnc  |  10,050 B  |  7905a010b8e4f406d406f5aaa2b59b6cffd1df1d8a8e64d1553e3ffdebd207a5
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195943\PKPMJWD.dll  |  40,960 B  |  45b80ca5fff037633b18a8aaf1480323fb73bfa667b637c7525a0f6d07aa40a4
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195943\engine_path.txt  |  34 B  |  bac88941a19afea9575f5a6d5489b3856bdc9fd233f3cd40b38fc830d06dc77b
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195943\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    插件包\test\_acc_r3_out\sb17\PKPMJWD\_uninstalled_20260925-195943\pkpmjwduniquename.pmlfnc  |  10,050 B  |  7905a010b8e4f406d406f5aaa2b59b6cffd1df1d8a8e64d1553e3ffdebd207a5
+    插件包\test\_acc_r3_probe1.py  |  4,141 B  |  3d585ac460ddb2c08ca2d8739de3cfc9b301fb0b424f1bd3a3c9153682d42005
+    插件包\test\_acc_r3_probe2.py  |  6,121 B  |  94c59775159dad9cbd38e959447e4d7c83842f880a93ff3ca25c03ca52b800e1
+    插件包\test\_acc_r3_probe3.py  |  1,007 B  |  7b9f8795ff4a383e59fdad7ce222cea175ceb9f3ce744b7f30b4ec38b87bb150
+    插件包\test\_acc_r3_probe4.py  |  754 B  |  9e3bc921460237d5bd204e4be9ddc4a1028f57f28b9a6d1b71340e531722a88e
+    插件包\test\_acc_r3_probe5.py  |  928 B  |  60766cc6384cec1810e33391f9fc0bdf6d8ac7df0024bb4fb6ecacaf4a4614f5
+    插件包\test\_acc_run1.txt  |  12,170 B  |  a6d772960799971b59a8ed7b6f3168c7d4bbf33e2be3d47a5c8bd08883e17ea5
+    插件包\test\_acc_run2.txt  |  12,181 B  |  da0993cd47cb8f507c48b73822ab5faf473ab39702e64ed010ca67ce2dba293f
+    插件包\test\_acc_run_final.txt  |  12,181 B  |  da0993cd47cb8f507c48b73822ab5faf473ab39702e64ed010ca67ce2dba293f
+    插件包\test\_acceptance_out\JLCJ2.mac  |  384,970 B  |  0bd47b047d13ad8f95c6237c38e3b0389129f36ab6fd5a379aac62be78fcd6d8
+    插件包\test\_acceptance_out\JLCJ2.report.json  |  62,795 B  |  db29b22a31bc41ab4518fc3913b04007b37d4da71ac67f3b7906e85549cbaa33
+    插件包\test\_acceptance_out\JLCJ2.roundtrip.jwd  |  798,720 B  |  2c97c4c182f2b394923f39b3068e51e746be400fcc89a240b0729779b4b75a99
+    插件包\test\_acceptance_out\_last_run.txt  |  12,926 B  |  302ad559550622fbbfc24fc5f608d3d54614c8b6c0be27a0ce8a2f8b1b7b8f99
+    插件包\test\_acceptance_out\_r2_all_help.txt  |  8,197 B  |  c94515149eb9fbbc64c0383425a29848385322ff7e9926d187fdf0db2f976ffc
+    插件包\test\_acceptance_out\_r2_cli_help.txt  |  1,541 B  |  95c3b348f7725aebb95264a88b0f3cbdb801256a0e4caa39ae1fb281c8a70ef5
+    插件包\test\_acceptance_out\_r2_h_db2jwd.txt  |  551 B  |  cd7410b582e143e2606c42cb59cdc45759223a5e921af5c32924d3530aea3b83
+    插件包\test\_acceptance_out\_r2_h_db2pdt.txt  |  746 B  |  23dec445af018b566b13e0ea44e758be49ad7855f60fe067a8063aff47c1e200
+    插件包\test\_acceptance_out\_r2_h_dbsections.txt  |  857 B  |  f9b36a9015ae34ff9c1677e836a8f12a15cc04cb77c8110bc8952526f2d1cf58
+    插件包\test\_acceptance_out\_r2_h_jwd2db.txt  |  1,393 B  |  985b4bfbcf6e109aad74e416754d203daf05a609706c7bfbf734e86c65410e04
+    插件包\test\_acceptance_out\_r2_h_jwd2pdt.txt  |  806 B  |  1009bca8754904607ed419462b3689436edfd5b3e169c1f4773ae64b45d34038
+    插件包\test\_acceptance_out\_r2_h_pdms2pdt.txt  |  920 B  |  1256140f4569dd3f2668ffc8891194dfee3afa3e38b0cf2ccf554c51181c5998
+    插件包\test\_acceptance_out\_r2_h_pdt2db.txt  |  1,385 B  |  b07f5e1bf88bcf7fbbd3e8e7528ae0b2d3a1ee25a1e5b65a63a39d8ad6b320c5
+    插件包\test\_acceptance_out\_r2_h_pdt2jwd.txt  |  487 B  |  9510b009caec0c2db07a4e6498bf1dfdccc8c7d1640bf33356e83fef2eda4589
+    插件包\test\_acceptance_out\_r2_h_pdt2pdms.txt  |  1,048 B  |  80e51069995aee590a5a569bf1477e0401c7d89946dac032decaf9a15e72ec23
+    插件包\test\_acceptance_out\_run_relaxed.txt  |  12,359 B  |  d0092bc199d18ae5d0179f8f28be075b95676d311ca46f9d86e4cfd9bdabd76c
+    插件包\test\_acceptance_out\_run_strict.txt  |  12,926 B  |  302ad559550622fbbfc24fc5f608d3d54614c8b6c0be27a0ce8a2f8b1b7b8f99
+    插件包\test\_acceptance_out\_s6_cli_h1.txt  |  1,047 B  |  afda74a62b91e938ed93075cd7c88ee60d50d81e486923e800fb37c1fd9dea1f
+    插件包\test\_acceptance_out\_s6_cli_h2.txt  |  720 B  |  3306f73a11ed8b11e63b3a03c7eed9fbd4848be534dbaf46f9fccb30d9d6fc2b
+    插件包\test\_acceptance_out\_s6_cli_h3.txt  |  369 B  |  265e59643609ba81fd8ebe11e329375b1754e34742795d14a68dba90a5d026ac
+    插件包\test\_acceptance_out\_s6_cli_help.txt  |  670 B  |  a6ef6551fbbca50748acdee0432a9472a751471b9d17c32e8fb70e1028ac9b14
+    插件包\test\_acceptance_out\_s6_deliverables.txt  |  5,230 B  |  44c1fc85bfac71cd36f2af68ab352a499b334e6d2119d84b838638061cb3c8af
+    插件包\test\_acceptance_out\_s6_dryrun.txt  |  2,424 B  |  0f04b0b178d413ec2bc6a9cabe2146208e0e8abdfd2b7ff175f2c449c8a85bfe
+    插件包\test\_acceptance_out\_s6_md1.txt  |  57 B  |  5eed9fe8e52abe05ff99e1f40a33b0c59214ac1a1a22c91abcd43648a2d84f6d
+    插件包\test\_acceptance_out\_s6_md2.txt  |  61 B  |  a1fceba3cbc78032ec307bdc2e371f437705763a27eb073a34a483d32db91047
+    插件包\test\_acceptance_out\_s6_md3.txt  |  63 B  |  6117534a33d38438dfe5d8368f11dc05ec9065c1c41882aef44698fdef05f3c2
+    插件包\test\_acceptance_out\_s6_md4.txt  |  57 B  |  0a7d80c4c0a8fbe55d0a3778aa524ffd9cce5aafa1930e2be0835da37f052df7
+    插件包\test\_acceptance_out\_s6_md4b.txt  |  57 B  |  0a7d80c4c0a8fbe55d0a3778aa524ffd9cce5aafa1930e2be0835da37f052df7
+    插件包\test\_acceptance_out\_s6_md5.txt  |  57 B  |  989937b45a840ac27e2982420213227e1e75eb971a180af454722f47dfca61dd
+    插件包\test\_acceptance_out\_s6_md6.txt  |  69 B  |  1231646f815b3c05a11d0bf31ead0ca3fd5a8054e7298fa6e96616e59914e803
+    插件包\test\_acceptance_out\_s6_md_final.txt  |  364 B  |  6c6cb0ef109bf8045cce807e19b4c372953e88b68b77270adb20d206ba2e2d5f
+    插件包\test\_acceptance_out\_s6_mdcheck.txt  |  482 B  |  6f847b05966f6dd91663097eaba2c5a907481552fc560f5a26e7e14ebb5aad6b
+    插件包\test\_acceptance_out\_s6_rerun.txt  |  12,181 B  |  da0993cd47cb8f507c48b73822ab5faf473ab39702e64ed010ca67ce2dba293f
+    插件包\test\_acceptance_out\acc_fixture.jwd  |  569,344 B  |  6712f98f7725520ff5c121eca027e277e2fe2904e2e9720d83443bc31d001dd4
+    插件包\test\_acceptance_out\acc_fixture.report.json  |  13,034 B  |  a34ff967762e96212cc844a2fef77348ed517bdbdd7ed78ae0a9b633175c8d59
+    插件包\test\_acceptance_out\acc_fixture_dump.txt  |  880 B  |  9014d9d36b63e98e58cb8780f774e3a7c87bba0dddb2d00b85be15bb6b382458
+    插件包\test\_acceptance_r2_out\_r2_doc_rerun.txt  |  27,137 B  |  d7cc94f9662218f221c684e541f5d04da68ebb740a1a0f330c5579574c35220b
+    插件包\test\_acceptance_r2_out\r2_closure_jwd2db.mac  |  18,867 B  |  ad62bd979da0503d44f5e32f0a54399b4cf425e42c5050cdbfe0c1003342b8f8
+    插件包\test\_acceptance_r2_out\r2_closure_jwd2db.report.json  |  10,187 B  |  6b3346ae6eb5bad42e47a6111cb336983d23ece84211d65c96274b3dae8dd5bb
+    插件包\test\_acceptance_r2_out\r2_closure_pdt2db.mac  |  11,109 B  |  a70eea8ccb9d7197ec2619ee6aad54a3e3d84d8f843fa077f09d7612c5588c84
+    插件包\test\_acceptance_r2_out\r2_closure_pdt2db.report.json  |  9,223 B  |  e72a000c9fac009a47358bff4c70199cb85d829d5ef638b542de6702d04e9900
+    插件包\test\_acceptance_r2_out\r2_db2jwd.jwd  |  569,344 B  |  e77a807ca525dd08d0c9787333bfbc51f42beb5b9c89ea72a31ac241cb243f51
+    插件包\test\_acceptance_r2_out\r2_db2jwd.report.json  |  23,043 B  |  eef00c3f257b707a66d2dc5d6d872937d3fffae701f48b03f16903d4938cc458
+    插件包\test\_acceptance_r2_out\r2_db2pdt.pdt  |  8,327 B  |  2b283bb17104c8f0c117f7b2f491abb87dfb43e7ee08ce2582cdedce64a21ddc
+    插件包\test\_acceptance_r2_out\r2_db2pdt.report.json  |  18,637 B  |  20a668af6024145a53ad301079d55e40bb2f7197e53a1630947db7d11aceddfe
+    插件包\test\_acceptance_r2_out\r2_db_table.csv  |  9,701,321 B  |  b2a20ca0a5484d7aff75dbda46adc1366df81c6ee184d5dadf623980b374d7b5
+    插件包\test\_acceptance_r2_out\r2_dbsections.report.json  |  15,010 B  |  e8e158c34d783e4eff2701295fe6e6052e188e05f39a5456c8496a1d89d45ea4
+    插件包\test\_acceptance_r2_out\r2_from_builtin.csv  |  4,835,597 B  |  ade94b8159226b376479a362c999e968b60e11733fcd90b840a41569171fbfa5
+    插件包\test\_acceptance_r2_out\r2_from_builtin.json  |  4,837,644 B  |  715cb1b2617863bd8559c7eaab61bfeaba29aefd90d5ac680400e63cf5a83087
+    插件包\test\_acceptance_r2_out\r2_from_builtin.report.json  |  1,417 B  |  c5c84c0ffe4dc71a7dfd62e1cea45b5dba8a3122639f9dd06c2888e5741e3ba8
+    插件包\test\_acceptance_r2_out\r2_jwd2db.mac  |  33,924 B  |  86e7e4cd4aa791274183e9261ff0db2ce00c2ce232bbd75746ce264e0a9c3952
+    插件包\test\_acceptance_r2_out\r2_jwd2db.report.json  |  65,538 B  |  8efcef7d141a706764540256a7d47534afd46acab4ff2b72f7da5c745f159824
+    插件包\test\_acceptance_r2_out\r2_jwd2db_clean.mac  |  35,354 B  |  6e5f812e2a9d4be0415569b7e0292a7c8924bc7b970422ddc5cd66cf4fc5998e
+    插件包\test\_acceptance_r2_out\r2_jwd2db_clean.report.json  |  65,794 B  |  7c4fe8d9fb259f61a38eb9336fc9e067df4d035b87c12b67644f9f465fbf522e
+    插件包\test\_acceptance_r2_out\r2_jwd2pdms.mac  |  384,970 B  |  3ea8f1309a0d73aaa9cd9c8326902f4e749558de390e10c58d446051c722402b
+    插件包\test\_acceptance_r2_out\r2_jwd2pdms.report.json  |  62,804 B  |  41b8b0b2fe5cb0df83420369022d31602d72435ec0404e3dda047220cc214912
+    插件包\test\_acceptance_r2_out\r2_jwd2pdt.pdt  |  346,734 B  |  20fd3d2ca27f87dc5e2cb01b09ba1f8d48bf0e963b3d8b5344970d4b18b1789b
+    插件包\test\_acceptance_r2_out\r2_jwd2pdt.report.json  |  109,849 B  |  c61fe441b520705c03ee78989a71b6696dd35e34da927aaa9dcb16c285b12102
+    插件包\test\_acceptance_r2_out\r2_pdt2db.mac  |  14,730 B  |  316784e66aef2fcbcf30d58a9197a1744572d5d2b15df7f9c93e5e1a57e753f4
+    插件包\test\_acceptance_r2_out\r2_pdt2db.report.json  |  92,502 B  |  4b6f5be6ebba160f08de4ae3b7a5c92544bc7ff060b66305a084d3f6f4d3d207
+    插件包\test\_acceptance_r2_out\r2_pdt2pdms.mac  |  508,625 B  |  ef9744070b7035855a7922f34e926f580da47900bf8856159fd3e698c57a79a7
+    插件包\test\_acceptance_r2_out\r2_pdt2pdms.report.json  |  91,018 B  |  98d8668163c2883e887e18c8ddea6d67b93043fdd59907189f6a82310908bc5a
+    插件包\test\_db2jwd_out.txt  |  13,817 B  |  71fb2dd4d7350b6bfd2d6d6509cb5acc37317949ad892ff6e280e382aebf8f84
+    插件包\test\_db_out\closure.json  |  82,966 B  |  1276e57cf8b288c1cb6c4758d95d05af49ba95e00197b257752d840a3e9e0b67
+    插件包\test\_db_out\fixture_gbk.txt  |  1,102 B  |  e5165094bccc9fa2769d281485f5e29834f2d9dc97fc26b2dbee2fd5ba23f027
+    插件包\test\_db_out\from_jwd.mac  |  10,368 B  |  2d8ed563a6ec16e51f5a561a2c812535015cedaad2f4e364d39e9059d1604b5c
+    插件包\test\_db_out\from_pdt.mac  |  5,280 B  |  6e2df7ea8bbd6369fe027974c1b398a718d96940c6800ea03fce4783bf4765c9
+    插件包\test\_db_out\selftest_db.mac  |  2,849,041 B  |  81741d6842e35263bf3a4c6d4aeed4a00b02a5e9a179980f1922dde031e98bcc
+    插件包\test\_dbg_db2pdt.txt  |  1,877 B  |  951dfb6bea2488e4061f9e6d74c70c43c92504b99cd806fcae6501ef48cde525
+    插件包\test\_dbg_fences.py  |  531 B  |  b3e687142ecbc6b12282f074e358818bacb2aefd158bec1a0f1248da207ec757
+    插件包\test\_dbg_out.txt  |  683 B  |  ce0f9c52296b93f15bad46dd56f79c4c921bfbf41542f5f78c61ad5b4bcd8ea2
+    插件包\test\_deliverables_out.txt  |  7,004 B  |  ad7fbf19d8f8efeea0bff77fdc7f7d8039302b3a005dfcfd64b4efcd11af2663
+    插件包\test\_dll_probe.txt  |  1,895 B  |  bb8ba20acf2273720054afe544a5a4869fd89a9a168b66d1b79bd5231e2b24da
+    插件包\test\_dump_chain_out.txt  |  12,194 B  |  f28da45c32cd78e021bbe1bbc0c9a81e4d60be6b15bdebf5bc3d9926cc1915c2
+    插件包\test\_fingerprint.txt  |  1,325 B  |  1ce2c344a8f52d656ba7622af0be7afa009c9542e893c5a3f7d3a3f61326bc58
+    插件包\test\_fixture_specs.txt  |  1,197 B  |  803b41be767c191753427177e33518054774dfc7c40fff83f409020460b854c5
+    插件包\test\_grammar_out.txt  |  1,332 B  |  e5ecd5185e855f426b0bb753ca4d55ac6061b60376c452c2c2886b8cfc7acb0f
+    插件包\test\_jwd_read_stub.py  |  7,920 B  |  8a70f636068b58dcab83ca69c5ad9cd2a18ac4a2927673853d08c6d536119ad9
+    插件包\test\_jwdread_avail.txt  |  573 B  |  35930423ede340d47e440c1e437b68282f84dbb313a52998f27bcde263988078
+    插件包\test\_nav2.txt  |  11,341 B  |  e9a3712964cddb8af2ea2a0ae0a58e5c8c3407292b4ca1877202fca0c3cb13d9
+    插件包\test\_nav3.txt  |  6,776 B  |  8c79b4f5f07d7231999e16dd502ed334f3363b0f0b9086df0d292d094106e451
+    插件包\test\_nav_out.txt  |  10,015 B  |  e732ed908bd8c626b36ff2a39cce4a109e6a3492552a5836b106e3cb834cd101
+    插件包\test\_pdtw_out.txt  |  17,315 B  |  0bf50098c99cda67bc92fde601df0b5687586e21e34fb4a6a2664ed43d1cace1
+    插件包\test\_probe5_out.txt  |  7,260 B  |  e339c0c6855729be85426973fd0b2641ea1165197df516d1daee2b2e55989afa
+    插件包\test\_probe6_out.txt  |  4,073 B  |  e9ccb38aec053a786b346339a6504e0af3581ecc02acb3860a091dcac1d657d1
+    插件包\test\_probe7_out.txt  |  3,659 B  |  2dcf07de919b6a9834de58d3e640fba4196d749fe794605a4050a550c5f603f4
+    插件包\test\_r2_pkg_check_db2jwd_sections.txt  |  13,817 B  |  71fb2dd4d7350b6bfd2d6d6509cb5acc37317949ad892ff6e280e382aebf8f84
+    插件包\test\_r2_pkg_check_sectionlib_roundtrip.txt  |  219,035 B  |  92e4568b3fc13457639625452898dbd47e13b364824c288de12bc45313a28557
+    插件包\test\_r2_pkg_check_v2_contract.txt  |  2,445 B  |  97b2800bbc64b60c7bf75461d047372d4347d9b7fb06e0875e19877b5ee3ea80
+    插件包\test\_r2_pkg_check_v2_db.txt  |  13,253 B  |  8f6f40c59159cfcc69de2574e947f5532273c8d5e2a83658729e5a0d10ba8f11
+    插件包\test\_r2_pkg_pdt_write_selfcheck.txt  |  17,152 B  |  01770615c1e67359c57c55ce3bf427179ab5d191acf92f1b819e2dc402df5ad0
+    插件包\test\_r2_probe_dedup.py  |  701 B  |  1db65bbb7f639749a43aac3a0a0ba11b9c578fe8ec3bd347d61985de3a9be195
+    插件包\test\_r2_probe_dllpairs.py  |  2,191 B  |  866f80ce90537d13742dff9bcae3e36ca7547fea0244d5d09158abb07d6ff7a9
+    插件包\test\_r2_probe_dllpairs.txt  |  4,351 B  |  2667dbd09437a5e97b9605e2b006315e08c34144179b2e704081d670aabfb0b1
+    插件包\test\_r2_probe_srcdll.py  |  2,223 B  |  ec3eb8fb39a05e0956d4723f604e3ea8f9fd3e7a1fb7e7d8c39535d59ff47e8e
+    插件包\test\_r2_probe_srcdll.txt  |  13,129 B  |  934ff3132164f912b260f23f712a1c549f875775f64a00400dee2e288cb038cc
+    插件包\test\_r2_probe_tables.py  |  2,659 B  |  942453e8ff16f57aac94eca54df06e97361b119ea1b564bb34b36b5ee034929b
+    插件包\test\_r2_probe_tables.txt  |  6,511 B  |  1a335e2ff96a4e0a94dd807ccbf591b49489189250428a5bd72f5227383dff5c
+    插件包\test\_r2_probe_variant.py  |  2,920 B  |  e7e487fa83d272c86ebe90368d98819d2317ad02fa940ba07ea9c20b16032ecc
+    插件包\test\_r2_probe_variant.txt  |  2,691 B  |  a0a293a831e8d71680bb9be7cbcfb7b116556da40d1a95aa9572c7518800aabe
+    插件包\test\_r2_probe_variant2.py  |  2,718 B  |  0b873fe4cedfbdfbd56e430d234be539a9141a36c70015ef47f1e7e18c3e5db9
+    插件包\test\_r2_probe_variant2.txt  |  284 B  |  6ab6610c3029a7065c7f1bb658a1900e630ee7ebc72d4410d1bca3f1d4770d93
+    插件包\test\_r2_run1.txt  |  27,081 B  |  21a75c422876bc7bb0e5de42f91684972df63388aeed3c9c8600f8d9f8cf5c8d
+    插件包\test\_r2_run_final.txt  |  27,081 B  |  3d6b28e5b1d6a9590960e07bdb1cd91bebc760b1cd694c20fa206ff391fd9732
+    插件包\test\_r3_m2.txt  |  5,235 B  |  334cb403c34bba93ef799ff1f5d801cb02250233318140e90b79b972a5245438
+    插件包\test\_r3_pkg_check_db2jwd_sections.txt  |  13,817 B  |  71fb2dd4d7350b6bfd2d6d6509cb5acc37317949ad892ff6e280e382aebf8f84
+    插件包\test\_r3_pkg_check_sectionlib_roundtrip.txt  |  219,072 B  |  2e02b7ff7c3ad0a7febbaf6df26c73295085b3dad06324117ec7748b4b111af1
+    插件包\test\_r3_pkg_check_v2_contract.txt  |  2,445 B  |  6c90f0582c49d88bf3c272385b7af0ca70d9328500807013f2b5f2b56deb0e54
+    插件包\test\_r3_pkg_check_v2_db.txt  |  13,253 B  |  aaef5ba9492a96923f81f131906872952e0c0bf785e1e75ef49c28285981b8ba
+    插件包\test\_r3_pkg_pdt_write_selfcheck.txt  |  17,326 B  |  f6eeb64a0c3e46b6d3377d0024bc57ec3da2d51e7ccaff8b3f853b90daef4a14
+    插件包\test\_r3_probe_err.py  |  403 B  |  ac406d65975cd38696805f5878c367455ff04e85e1d4bff917fb1f4f965dd156
+    插件包\test\_r3_probe_fixes.py  |  7,252 B  |  9f3517ebaabdc7a5252a515a37b7e1b8cbe04bb7a7c4080f0c33d6726c533b07
+    插件包\test\_r3_probe_fixes.txt  |  2,188 B  |  738b174eb805b80e8e9f056b5d6604f7a932c74bc22b46e441708f72c862f0eb
+    插件包\test\_r3_probe_grep.py  |  411 B  |  0ec6a6fe32e9a44b228d59e5a57dc8f75bfa2c2a7bfa8ab9c7c4452b38d325e0
+    插件包\test\_r3_probe_grep2.py  |  647 B  |  6f73e8f61084014997d98f59d9bf9c3cef1a4c887c0b4b3b8d53090d45a7fdfb
+    插件包\test\_r3_probe_identity.py  |  1,136 B  |  ec674f60346f3e1754e39ca458ded0d6d906fb6475641530ca0fa4a5ddfcfa35
+    插件包\test\_r3_probe_ids.py  |  1,722 B  |  822d5d17fa3f4d51bb9db6ba59e5b308be79f7b035227b4ce9d3659234edb8a1
+    插件包\test\_r3_probe_ofchains.py  |  2,333 B  |  ac375294d6f23694b7c6f8c1748a7c5a278deee9a09d7daf356184b5e03a861d
+    插件包\test\_r3_probe_ofchains.txt  |  4,517 B  |  ba6fc68eed559abfc5045c0d1ff9a39842ca5d84e4c08a96a20b25208884abd9
+    插件包\test\_r3_probe_rtcmp.py  |  1,066 B  |  1772c0dc48eca2675c748b54e8c3f77d1e3f44a49bb94be40d425208eeea2622
+    插件包\test\_r3_probe_secs.py  |  1,221 B  |  066cf8f4785a938b858e4231a16ab9a84491423aa4cb67cde4980f92ea0f1913
+    插件包\test\_r3_probe_secs.txt  |  2,840 B  |  c380ce313e18cfd04a1273d21d9cc8b54fe4980a896a60a05b60905ca919fa44
+    插件包\test\_r3_run_final.txt  |  27,137 B  |  a33c7bb9a4d55723601dc164239bc4e8548d195e611982eda4cfdb50e3ad1c96
+    插件包\test\_r3_v1_regress.txt  |  12,181 B  |  7878aecfbb1509af6cca381e906898a077c8be33828dde5a1ebea917d4cab968
+    插件包\test\_r4_collect_log.txt  |  97,048 B  |  7eb6de95a532c17aeb09556a39cf4b5ba8bcd1fe111b4fa55ca7a34ac4559f15
+    插件包\test\_r4_collect_log2.txt  |  50,481 B  |  4b19300b57480e51c38a972fcabd3ea0e3555a74d7164b6f63e18d0f13e7a9c3
+    插件包\test\_r4_patch_docs.py  |  3,710 B  |  89e456d3aed8aa268e04597b50d2ec854f163efb2b1abc1e3f9990ebac43fbaf
+    插件包\test\_r4_probe_after.py  |  1,890 B  |  baffc3121fc3ebc08d9a0096522e97a3e2bba2a51a59937474191fdc113fda9d
+    插件包\test\_r4_probe_after.txt  |  1,168 B  |  f21ea5256385111705e681177ed989c28591dfd755635d795c6717ccba3cdc8b
+    插件包\test\_r4_probe_call.py  |  692 B  |  8d8793a4a4685622f97ba59a28fdc1a469cf5799627fb2b274ecc3b805be5389
+    插件包\test\_r4_probe_collector.py  |  761 B  |  421086dd9ccae8ea704740f9ce1309be135d49d5f6cd6375e803151e14408ded
+    插件包\test\_r4_probe_delivery.py  |  2,636 B  |  363aec98cca625ab88edac2175f4f6ab9281dccb01cfc1d5949cf17a213952b0
+    插件包\test\_r4_probe_delivery.txt  |  9,240 B  |  1e7c330be742c1b86258b35d1266feb8b51594df3aa8b66a175926fde68e4708
+    插件包\test\_r4_probe_doc1.py  |  539 B  |  dfad8eb94753476e4000ed4f965eaff957f9c15755e5fd353c5ac69256079216
+    插件包\test\_r4_probe_docs.py  |  798 B  |  bd00a3872b5e58854c97b096852d2b9180fc9ff0cfb5f54b497e573afb7a351e
+    插件包\test\_r4_probe_docs.txt  |  8,289 B  |  afa62d5838eed35db03ce4bba878ab493d7d476b75427c650707c37b9f4d8d27
+    插件包\test\_r4_probe_log.py  |  525 B  |  a76044019119e6adfca63afe5a6746ca05773f9cb25e78ab4bf12c760d541215
+    插件包\test\_r4_probe_macfmt.py  |  520 B  |  956b9d8d4ce31b3b233258de6cb019b1b699bce2ef0e26432e871117c311d4a8
+    插件包\test\_r4_probe_r2fail.py  |  355 B  |  39689e18ad2f161884d544cd9b0a7ece268061ec865c8bd02738d48bb6410957
+    插件包\test\_r4_probe_rootfiles.py  |  676 B  |  484d8238eebf52095dc560da9cde8f9607247985674c710dd0e0f38579e4571f
+    插件包\test\_r4_probe_rootfiles.txt  |  7,111 B  |  b70f7724c5438f1c0408c5069675f03379a1e800e9bf3d9182d5d9c2d84876a2
+    插件包\test\_r4_probe_v1fail.py  |  250 B  |  9a13d3c190165a677dcb742565c8deecd07fcaaed255f72b6eb661365d5a0f5d
+    插件包\test\_r4_r2_regress.txt  |  27,627 B  |  a1e3e8363d6719865c8a8641e65887b090fdcd9993b0aafb0ede7fe64d6233d7
+    插件包\test\_r4_r2_regress2.txt  |  27,137 B  |  82fc5cb62049c7e65c60fd365f733d14bf3febc1231c31135c59a9e8ec45ea1e
+    插件包\test\_r4_run_final.txt  |  9,939 B  |  091b8b0e56b57de45011b3d31e2e7792e3a9377f05a26cf175116d069c94e2df
+    插件包\test\_r4_run_final2.txt  |  9,939 B  |  091b8b0e56b57de45011b3d31e2e7792e3a9377f05a26cf175116d069c94e2df
+    插件包\test\_r4_v1_regress.txt  |  12,846 B  |  c2151872287839788e497789be78a358779727cda0f81d714ba230d9d3314a10
+    插件包\test\_r4_v1_regress2.txt  |  12,181 B  |  66f6802c0c82d7465d50a6828c3256e37cbab26c5ca8b1184ab10beafaf60de6
+    插件包\test\_r5_collect_log.txt  |  68,559 B  |  5a4f844b3d572cc857935eb9a683072510c635953f434d46f5f8fd3838c97a2f
+    插件包\test\_r5_patch_pmlfnc.py  |  3,362 B  |  ba95511ba40233d4e329bf73b1b3e2a484a70d25c0af17ac881911bd8c34de73
+    插件包\test\_r5_patch_pmlfnc2.py  |  1,124 B  |  90b1e690cdabf48feaa4768129613869f0ac9713be7e6cecae6f4e05fa18c7f2
+    插件包\test\_r5_patch_pmlfnc2_out.txt  |  164 B  |  75cda4f983c8e5eaa5b7039d2f0cb4187f643e04393ed365a7683594eebad11e
+    插件包\test\_r5_patch_pmlfnc_out.txt  |  276 B  |  20a137e7787b54cdf11a8a04e4bf4beb94235dc3ab2d1cc5bde7c1b49a758ee6
+    插件包\test\_r5_probe_collect.py  |  346 B  |  25147bd6ee6ec6d98d8458edede58ee2299f93959be86def9af8266935f62d5f
+    插件包\test\_r5_probe_exist.py  |  466 B  |  9493c9e517634f7920260271ce638db75dbfa885af232a3a10eb92b03c200516
+    插件包\test\_r5_probe_exist.txt  |  941 B  |  f089d990abf2f117ee28eefd38d826f1c1b917d4e966198d8f333e9561c3a842
+    插件包\test\_r5_probe_line89.py  |  629 B  |  c182b54c1eb8d1c30d8c0529002cb73a83d7efe8a0d282a71d71da5cc463dbbd
+    插件包\test\_r5_probe_line89.txt  |  1,191 B  |  ef512fee8d11b122114386bcfce92d79bf4d19b67095ad984e4a8e620f3aa472
+    插件包\test\_r5_probe_mac.py  |  961 B  |  c6bef233fc15f1bff32645b03c122351a62e59c39f6c8ad2f5ad9fd604086194
+    插件包\test\_r5_probe_v3c.py  |  303 B  |  e6e6fd561667be7e2e41f1911578d6ee9c04eec68291d0f79c40a0527042a580
+    插件包\test\_r5_r2_regress.txt  |  27,137 B  |  38228b11d129bb2f23200e4751a1ed3b7a139c27aad4493f610a6e8e899136bc
+    插件包\test\_r5_run_final.txt  |  10,026 B  |  062e204550f81c932cd2da471ec0573cf02f10141b4ab719f15252070341162c
+    插件包\test\_r5_v1_regress.txt  |  12,181 B  |  66f6802c0c82d7465d50a6828c3256e37cbab26c5ca8b1184ab10beafaf60de6
+    插件包\test\_r5_v3contract.txt  |  2,883 B  |  91de4272bd03220d76f6d79471c7d506496ad57be78c2929f92981d876daf3cb
+    插件包\test\_r5_v3contract2.txt  |  2,804 B  |  ffc8c00789a16bd84d0e953f354d3cb8eddeb43e421a87daddaec53f8ae1ad97
+    插件包\test\_refs.txt  |  5,451 B  |  9d341755d19f27889e648e89a742d8e2c2b0723d6f7a8e59bccb449d52befba8
+    插件包\test\_rt_out.txt  |  6,949 B  |  94d2469020f2bb142b4ad4d696794cf5ef827b1df6fa8f1902df1463d1e9d3dd
+    插件包\test\_rt_out\JLCJ2.real.jwd  |  798,720 B  |  2c97c4c182f2b394923f39b3068e51e746be400fcc89a240b0729779b4b75a99
+    插件包\test\_rt_out\JLCJ2.roundtrip.jwd  |  786,432 B  |  a15e52809cd35d57839d48a33447076526c786ba28923532bb4dfe0abd85ae37
+    插件包\test\_rt_out\db2jwd_closure.json  |  51,499 B  |  7b6471e007f601d1ef6a42a35c0926381c7d07f984eca83b72dd321b0fb45e41
+    插件包\test\_rt_out\db2jwd_losses.json  |  4,036 B  |  aa5264b4ec8efea70403318212519763d8401a266fe90bbc931530d45c6c5aff
+    插件包\test\_rt_out\db_sections.jwd  |  802,816 B  |  676321c987c21f84d423f77c2c8d897db6ec8cad86116f101f8f2fb5586b68c5
+    插件包\test\_rt_out\db_sections_dict.jwd  |  569,344 B  |  b2adda0f25400eb01f28d7a8c118e5cab4dca4b31f69a4c290558cef4f52137f
+    插件包\test\_rt_out\db_sections_empty.jwd  |  569,344 B  |  fcde4d26bb848d5071b72564c3270867a0579b709d49ec625950a6d6fc635ba4
+    插件包\test\_rt_out\db_sections_reid.jwd  |  569,344 B  |  ef0d39d62619818b733c1f9f1902608e4118da791f0eb28b78ca27f68bee2484
+    插件包\test\_rt_out\db_sections_split.jwd  |  802,816 B  |  785d13b7ce9e038df85e7dc9f08902994b6b0d27c435a7e2aff5ead0b977e79a
+    插件包\test\_rt_out\dump_ext.jwd  |  569,344 B  |  0536c56c3955a644d9bb597078b0bcdabda9dc2ab1c78a5ab1eb5723b333fd98
+    插件包\test\_rt_out\dump_ext_nojoints.jwd  |  569,344 B  |  d14368f32813719fddbc83b05a0851acf41d225b7b53d748ff7b6b71bea1be4f
+    插件包\test\_rt_out\dump_ext_prop.jwd  |  569,344 B  |  bb2ab4b6bbd41f645f7718e43b8e0ec1fd0722dff3edabada16e0b492743a820
+    插件包\test\_rt_out\dump_min.jwd  |  569,344 B  |  68040338cc7736cd55054472915606e6da9a56c162534ba09a51064004bdc036
+    插件包\test\_rt_out\fixture_dump_ext.gbk.txt  |  1,319 B  |  1d605d951fa4fcee639255433b6934143fe5ffa803ab177974f8a9c8ad68e08a
+    插件包\test\_rt_out\fixture_dump_min.gbk.txt  |  726 B  |  19843401718816e23c3a641c17df702e24f4c473455afa42acd2329148b04573
+    插件包\test\_s10_probes\_check_readme_enc.py  |  571 B  |  53f1e93372cd73caa1f2d7cafbd8849464d16ac0c81dace623a4b1b5606fa18f
+    插件包\test\_s10_probes\_dryrun_s10.log  |  2,595 B  |  46990cfe1ec421318b073d710896e4a2c804ef8ce309d6ad15a4b1f9de1a8fd7
+    插件包\test\_s10_probes\_fix_gbk_chars.py  |  1,209 B  |  474f7d3c15520320b27d7c7ff2c5412b65066648d2e61cf5283666877d98eb12
+    插件包\test\_s10_probes\_patch_form.py  |  3,070 B  |  5fee640d62813bb8f93f5d96b0873372417cf5aebdb4e6b9aa7ba73f441df969
+    插件包\test\_s10_probes\_patch_hdrnote.py  |  1,001 B  |  ed84d0710f29a611e0cf5cc41589ae88cae3f5857ca9a604ec210cb919c24edb
+    插件包\test\_s10_probes\_patch_readme.py  |  7,330 B  |  a3a26c6d9cf7888d46fbd98a528e56f940041b8bf3a8524edbc16500cf62e887
+    插件包\test\_s10_probes\_patch_two.py  |  1,354 B  |  1554879022569ddb75164f0ce972c2eacdf500a0fb6e4f9f4377fa25b6330105
+    插件包\test\_s10_probes\_peek.py  |  1,456 B  |  8dc86659e7f1c898d6f14687910fec8eddb7bc79a5cfa7de8f2521bc824a351c
+    插件包\test\_s10_probes\_probe_cata.py  |  1,395 B  |  7f05450eaeb5d803f39dc47c840e9ef03b3ae1b1ec344d8ca6cf4a22441f4beb
+    插件包\test\_s10_probes\_probe_clock.py  |  1,428 B  |  7f3aced6f1332485dfa6d8a43191568570a548339a6812ffaa6ad677fa5acc95
+    插件包\test\_s10_probes\_probe_datatext.py  |  1,223 B  |  7b08bf25c0ee45246b6fd758d383edab763abd53b7f4bc4717277a0f3f2ccb70
+    插件包\test\_s10_probes\_probe_date.py  |  1,709 B  |  874c976b24db6a259d991e1b8b0770ea75de18d06d47a742628d34a448b665a6
+    插件包\test\_s10_probes\_probe_dbcmd.py  |  2,565 B  |  775d349fb282f2859aec1ea100a8fafa936a03d5268ca94e8ac13282c5cc3f5a
+    插件包\test\_s10_probes\_probe_dbtypes.py  |  1,765 B  |  0d30e7a1a33ebc0cba3d221a82bb7751ce28ae82090390fab565c27e8532712c
+    插件包\test\_s10_probes\_verify_citations.py  |  2,165 B  |  4b3745b484569d00724bd5f44c6bee65777580c57dee18ecd4d87a943ed1e13f
+    插件包\test\_s10_probes\_verify_headfoot.py  |  1,866 B  |  a2736998a59994c94425874921d3d920c6c4db64239588689420d6688c169b45
+    插件包\test\_s12_probes\_final_check12.py  |  3,849 B  |  7297442ea6f9735d1c1b1aea47b84a8a7e656073914469cba4f34b66583e0812
+    插件包\test\_s12_probes\_patch_readme12.py  |  4,182 B  |  2d3e64f52bf36b6fb0abbd28a340f5c4308118cbab1c118cbcd23a227b7c0156
+    插件包\test\_s12_probes\_patch_uniquify.py  |  7,796 B  |  b10599aca7778847df7a2ddd0b0959e7e2b222100cd27952fa37ae6efa177db6
+    插件包\test\_s12_probes\_probe_elsehandle.py  |  1,166 B  |  b34d66ef0b26f5ab45802f59130aa5dc6cedcdd49240164fc9de2c83d508f5f0
+    插件包\test\_s12_probes\_probe_func_ctx.py  |  1,635 B  |  d165c7975fe458c7643944e8b5160a16ce570c5765b581dea551a982c1cdbc27
+    插件包\test\_s12_probes\_probe_nucroom.py  |  527 B  |  bf0f571ba8f5384188e43e357026c18ad410e4dda376a8ab59793fe488611e27
+    插件包\test\_s12_probes\_probe_objarray.py  |  813 B  |  39d26b3565652a867da01d852a61acbfc08dfca20775c8b130b0af77bc80f6b6
+    插件包\test\_s12_probes\_probe_pdollar.py  |  875 B  |  31b3d53936176a0271207e44eb75d0f2bb177970f1be54f029a20f55a356031e
+    插件包\test\_s12_probes\_probe_return.py  |  1,735 B  |  5f7749907d3d2a38ebc99d0b1e34be95f4b2a31c009ec39651527c8e7f350024
+    插件包\test\_s12_probes\_probe_varexist.py  |  1,160 B  |  ca0f9d3aa2d1982a4129d1ee7405c091d2f36e59ea35fa4088a132887b141ea2
+    插件包\test\_s2_probes_20260924\README.txt  |  2,516 B  |  8cdbaa62f984d8cb28fe7dd9e88ff4eea710c0ce2d6fddb24f94cef6d137d498
+    插件包\test\_s2_probes_20260924\_check_continuation.py  |  667 B  |  56c86953f9f492dbd5fc63180b482ab5e4d4e542406fdcc5282a73aa46a7c5ea
+    插件包\test\_s2_probes_20260924\_ddl_block.py  |  18,211 B  |  753bd7e7643019479ef2315e31b578ac6e61d3b4f9467b6f2a8fe112f4abd57a
+    插件包\test\_s2_probes_20260924\_dump_pml.py  |  538 B  |  3340b3287f80a834ed95c8b361a71a515661b18bb51d3d4c9af73814889a7890
+    插件包\test\_s2_probes_20260924\_final_check.py  |  2,232 B  |  5c7f34465b1b468075ad974071b42307e2b50b9e40d19b2409269b6813cb8a9f
+    插件包\test\_s2_probes_20260924\_fix_indent.py  |  3,694 B  |  4eb116d389067109ab3a293d41cebf4bd22d6da9b6f66cef98c0e5d467c61066
+    插件包\test\_s2_probes_20260924\_fix_ops.py  |  3,001 B  |  bcd54c3f5bae6b8e155330d813967340452cfe388d83c4849d81f4a2c5327ee3
+    插件包\test\_s2_probes_20260924\_fix_pathtype.py  |  570 B  |  d40b1df626ed280e585c99701a2f12652e526dfd9a8a48802f9f5545da4d77bf
+    插件包\test\_s2_probes_20260924\_fix_return.py  |  1,204 B  |  41b6b79ba54b4ae374306700e39e1d5874d9ffbabda6608e9d267aee2b158831
+    插件包\test\_s2_probes_20260924\_fix_unset.py  |  1,285 B  |  59a403cb39fc0b1ea902cef1134baa16b8880d212330ab1d719e541e621f2bad
+    插件包\test\_s2_probes_20260924\_norm_cmp.py  |  1,175 B  |  f7ea67d0aa85d56a39f1c1fa013cae93050e5ca2161762c5d995b0e6d7d3930c
+    插件包\test\_s2_probes_20260924\_probe_cmdtype_out.txt  |  5,065 B  |  6bf6bfbbde0885caa44f2a4291856ce00b94975bb507b974fa6ccb7324e59be0
+    插件包\test\_s2_probes_20260924\_probe_io2_out.txt  |  12,372 B  |  ee56d3e4964622ab9fe31a239ea379b944c5b353fb4a8671b6d715ae11ee05f3
+    插件包\test\_s2_probes_20260924\_probe_io_out.txt  |  13,268 B  |  b0c1ee61718a8cf00b2825abe36de50b4d38c7598e13446c9ef6e3b299e52607
+    插件包\test\_s2_probes_20260924\_probe_macro_out.txt  |  1,171 B  |  01dfa72403e23e148082f5cea472954304c8cf15d077b613b65ad2de7a2b6d99
+    插件包\test\_s2_probes_20260924\_probe_nav_out.txt  |  7,840 B  |  4ba4f06d775f1d4f1e446a526af16b0e23b6126bffb4727910935d06d789c6c4
+    插件包\test\_s2_probes_20260924\_probe_uic.py  |  843 B  |  c8491e1be051ba51255a2e8aa1c74b5c723a92e0303a3336cd2c4481b1cf3439
+    插件包\test\_s2_probes_20260924\_probe_uic10.py  |  1,195 B  |  4597a59897cb8d8655f32949c4538e18242385e363e86a91c28f2ebcf8795e0d
+    插件包\test\_s2_probes_20260924\_probe_uic11.py  |  818 B  |  01bc90e43a16147dcac0451f5de8856434c46e93fedf90ce31e4e3041d1b005a
+    插件包\test\_s2_probes_20260924\_probe_uic12.py  |  730 B  |  60597941ad54d9740dc8aed0c407b86dae4e9c720d6527ae7245ec759ec6e952
+    插件包\test\_s2_probes_20260924\_probe_uic13.py  |  1,285 B  |  c06e799aa1239726044dbd52c524dd6dc62ba10b831279d3064a9188bef6f52a
+    插件包\test\_s2_probes_20260924\_probe_uic14.py  |  1,791 B  |  2eb25b581e95f768b02ccc03916fa800eecde6bea03642c8f0c987e9c1b202b1
+    插件包\test\_s2_probes_20260924\_probe_uic15.py  |  1,844 B  |  d8259781cf299910300be4d3fa1bbc304e0f22e34d08f2cbab87bf883d4e954f
+    插件包\test\_s2_probes_20260924\_probe_uic16.py  |  1,680 B  |  de8f0ab6f84d393314f594d2bfa2cbeddb5f6053d3ef1ce14ff2bfc3d381f039
+    插件包\test\_s2_probes_20260924\_probe_uic17.py  |  1,585 B  |  fe950e80ae5e26be26a5ad16b9af6d51e2a5549eb7a3b3eb66f4d6baef9be7bd
+    插件包\test\_s2_probes_20260924\_probe_uic18.py  |  816 B  |  8789d900c671e10552cb789edb45bfca40b215e40ca73a8e4d531b5e9e9270d2
+    插件包\test\_s2_probes_20260924\_probe_uic19.py  |  2,249 B  |  2fec8592adad7c6d11bdd31eedd62f69467111723224ddddaf49873073fe40d7
+    插件包\test\_s2_probes_20260924\_probe_uic2.py  |  1,017 B  |  8cccada8e6898255cf1aff1d0a8c6dee5c18da1fdc0d0be3e2c5f384ee6f25ca
+    插件包\test\_s2_probes_20260924\_probe_uic20.py  |  1,748 B  |  84309133f3b847a0eec4b50e0e978caa7d8fc9176c2df508ab0f084f3d14d85c
+    插件包\test\_s2_probes_20260924\_probe_uic21.py  |  1,149 B  |  e131632f7ca3a92a1f61bdc4643c15ef3b7a420d31f6b191cbbbda033e2c834a
+    插件包\test\_s2_probes_20260924\_probe_uic22.py  |  769 B  |  687e530d24b6de19711acd81d992636907c38dc54b2623800accdc30e52f2264
+    插件包\test\_s2_probes_20260924\_probe_uic23.py  |  1,807 B  |  9279bd3fcb5bc6565157037e66ff1e33b8b4b523f3f705ecd6d46504a1b2f901
+    插件包\test\_s2_probes_20260924\_probe_uic24.py  |  1,076 B  |  d9fba6986ecb96dfddba0d29cc4a64bb8d1fcd08e78836bc5779ec49dcc43559
+    插件包\test\_s2_probes_20260924\_probe_uic25.py  |  1,542 B  |  86152631b8e6fb002c568b105735d177b812a2da172d3c8eb9437599aaa2f495
+    插件包\test\_s2_probes_20260924\_probe_uic26.py  |  1,505 B  |  87402c8a53073c4f37e3ef50487d4dcd948a33a25fad1e08bc51690cc809c727
+    插件包\test\_s2_probes_20260924\_probe_uic27.py  |  1,648 B  |  5c492b27ff1dc2a7cb7a63fd851fc192db78885f73f74e98137bc1d7f5e0514f
+    插件包\test\_s2_probes_20260924\_probe_uic3.py  |  1,088 B  |  5802786d9dc289625cdea40dbef4053865831925856c6c592954e906aaf02c75
+    插件包\test\_s2_probes_20260924\_probe_uic3.txt  |  445 B  |  303336c3f8042095a0ae2b221bde7a13d064e55cd63aedd8bf826fb10c7168ce
+    插件包\test\_s2_probes_20260924\_probe_uic4.py  |  429 B  |  cc911d97e6aee7dc73c808485d99b58a9c16c20ecb8f154062ae000dfe576939
+    插件包\test\_s2_probes_20260924\_probe_uic4.txt  |  1,936 B  |  8fe249012c89608ba39986b5c993db6100afe53d42a64e8b9bba2329d61d0191
+    插件包\test\_s2_probes_20260924\_probe_uic5.py  |  885 B  |  2cab43e7aef08a859b3a0d34d4e36e50801f7f1ae58d9ee47103ed41c09492e3
+    插件包\test\_s2_probes_20260924\_probe_uic6.py  |  1,015 B  |  1ed1ee363277772fe6bfa70a663879f822bd64ea75f67d148f924b87d28041e1
+    插件包\test\_s2_probes_20260924\_probe_uic7.py  |  1,036 B  |  82a0fc4d8ebf5ca557dfab9a441075a17bab335db3334ae3a4d543fb408dd558
+    插件包\test\_s2_probes_20260924\_probe_uic8.py  |  1,129 B  |  564ab319cf932242ee0d32d7d01370158355eddd595d4090c18daae821913588
+    插件包\test\_s2_probes_20260924\_probe_uic9.py  |  888 B  |  a6a7d9a0ae5022092d2ec6f2eedadc5bbdd0f3e63877bc63042fd8bfcc506c2b
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\PMLLIB\_removed_pkpmjwd_20260924_002952\pkpmjwd.pmlfrm  |  6,023 B  |  8938222f938f5126158f3561b273f03aed3b95841a632a90c2fef52f2b398025
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\PMLLIB\_removed_pkpmjwd_20260924_002952\pkpmjwdexport.pmlfnc  |  19,560 B  |  176ec0b714a515c871a5cd4153fb4c247510084de744c0e7d1d116a04fe948ac
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\PMLLIB\_removed_pkpmjwd_20260924_002952\pkpmjwdrun.mac  |  870 B  |  fa0ae4d492b78f6974b412b657c1a162267f03fc31df88a634e31a7a670d377d
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\design.uic  |  6,008 B  |  b7c3a5698ba61739e6bd345bb7a400ae5af9fb9b6fc3a151a9b45da1573850af
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\design.uic.bak_pkpmjwd_20260924_002929  |  6,008 B  |  b7c3a5698ba61739e6bd345bb7a400ae5af9fb9b6fc3a151a9b45da1573850af
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX2\design.uic.bak_uninstall_20260924_002952  |  6,595 B  |  64eb8b0408b8a68cf28e7c361feaa107d766b55bd042d68f31778989fb5eae01
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\PMLLIB\_removed_pkpmjwd_20260924_003323\pkpmjwd.pmlfrm  |  6,023 B  |  8938222f938f5126158f3561b273f03aed3b95841a632a90c2fef52f2b398025
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\PMLLIB\_removed_pkpmjwd_20260924_003323\pkpmjwdexport.pmlfnc  |  19,708 B  |  3e11c3900ccd1f0501dc31bebfd76012efcb62ae96b9c2793f5a30e42582f280
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\PMLLIB\_removed_pkpmjwd_20260924_003323\pkpmjwdrun.mac  |  870 B  |  fa0ae4d492b78f6974b412b657c1a162267f03fc31df88a634e31a7a670d377d
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\design.uic  |  6,008 B  |  b7c3a5698ba61739e6bd345bb7a400ae5af9fb9b6fc3a151a9b45da1573850af
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\design.uic.bak_pkpmjwd_20260924_003312  |  6,008 B  |  b7c3a5698ba61739e6bd345bb7a400ae5af9fb9b6fc3a151a9b45da1573850af
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX3\design.uic.bak_uninstall_20260924_003323  |  6,595 B  |  64eb8b0408b8a68cf28e7c361feaa107d766b55bd042d68f31778989fb5eae01
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX\PMLLIB\pkpmjwd\pkpmjwd.pmlfrm  |  6,023 B  |  8938222f938f5126158f3561b273f03aed3b95841a632a90c2fef52f2b398025
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX\PMLLIB\pkpmjwd\pkpmjwdexport.pmlfnc  |  19,560 B  |  176ec0b714a515c871a5cd4153fb4c247510084de744c0e7d1d116a04fe948ac
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX\PMLLIB\pkpmjwd\pkpmjwdrun.mac  |  870 B  |  fa0ae4d492b78f6974b412b657c1a162267f03fc31df88a634e31a7a670d377d
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX\design.uic  |  6,599 B  |  04940bc49aa3c4efee5663022900fb062cf3f47870089ff767aa45fcffb62c91
+    插件包\test\_s2_probes_20260924\_sandbox\PDMS_SANDBOX\design.uic.bak_pkpmjwd_20260924_002826  |  6,008 B  |  b7c3a5698ba61739e6bd345bb7a400ae5af9fb9b6fc3a151a9b45da1573850af
+    插件包\test\_s2_probes_20260924\_sandbox\design.uic.orig  |  6,008 B  |  b7c3a5698ba61739e6bd345bb7a400ae5af9fb9b6fc3a151a9b45da1573850af
+    插件包\test\_s2_probes_20260924\_sandbox\dryrun2.log  |  1,610 B  |  7a15a713c2f7667e5c1ac7ccd2040a233950b79394e345f170b1a86b1e48699e
+    插件包\test\_s2_probes_20260924\_sandbox\final_dryrun.log  |  2,424 B  |  c000e73982663fef1a7ea91e7b3be3b79f75b960a200962b410b800dd6493f3e
+    插件包\test\_s2_probes_20260924\_sandbox\install2.log  |  2,500 B  |  c8d06e7639df491a44d1d8073a077c1cd95a19fedd9f47ac5247a6b9d26a82de
+    插件包\test\_s2_probes_20260924\_sandbox\install3.log  |  4,111 B  |  386d86ea8482d1ee38c41587e3d80d5ea794deafd47b530afcd600faad43f94e
+    插件包\test\_s2_probes_20260924\_sandbox\uninst.log  |  1,993 B  |  b4d4d523efd6c81b1c623c06df8dfd8cdca85117cc6f3e89ef98794c7ee47250
+    插件包\test\_s2_probes_20260924\_sandbox\uninst3.log  |  2,173 B  |  ac984bc0caed1abef27df95de16df4dffd3301aa54c4b88fac70a125d50133c4
+    插件包\test\_s2_probes_20260924\_sandbox\uninst_dry.log  |  1,517 B  |  04cddf8feb8512044822ede6d209f266b523be49341ea4b7ae0c2f1f5b3b12cb
+    插件包\test\_s2_probes_20260924\_sandbox_after_uninstall.py  |  1,102 B  |  0a02d7b2e4020eb2412d07f2fcfb9f9bd835d6f3df7fda5445a84cef89855de6
+    插件包\test\_s2_probes_20260924\_sandbox_verify.py  |  2,026 B  |  26f8542fd6609f7ac9fa470f7a15631f84df40be76a56ab9d7e934070612b79c
+    插件包\test\_s2_probes_20260924\_show_ops.py  |  690 B  |  ead7e52fff55e81674dfbbb4c5097fe798e91df71a6fcb1fc49b58943027ae4f
+    插件包\test\_s2_probes_20260924\_stray_empty_from_failed_move.txt  |  0 B  |  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    插件包\test\_s2_probes_20260924\_tidy.py  |  2,351 B  |  8425177f31b8992dc1c82c674b50f896b0354a810a9dcf50e3082661017a3c30
+    插件包\test\_s3_cli\check_cli.py  |  14,392 B  |  3ec9d43ff0098478f1fc2a53abbb606cfbc7605df2569fc50eb9ef82e7572c9f
+    插件包\test\_s3_cli\check_gui.py  |  11,553 B  |  2d6249b691f6d427e32b1312383564f736cc71c04ed4a23243c30cf68d9986d7
+    插件包\test\_s3_cli\check_r3_engine.py  |  8,237 B  |  efa9eb9d7e04c4b3c90bab07e3862235660dbe5acd9dd86a681d7c1a0be3d480
+    插件包\test\_s3_cli\check_r3_macro.py  |  6,750 B  |  aed89202ae3d311c5ee9f45f3e29a3e4e1c53f4c29f252eb9e8379adfb8d6781
+    插件包\test\_s3_cli\check_reports.py  |  6,300 B  |  86ca8dd5fba9efb39d17f301a5caff2190cb1c3502ebbbe8c173443b56e5e9ca
+    插件包\test\_s3_cli\check_v2_artifacts.py  |  5,463 B  |  84a68feb5505765961416fe2b4e6c236b8395f71dd931917180442b2fd79ffdc
+    插件包\test\_s3_cli\check_v2_cli.py  |  21,186 B  |  d99559df0021c69aab03fae7c3cb09601f94c46562ceea637a0f9474f0ef0be3
+    插件包\test\_s3_cli\check_v2_gui.py  |  9,364 B  |  23c6d361350b2668a415ba1d3a4db76881d67f79a0ad53b939698aa87655e56d
+    插件包\test\_s3_cli\make_requests.py  |  1,788 B  |  48629937cd87bc89079e6e3a33e27c75ba28298f9975ba046da1620f119ecfa8
+    插件包\test\_s3_cli\probe_family.py  |  2,230 B  |  8cef345b22c14fecd24515178ffb40b5d9c331a5d07d35daf150a0fdd6a2e426
+    插件包\test\_s3_cli\probe_inputs.py  |  1,904 B  |  558f72dbd2e07ec00ca1e4cc45320b9a0fdadd683e7b0adb22bb3184b4897390
+    插件包\test\_s3_cli\probe_v2.py  |  2,263 B  |  9c95cf209b99acb302c8609e572cd4b845bb59ff9081581cfe53f9de60ce73ab
+    插件包\test\_s3_cli\run_required.py  |  4,236 B  |  70e78f217c6ec8b07f7f13c429e4c66c32165affd3a98e4e80b8d8f5248cfbe9
+    插件包\test\_selfcheck_out.txt  |  18,142 B  |  8ce34461e9f203440fe9dc16ed9a2e2a363202174bfe1b7b2529821ee83a37f2
+    插件包\test\_summary_out.txt  |  185 B  |  ff056f802cfb69075467d58c1338de2d0da0cdc0b94cca05f389ea0ec4885ec9
+    插件包\test\_summary_v2_out.txt  |  272 B  |  16fa95a6872558fdc94aa23b41f3f853a758199c3169a9bc72932fd36c4a611c
+    插件包\test\_v2_build_out.txt  |  1,568 B  |  e13e24af70f7b87815ad9a6997b4f284feb9bff63c5f681c296931770839a69d
+    插件包\test\_v2_calls.txt  |  332 B  |  640512689a7a04b4b95ad50fe1ca7566f9145781fe4ab7ebe99a881b160f2a0d
+    插件包\test\_v2_check_out.txt  |  2,459 B  |  9dee1846c93da07b67e06a84239fd5b1a560731dbe469b4c47208b55166678fd
+    插件包\test\_v2_db_dtset.txt  |  1,632 B  |  7ff30dc6fa05eb2c73cb1bb633b64595842beaa6f292ed7cdabc3dfec98bb7c5
+    插件包\test\_v2_db_params.txt  |  14,569 B  |  30058b3b4cdfbbe5b118089a22474b8afc1f02f5f0a15dc73070e6ab55fffc4f
+    插件包\test\_v2_db_source.txt  |  6,780 B  |  3bd1cae073a4ac0d3c3e8ca23b95ee6914f98fc5006bfd43275883e8f29d12c2
+    插件包\test\_v2_exr_out.txt  |  2,570 B  |  0412fea6eb92b26ec95d32d17ccc1cb577928a93c090e50fffa632476b92a13a
+    插件包\test\_v2_probe_a.txt  |  18,681 B  |  346b645b50db7caa41305ef0d3aab056cc774413fb02a8140ed28104550a69b3
+    插件包\test\_v2_shapes_out.txt  |  18,681 B  |  346b645b50db7caa41305ef0d3aab056cc774413fb02a8140ed28104550a69b3
+    插件包\test\_v2_slots.txt  |  4,513 B  |  fafb1cf3b0fd136b13d0ce0d150c93c63ec3311b1900a0b5b6a9c5448d68a1b2
+    插件包\test\_v3_check_out.txt  |  2,581 B  |  686a4eb0c052692a70eff8c2486205a387abb5e64d405a7dcd59cba6537f31f9
+    插件包\test\_v3_csc_check\_baseline\aveva_root.json  |  98,577 B  |  ede65d660ef1ecbc941bcb77a1e3e79b69f183ebe7a0a930088c886e55ab65e1
+    插件包\test\_v3_csc_check\_baseline\g_plugin.json  |  150,204 B  |  0bc6ad24e5d78aebb8ec1185a44e9fc68d0220165637357c72b2d68d0ae81c4f
+    插件包\test\_v3_csc_check\_csc_probe.txt  |  885 B  |  4e4c459a65a9d3e36103d1e50976b6e3d746d99286ee7c128c46719c1bf78f16
+    插件包\test\_v3_csc_check\build.cmd  |  878 B  |  b9456a0933153a1567e17ebd4d54bb886222e30e0d1436637eb8ea39a9930f2b
+    插件包\test\_v3_csc_check\stub_pkpmjwd.cs  |  966 B  |  89a36baaaf579d55709a6095201c553e741bf8809eb838519a50224586bbe787
+    插件包\test\_v3_csc_check\stub_pkpmjwd.dll  |  4,096 B  |  6adeda113d4c9f6e5e74203e6fefa3803dbd35f8fab656805b1e510bad0749e8
+    插件包\test\_verbatim.txt  |  8,311 B  |  3124e89cd21ba03dcc3192024a4fce9ee0713de09e6be14c1efee60fe9d7d32e
+    插件包\test\_wr_sample.txt  |  22,195 B  |  b08da948ad6dbbfd974786115198d56d667471076bbe070276024e1d3c5bba90
+    插件包\test\acceptance.py  |  75,187 B  |  0fd1f92ab43278c421aae87da0d226473dd3df574f337b7cc0df9f447a8c0b90
+    插件包\test\acceptance_r2.py  |  80,500 B  |  cf4732e2e15ef2db1e81939c463f7f97cff5e8ca6c0057cef7360b3ac024d5e9
+    插件包\test\acceptance_r3.py  |  45,270 B  |  a864a90aca9e2631c1b6afd37ea23791e0acf665beb253676b0c3a7658574a55
+    插件包\test\build_section_table.py  |  15,139 B  |  d2ff6730ee44fd010e0f4a0e82d90d46533e01f3729152815686f397cc996f6d
+    插件包\test\check_db2jwd_sections.py  |  34,995 B  |  e0d19ad2229b5ac0a0d80bc50ae2e7d3765bdc6e1c0d2e00e44836d249886665
+    插件包\test\check_deliverables.py  |  9,714 B  |  9e7e1f932bc7059662eeb3f9682249ad8d17b9c29724dd443dd8972a12fcc3b7
+    插件包\test\check_dump_grammar.py  |  6,007 B  |  57dc946bec0c4bf51a0e93ce55f89547554b454d0685d35d714f8b266c6ebfe4
+    插件包\test\check_dump_to_jwd.py  |  24,073 B  |  46a3041e199c9a4492899f96e664fdcebc36efda36c648aad6ccbddaf6ec7588
+    插件包\test\check_encoding_package2.py  |  901 B  |  c5c0ce16631dce955dbcf01605cbedcde526acdf5d0c60eb8e73405c0bd8ad79
+    插件包\test\check_encoding_package8.py  |  1,206 B  |  63a4c38c3e221924e7294163d728a7582f29ae906a196512b7c06e7cc0b3d69c
+    插件包\test\check_jwd_write_roundtrip.py  |  23,560 B  |  4dcf7fc9b2d9a547330e1978857a8feab482c3452d7ab683d8fc3eee2ecfe02b
+    插件包\test\check_markdown_tables.py  |  1,334 B  |  6ff26ba8a3918151d4ff59750e754a096e95e3c105b5e936dfb4159736b2f925
+    插件包\test\check_pml.py  |  8,872 B  |  ded2cef00227192245460f5efe856b32c328d4aa931dbe85aeebf6d01e947a65
+    插件包\test\check_sectionlib_roundtrip.py  |  29,850 B  |  e7b15c1989029965bf8d4dc103e1185047d54bd7e0e252e87f97a9c1db7a9bd0
+    插件包\test\check_uniquify_logic.py  |  8,155 B  |  60cf578669b3e323cce1f573abc7f7166fd8d46f6b866f9d152ed346ea1107c4
+    插件包\test\check_v2_contract.py  |  12,114 B  |  58b78e7bf6bed3ca476f1645540660be5e3bdf6d5733ed38aeedba393ca142bd
+    插件包\test\check_v2_db.py  |  26,262 B  |  e8f7bc18fafb4bdfb88bc6303610a97a01ab1c67135db512d641c736c2aff886
+    插件包\test\check_v3_contract.py  |  9,026 B  |  2d3a41eb5c29f01fcd06a9fa37e6fcd13bd3eabdb988b9d47a4fc724bdf56ee3
+    插件包\test\check_v3_csc_probe.py  |  6,717 B  |  afd2c1984e519be166910bb79a49867049f955063a699320caa911f711dd0994
+    插件包\test\check_v3_notouch.py  |  3,822 B  |  d0367286bd9661749b8063831760586d42fbd877c0101326da130a2d7786093a
+    插件包\test\contract_nav.py  |  748 B  |  71626dca5eef7bef6dc3f4b04de40ad598a3d8c5747068264d59f27859f48bc8
+    插件包\test\diff_pdt.py  |  770 B  |  312318c17c972b792dac0ce455efd0fc8cc58f6fa1fa99e8a41d31750219251c
+    插件包\test\fixture_dump_ext.txt  |  1,290 B  |  34be58c7c8384bae2f351be8a86817a5148d1cab9fbaac07e1ecfaa11b2ebe3d
+    插件包\test\fixture_dump_min.txt  |  706 B  |  3053e46fd17691dbb65253908f998f60729cd3bf685919ddfab7060984bf9a2c
+    插件包\test\fixture_secmap_dup.txt  |  254 B  |  5d82bb8dea0a6bafefdadc69daab7f75d058e6bef34db74861c22a1e54566912
+    插件包\test\fixture_secmap_extra.txt  |  108 B  |  826196319a34853cd18fbda6fb353747452bf041b0d9bad9d350088eac04c621
+    插件包\test\gbk_crlf_convert.py  |  1,356 B  |  2217a32a898d324868f417f507032222d4ba6f28cc4e09bfbbbb0af6d82b4ea0
+    插件包\test\gen_ddl_block.py  |  1,260 B  |  cdab03b9c32347e5fb9f87a7d1790d66e9626bcf51e946a88865281a4eac0c15
+    插件包\test\grep_out.py  |  562 B  |  5511615964b7e766b5d33215a722491d9433f0c6239479ef8dee3ed2971ce2dd
+    插件包\test\make_gbk.py  |  2,822 B  |  a99177ab1b8e2352b3b63e530fa359b7d90694ddfb19caeb400ff31450aa02a3
+    插件包\test\out\_cli_selfcheck_out.txt  |  8,921 B  |  7c8afc8a53316682728784590a60111f47ba4fab20e2884ee5998221014e8d41
+    插件包\test\out\_ev1.txt  |  729 B  |  504dccb80fc848e63d7d5e248fa90273769cd7c16591efada3fbc0af09df011c
+    插件包\test\out\_ev2.txt  |  1,726 B  |  4407d34e13cc5e7a4ff69ccf387beb97b05a808a7add45722eae562678da8661
+    插件包\test\out\_ev3.txt  |  1,284 B  |  2721d1e04d5d2b4a8eb1feb8cdc52538d1fa1b1daf2662e800693e6dc74d4ed9
+    插件包\test\out\_ev4.txt  |  1,316 B  |  7dd9043c8332b3987ae34a637cec4c2299586e97c356de863eed9c1cf372df3b
+    插件包\test\out\_ev5a.txt  |  1,293 B  |  47e3e1ec133c061b99a0c42db67fc2b3365915585d5ac2d12ca9d3732e21a3f0
+    插件包\test\out\_ev5b.txt  |  1,409 B  |  bb8a25af3f94bb05d7f0b496e44d1400a15c3e930213c371449045ff35adb4d7
+    插件包\test\out\_ev6a.txt  |  589 B  |  06da997d08ba448531bb474350a45e693b20197f8258667006c66e21eaa3f535
+    插件包\test\out\_ev6b.txt  |  1,107 B  |  6988f5635899595a64f03892b6ab0d884fb9bd6bc6526ae93c3bffe79bd995aa
+    插件包\test\out\_exe_probe.csv  |  4,835,597 B  |  ade94b8159226b376479a362c999e968b60e11733fcd90b840a41569171fbfa5
+    插件包\test\out\_exe_probe.report.json  |  1,385 B  |  6755b25e77cda4070b6329827762c65e344cb9d6fe13ad5978af38ae213416a3
+    插件包\test\out\_exe_probe2.csv  |  4,835,597 B  |  ade94b8159226b376479a362c999e968b60e11733fcd90b840a41569171fbfa5
+    插件包\test\out\_exe_probe2.report.json  |  1,386 B  |  bbbcb84c3d53b93a441e7fd6e8e4e42bac55c28c305ab5c36ac4a56743228167
+    插件包\test\out\_exe_request.json  |  363 B  |  4d45e409cc22f3208e7c3c56ae1ff6cb32ec7840a7fc4ccae063167a62c24533
+    插件包\test\out\_exe_request.mac  |  33,924 B  |  0d2b9fa5d4d417991fba516aa6af772e7885f06e33bfed1a6685af196915396d
+    插件包\test\out\_exe_request.report.json  |  65,444 B  |  dc5fa04f10a3d380b221415efafc6b65ebe4d6557cf422edf3e3d6fd459f6434
+    插件包\test\out\_exe_request_out.txt  |  1,759 B  |  4e1b6b3f926ec6e9acc16c30dcd260f5467b33231bf46a991682426068f314f0
+    插件包\test\out\_exe_stdout.txt  |  568 B  |  0fecd7f2985d3eb9760e6ebeea0efff447f13f9342ceaa9901be900184c7b9e0
+    插件包\test\out\_frag.txt  |  255 B  |  ba8196caff2fb238675ee2d7ae95011a21b663d33b4d7359985b2cc5d3d6c254
+    插件包\test\out\_gui_selfcheck_out.txt  |  4,379 B  |  7c7c34e5c71b76a46033c15cdabea3cf4b3388b562be3f19c3311e52a1e3c87f
+    插件包\test\out\_help.txt  |  670 B  |  a6ef6551fbbca50748acdee0432a9472a751471b9d17c32e8fb70e1028ac9b14
+    插件包\test\out\_r3_build.txt  |  86 B  |  ac8fb1d0b83dd8a1ba5b8b5ac3ab2d746d7bfa7b1a337970b5c4c3a66bc04e11
+    插件包\test\out\_r3_engine_out.txt  |  2,754 B  |  1a3f35b777809c1d16ce092944b84f1b9d22392dda1328822304e3a1b698c3c1
+    插件包\test\out\_r3_ev1.txt  |  1,159 B  |  176e7dd5d61b626eaf563173684666d502694b384a300d6637054b2d614f724f
+    插件包\test\out\_r3_ev2.txt  |  717 B  |  568318001e1da20d29f4030d6f2e9b9f6c6346401a907631e6dd5f250955ef44
+    插件包\test\out\_r3_macro_out.txt  |  3,241 B  |  5dbe5b041589fd9beac54a443eaf23fb4f9887b9bee19e0eb6aa5a16b9f72229
+    插件包\test\out\_req_bad.json  |  12 B  |  9d4af4ce0bae7899f88f4c203eb18cc04993df270bdb5eb705de75f5144461b8
+    插件包\test\out\_req_bad_engine.json  |  73 B  |  4e080b37c8788ea4f1f4fdb6906dabdd16916cfeb4157c705e5b29b8e854a568
+    插件包\test\out\_req_probe.json  |  118 B  |  871149d3cda55f1f6ab56f2b7a1a365c45b8022974ff61b433001845d0d730ce
+    插件包\test\out\_req_probe_engine.csv  |  4,835,597 B  |  ade94b8159226b376479a362c999e968b60e11733fcd90b840a41569171fbfa5
+    插件包\test\out\_req_probe_engine.json  |  167 B  |  9dcdc98ad666b292fa3d18869f59d31046a5222b22b71a1877ad2da774873c74
+    插件包\test\out\_req_probe_engine.report.json  |  1,401 B  |  0881e3ee4a881123f4ce3eff053d16a1cd7e094fbbdf44c117aaadf3828522dc
+    插件包\test\out\_req_r3_jwd2pdms.json  |  355 B  |  089126d7f8a9b05a04528b9fe268e07ab519263ea54bd364bd4261b27386bdf4
+    插件包\test\out\_req_r3_pdt2pdms.json  |  358 B  |  8d5049a88c5816df9897d4a5f813eeb207e36925e27687731f79b3b1b41f2aa0
+    插件包\test\out\_v2_acceptance.txt  |  12,181 B  |  7878aecfbb1509af6cca381e906898a077c8be33828dde5a1ebea917d4cab968
+    插件包\test\out\_v2_artifacts_out.txt  |  2,902 B  |  91ec03a9ea6f4b90f043e64a1066b5002c4b7a550a3f5a1ce25800098b62a12f
+    插件包\test\out\_v2_cli_check.txt  |  9,304 B  |  48d1790dbf2ebb78beca7f639a5c6167d1be8376256550822f589401fdfc0fd6
+    插件包\test\out\_v2_cli_out.txt  |  9,304 B  |  8190d54d8a445eab568a7338418f009575c33896cc208b745b13f0201ae7409a
+    插件包\test\out\_v2_gui_check.txt  |  2,574 B  |  62f16dc47fa5ff54db8ef44827ed75d32deef9d146d7543ddc1c1b2cd66937eb
+    插件包\test\out\_v2_gui_out.txt  |  2,574 B  |  04b9f30ceee2564deda261313782bfa62d3030ed67f855645cc1f0902884fb1e
+    插件包\test\out\_v2_required_commands.txt  |  15,418 B  |  5178a4efab4b23c1f4726be6d01cce4fb096829932ff502735d2e76ee1616036
+    插件包\test\out\_v2_run_out.txt  |  15,349 B  |  95dbc1fd1371a8e2570951781d237172aaeaed46ea681de11224266a804711e0
+    插件包\test\out\_v3_check_out.txt  |  2,581 B  |  686a4eb0c052692a70eff8c2486205a387abb5e64d405a7dcd59cba6537f31f9
+    插件包\test\out\_v3_notouch_out.txt  |  228 B  |  b1e9cbb6f70c55ad746c48125166129e4a9eb943ef2b19cc1187358da2efcb87
+    插件包\test\out\_wrapper_probe.csv  |  4,835,597 B  |  ade94b8159226b376479a362c999e968b60e11733fcd90b840a41569171fbfa5
+    插件包\test\out\_wrapper_probe.report.json  |  1,398 B  |  11c2445ea04a18dc6b95fa51a4a7362e06056df12b3a79b591f56737c3b054aa
+    插件包\test\out\cli_bad_dump.txt  |  58 B  |  5f8dd53f7a40a345c6ddb8f6074c724a8acc8298487a68d0a508b3ff8535a172
+    插件包\test\out\cli_broken.jwd  |  24,576 B  |  76fee9003cdd253408993992a32d532ca55837622a74cf333e3094eb56f7fd64
+    插件包\test\out\cli_broken.report.json  |  5,374 B  |  dbdec46e1f4a98df35afc1f9745aac013e46bbed8544ffaa9de2f7a37d333374
+    插件包\test\out\cli_dump_nounits.gbk.txt  |  716 B  |  386393510dc42d9593baabd3c149dae06f8b7e1f8eb9e0c5c92ae345c278a616
+    插件包\test\out\cli_extra_probe.txt  |  30 B  |  c85ab1e854763baff675721d2a56dcdb54f74c77f4aed6310543cde6f5cb861c
+    插件包\test\out\cli_fixture.jwd  |  569,344 B  |  68040338cc7736cd55054472915606e6da9a56c162534ba09a51064004bdc036
+    插件包\test\out\cli_fixture.report.json  |  13,522 B  |  5fbc7bb4f996c31678ff8034ff8b541096632ee4bd65fe9f4142e46455a80982
+    插件包\test\out\cli_fixture_dump_min.gbk.txt  |  726 B  |  19843401718816e23c3a641c17df702e24f4c473455afa42acd2329148b04573
+    插件包\test\out\cli_fixture_m.jwd  |  569,344 B  |  5b713c69eaadc375e9b86413d7ec41e05cca455866a527d093b6ce60558bb6b1
+    插件包\test\out\cli_fixture_m.report.json  |  14,199 B  |  ca85c168df43827ae1d51e416f353237de4dc70d74415125b823b1ecd1dc73d2
+    插件包\test\out\cli_fixture_mm.jwd  |  569,344 B  |  68040338cc7736cd55054472915606e6da9a56c162534ba09a51064004bdc036
+    插件包\test\out\cli_fixture_mm.report.json  |  13,617 B  |  1eac592bef34a1cfc7b64f6dfec7552536d4d28e98e2ce67b2c74414e5b1dd17
+    插件包\test\out\cli_not_macro.txt  |  36 B  |  f8ceaaa36f4c7cfd25f1ab3106b484cd015b3f7ffe91a55112dcff34765b411a
+    插件包\test\out\cli_not_sqlite.jwd  |  20 B  |  76403e209976c2deb806a2890d4bb3d6fec81b39c9a53407891b264b9229e05b
+    插件包\test\out\cli_sample.mac  |  388,023 B  |  d9a915622dc1e54ee64cb1996d741703166e1d60d0d3c6d35e28f922a524c627
+    插件包\test\out\cli_sample.report.json  |  62,634 B  |  221ac39c755f4b80658224c3ffecf45920859fa969629380f91d69240e4db7f1
+    插件包\test\out\cli_sample2.mac  |  390,566 B  |  75cce9ea0b78afaf7cb1e48d58fb6586e51087ab5c4cea34d190eff8ecaca8e8
+    插件包\test\out\cli_sample2.report.json  |  62,629 B  |  4561bc804203ebaaab26b7306e80b88b179b35896a4579e7be0dc653ed1c5351
+    插件包\test\out\db2pdt.pdt  |  222,986 B  |  fdf6d1cf52c5298d6739c67c76a74eb4f6dac85ff844b9f35aa563fb697e8038
+    插件包\test\out\db2pdt_sections.pdt  |  13,619 B  |  d9a313d2567c3d81b0e7e148640cbc85b4c4c13bffbbbc9a51f0fef6208021ce
+    插件包\test\out\db2pdt_sections_only.pdt  |  13,379 B  |  4bc2d7e714656559fdc58cded0fc75a3a2d91f1e1cf86dffda669c5f87ac0320
+    插件包\test\out\dbsections_builtin.json  |  4,819,648 B  |  d733660b05bb694035171619b456e1985df2927d4d70bd77ec29115de591fa58
+    插件包\test\out\dbsections_builtin.report.json  |  1,389 B  |  50fd706f031b7fd4bee5a804cfe9af5a4c6c5bf043f459e6905caca88f196bfb
+    插件包\test\out\dbsections_from_cat.csv  |  9,701,321 B  |  b2a20ca0a5484d7aff75dbda46adc1366df81c6ee184d5dadf623980b374d7b5
+    插件包\test\out\dbsections_from_cat.report.json  |  14,974 B  |  d180c6910d9ab3967bd9b1ff5d8e53492c1f4fa8aa3b0fe554aa44dacf3c02d6
+    插件包\test\out\from_cat.jwd  |  1,011,712 B  |  ae98d2d7ea2039dd50b9ceb0aa4ea34c71a28281d2bd604cc4576d446a3be31d
+    插件包\test\out\from_cat.pdt  |  222,988 B  |  95b042150f885fcc3beb077ca10c24a45ab567f3e85600c9bdf19b9f03ca9780
+    插件包\test\out\from_cat.report.json  |  1,563,875 B  |  7eb16d48db423cd98053f646859e68dfb08cd9575ac71af26e307fadf2064093
+    插件包\test\out\from_cat_db2pdt.report.json  |  2,113,021 B  |  39aa58c496b508b832644a4a40fd9731f9da8614027b89221d16900b76c52df6
+    插件包\test\out\from_dump.pdt  |  11,619 B  |  a1dd42e64d5c6814b8fe37af3c00a917d5357f67fe50717bef29276b0d0a8aeb
+    插件包\test\out\from_dump.report.json  |  13,181 B  |  4ec27a1c5ddaf9b74adae5bfd1b9125ae0ac7d5ee1e1e4c3c812fc945c2450e7
+    插件包\test\out\from_jwd.pdt  |  343,856 B  |  237f65572fb7df9b86aa9bd819129308483c5a7af5c1a8c7b9b5f32e9e15b7cc
+    插件包\test\out\from_jwd.report.json  |  109,039 B  |  14ff37de597e32ec5f250bbbc0ecb28d373c731928d3da01e6de578ac9edac28
+    插件包\test\out\gui_never.report.json  |  765 B  |  3a7b98bc00e9372415e87de3f208c40478654a6c7d4f801afe5ebed5825211da
+    插件包\test\out\gui_sample.mac  |  384,970 B  |  214f9bcba6237e55c26b0c0df919a09a44afba07cc6f17f2f025292167729d67
+    插件包\test\out\gui_sample.report.json  |  62,627 B  |  9269b42246abbc56807cf70e3561001d8935dbbf5a7e867c1e95772bd952c5a5
+    插件包\test\out\gui_sample_noBrace.mac  |  378,848 B  |  9d6235767b29129747b65f9b58e70bfb71610a6c10e0009b9503d6afaf2dbd26
+    插件包\test\out\gui_sample_noBrace.report.json  |  61,205 B  |  1bd17eedbb63a4d8c0a418da22fb15489685eaf472b212adf4ef49bc09198e10
+    插件包\test\out\gui_sample_pdt.json  |  459,195 B  |  61b5f5428236a1de6cf729475d7a259534e3029f0621efdc7feb9e079b67403d
+    插件包\test\out\gui_sample_pdt.report.json  |  87,657 B  |  57fcc3183c4d3dea5cdd9bb079cbc47eb8dbe779d33a924db6af4a39c0770d97
+    插件包\test\out\gui_thread.mac  |  384,970 B  |  214f9bcba6237e55c26b0c0df919a09a44afba07cc6f17f2f025292167729d67
+    插件包\test\out\gui_thread.report.json  |  62,627 B  |  1a557fe88b02a0c20d9ff80b4aa81960d65cfc9705f7ba73c5a6d1fa90fafa55
+    插件包\test\out\gui_v2_db.mac  |  33,068 B  |  e036e96ffe7de65df00390954c76fc31dc2a868f3fe4255eefc3d394c808acdf
+    插件包\test\out\gui_v2_db.report.json  |  65,359 B  |  1a87672067445e1cbca0d871d5181fff41b3ea864ab9a63d95c057f3f150f6de
+    插件包\test\out\gui_v2_from_cat.jwd  |  1,011,712 B  |  ae98d2d7ea2039dd50b9ceb0aa4ea34c71a28281d2bd604cc4576d446a3be31d
+    插件包\test\out\gui_v2_from_cat.report.json  |  1,563,911 B  |  7a9a1f747885a72461abd863398601ec38d5f18e2e0610accc9490e788d952c2
+    插件包\test\out\gui_v2_jwd.pdt  |  346,717 B  |  aa7bd76d73d2ab27dee04f891e522d0e2ebfc73715067f7edc1c16f38c98f485
+    插件包\test\out\gui_v2_jwd.report.json  |  109,834 B  |  59db0fc884f12f6eb00898005470be5ba90afbb7ba71de14384149b0873b3da6
+    插件包\test\out\gui_v2_sections.csv  |  4,835,597 B  |  ade94b8159226b376479a362c999e968b60e11733fcd90b840a41569171fbfa5
+    插件包\test\out\gui_v2_sections.report.json  |  1,399 B  |  0bbc29d5ba956bf35ae934378d5d5af069e95ddf74abfa0c0a2941317f972fcb
+    插件包\test\out\jwd2pdt_roundtrip.pdt  |  346,675 B  |  bf41bfec529b5991702d49e08258620a22a1600e582e618a5d8fceebbf4c08d9
+    插件包\test\out\never.report.json  |  826 B  |  aceb8b3d2b4204f1716ddf64587e8eaeb17a4fdde4867ddcacd885e33f654f64
+    插件包\test\out\never3.report.json  |  826 B  |  f04d8a955c1addff5ed199d0413bcc6e89f8653279f065276356497eb4f59e66
+    插件包\test\out\never4.report.json  |  3,367 B  |  97c692a976bfd0cdaa318dee3f8103b58b84c87ebd3ea73c606be3588ba9a640
+    插件包\test\out\never5.report.json  |  856 B  |  293ddcb11232fa2b892511758809f93a810b0f1a4a81ba6b65cbc822c88fcf99
+    插件包\test\out\never6.report.json  |  838 B  |  f0214f55b27d8451f2a0b856cae03f7520575ade49efedf4d230b67889ba398f
+    插件包\test\out\never_db.report.json  |  61,553 B  |  098c5987ab96e46db1973225a60d341da12893eda909483c9b7989fb0a54e19e
+    插件包\test\out\never_v2_a.report.json  |  4,084 B  |  ff818a171d488ff093407df68245d221f33c753e3e971ae5957c1b2f4a3891e5
+    插件包\test\out\never_v2_b.report.json  |  856 B  |  379a8fbff60f437651f2c53cad3e85d220c7a9154f50b6b449a5586b07527496
+    插件包\test\out\never_v2_c.report.json  |  61,578 B  |  642f8e4ca2d8f955cede0c221fd72fde348a057305a4aafde1abd3ca0f36f92f
+    插件包\test\out\never_v2_d.report.json  |  851 B  |  a4cb1acc2ca9a527619640bd818f9a07439526cae2f5af4692a3c0765ee9c7ef
+    插件包\test\out\never_v2_e.report.json  |  805 B  |  4f73131368a82301bb60502c82cde3ce9eda835b5b9e789a15ad4b36f547ff90
+    插件包\test\out\never_v2_f.report.json  |  3,248 B  |  b5ff623324f47739a041443c1262a33f485c9374ef5fcf279552964b439d77e2
+    插件包\test\out\never_v2_g.report.json  |  3,301 B  |  366f705d45bad953ebd9c6f38ad88fcc2dec340c7e1823a7e8188f927dd57240
+    插件包\test\out\noSecmapDir\1_PM.pdt  |  808,069 B  |  f653755b83bcdb0526ecb69e02404ebf6546510d0faea0b21a987aab220f21e9
+    插件包\test\out\noSecmapDir\sample_pdt_nomap.json  |  455,754 B  |  9043dcdfb3ef110f109c79d5b881ab3c0d859d06197659a7aa1837837b9cba8d
+    插件包\test\out\noSecmapDir\sample_pdt_nomap.report.json  |  59,008 B  |  84bc8d175d5fdc6f94174373a1a23fdd191c9e7ce738296827c3ea176b8982f2
+    插件包\test\out\own_tmp_20260924\_tmp_dbs.csv  |  4,815,297 B  |  190173988a459e5ba3f7e02f5cda2709112446dfdc77ad5f4148638c1a03004f
+    插件包\test\out\own_tmp_20260924\_tmp_dbs.report.json  |  1,376 B  |  e852ba8f84d307608433fc622a15942d191187e99a91250e05abd2448f1de885
+    插件包\test\out\own_tmp_20260924\req_probe_stray\_req_probe.csv  |  4,835,597 B  |  ade94b8159226b376479a362c999e968b60e11733fcd90b840a41569171fbfa5
+    插件包\test\out\own_tmp_20260924\req_probe_stray\_req_probe.report.json  |  1,424 B  |  85847fdff54641376eb9c26b1f981d388b93c7b10fab4ce85c8b8ace5152eedd
+    插件包\test\out\pdt2pdt_idempotent.pdt  |  499,502 B  |  c16e48196f1e5b015fea9c56d2cbb89f98844c6ab498b404ca6992796fb4defe
+    插件包\test\out\pdt2pdt_roundtrip.pdt  |  499,502 B  |  3966546da192185095d41ec793743f98dc7be427837739968f5ff3ea5c23336f
+    插件包\test\out\r3.mac  |  384,970 B  |  1c2d3cc030558f6caabbdb6765e95bfc2e743911067d4305eea990c1faaedbbc
+    插件包\test\out\r3.report.json  |  62,613 B  |  0849dfb9bd1d9716b94b90f5c5f8c7da98fc12447b21ba2d4c0df264dea34dcd
+    插件包\test\out\r3_pdt.mac  |  508,618 B  |  329b47cb41f932425d5ce2ddf71aac42467072f74408adfda6037dad878eabbe
+    插件包\test\out\r3_pdt.report.json  |  90,768 B  |  4744327e6fb881a1dfebdb710cee864edf51fd472c16a239a81089d1faef9a48
+    插件包\test\out\sample.mac  |  239,399 B  |  635ce7f297a82dcf4beb98a2ba8fafe74dc66d24cd9d0e78fae04b7cad849764
+    插件包\test\out\sample.report.json  |  59,742 B  |  cfefd521ecf4894b2236bd2ad0643649faa125df7acb1e631018d29f6ddd60bb
+    插件包\test\out\sample_db.mac  |  30,067 B  |  9fad5f9d0d8da241a797cb23a094a0d14d697c03f968dd17031c60438706f889
+    插件包\test\out\sample_db.report.json  |  64,468 B  |  dd8ce6b0bfaf96117a724540b3d8f1bb21dd6b7304cd88b62ed3458d2cb9e3e4
+    插件包\test\out\sample_db_clean.mac  |  30,434 B  |  96677d411734db9d13e91a1d38753f2164e29b9fb419f4856ab91859596df200
+    插件包\test\out\sample_db_clean.report.json  |  64,703 B  |  d7271bc3667a8c0d817d92bbd7a0b8077f59f2e77b2493d9ada2a6b455942e74
+    插件包\test\out\sample_jwd.pdt  |  343,858 B  |  e97fae6fb88fbd56a4b0af0c745b2da95a666d1d7b86d18122770c88a653cf2a
+    插件包\test\out\sample_jwd.report.json  |  109,041 B  |  9481cdb0e93974fda76e3d3c8d66076284576e1a9142685ac4e195d89e0fcd73
+    插件包\test\out\sample_jwd_sections.pdt  |  13,561 B  |  265cc058e10ef5ad51741f756639de9c6274d747f665d378a01e82986af838cb
+    插件包\test\out\sample_jwd_sections.report.json  |  108,875 B  |  29eb79bade096ccee45dbc2fbe0672ce63216588edb882afa859e681c7b1b237
+    插件包\test\out\sample_pdt.json  |  455,757 B  |  aead964619d1e63a6151e92f09fcfafb56f5b9873be97d916551206deb909af4
+    插件包\test\out\sample_pdt.mac  |  313,625 B  |  5f2a76f5cdd246615116bb4b8266aa4819a15fe7bd96c6dfcebf5d3e1cffaf03
+    插件包\test\out\sample_pdt.report.json  |  50,079 B  |  5c21c4417f31701cae19a958b910c2e936e51efe60155436f7eb7193b146b096
+    插件包\test\out\sample_pdt2jwd.jwd  |  913,408 B  |  0e85fe07e017b48cc2fadc7216da82dfaaca47c006bc00293894a56499e7a280
+    插件包\test\out\sample_pdt2jwd.report.json  |  59,325 B  |  8b78b4e8af43d05173e6e5858143a95d201ceff680ecbabdf19e2c1d872cd9f6
+    插件包\test\out\sample_pdt_db.mac  |  21,904 B  |  44a22006756110a3a307387e6c79aa82b73e959ea7549dfc0e808e69a18d45f4
+    插件包\test\out\sample_pdt_db.report.json  |  52,037 B  |  52496159386ef2c5032c5cfce359d470577293d9c1085e2f702a566d41833f32
+    插件包\test\out\sample_pdt_to.jwd  |  913,408 B  |  0e85fe07e017b48cc2fadc7216da82dfaaca47c006bc00293894a56499e7a280
+    插件包\test\out\sample_pdt_to.report.json  |  59,324 B  |  d7cccbbd61606222e5919d3e049efdc305a6bc3de76aa32d93c3aeeda22d3b02
+    插件包\test\out\sections_builtin.csv  |  4,835,597 B  |  ade94b8159226b376479a362c999e968b60e11733fcd90b840a41569171fbfa5
+    插件包\test\out\sections_builtin.report.json  |  1,400 B  |  3fce65043c8587cde358ec14b86e8ab8961c60e9067c4b32dbb6314670501fb8
+    插件包\test\out\sections_from_macro.json  |  8,805,872 B  |  76612d17d9b0f224ad52ec2db3a2c3d45835677c17294fb80aeda12d6710cbe9
+    插件包\test\out\sections_from_macro.report.json  |  14,977 B  |  ae108b078e82612063207a35299dcf5900cffbb1ea5445984d90346ef9a0b366
+    插件包\test\out\zz.report.json  |  439 B  |  68d43ae45582ae5b4707cae6c7e554a1bbac9cd725810d99144de5a979a24611
+    插件包\test\pdt_area_check.py  |  1,190 B  |  4d6a5d2eab073b02e79d76e117f3dd481c0e472d78e8d8e585b73db5f3d8427e
+    插件包\test\pdt_dll_probe.py  |  1,657 B  |  89501752f56e7a27dd0918c5636afee36e1517ff9e7948f251cd3f55e76803bc
+    插件包\test\pdt_dll_probe2.py  |  919 B  |  469c5dc1b0e76ca908b8ff59a7de55e6b8839227083d7b21ac8687e44f99ad07
+    插件包\test\pdt_notes_dump.py  |  800 B  |  7ef76cd839b0b0bf3171b5347611999bd11b27f816bf1625b36bdf79175f7dd7
+    插件包\test\pdt_secmap_probe.py  |  8,105 B  |  df964bd9fa1ddc55f910116ccfc76efbb8365a63575bb9d3b759d2af339f2a06
+    插件包\test\pdt_secmap_probe2.py  |  2,056 B  |  12b698881736f6f7b1503c1541bfd19990e92cb271cf83670b83365480140747
+    插件包\test\pdt_secmap_probe3.py  |  2,802 B  |  18b1816f68bb87845a08561b0157862fa89f0da19669fa47482bb3db64d19689
+    插件包\test\pdt_secmap_probe4.py  |  2,389 B  |  cbe8e80a45277b3025050ad41cb66bee0f9e753ee425b39aa9ed70f8ff10016e
+    插件包\test\pdt_secmap_probe5.py  |  6,018 B  |  79086a5f82e39a3a989286de27c7dd2841aa1f263be7dca7acfb4116bd8f10b5
+    插件包\test\pdt_secmap_probe6.py  |  4,343 B  |  ffb3a9e069fb3aea95f54507d9a3655df75e3d8e4e3b1cf9d23e8f083f034eef
+    插件包\test\pdt_secmap_probe7.py  |  2,855 B  |  5c66dfc97d0d0a4ae8e0941900aa3796ebae52fdf6774d5c222ef34504bf6add
+    插件包\test\pdt_secmap_selfcheck.py  |  19,054 B  |  33bffa39dc64525b5896b69fd3cad0c7caec2052e6117b756d73034fceedd744
+    插件包\test\pdt_verbatim_probe.py  |  3,327 B  |  c0fbfbc1ed41edcb8ddcc504c99d9ed21e6e17342431de409ed08a4117248314
+    插件包\test\pdt_write_selfcheck.py  |  35,580 B  |  352a9a7702e76c052a2b45c246c920e67f7071ec0811a91b6424bd72bf7c437d
+    插件包\test\probe_fingerprint.py  |  2,187 B  |  861d6218bbb6c118c03a4a68504df2b3c7694a05a550c7f173e2902e49a76f2c
+    插件包\test\probe_fixture_specs.py  |  1,224 B  |  82a4a14b998e9e2517a65beae4ac5badebb89fe3006648f42072e06bb4dbb257
+    插件包\test\probe_jwd_read_avail.py  |  792 B  |  342303989510075d02ef5173f25186100e5cac1f94d366320e465a33d59cf427
+    插件包\test\probe_kind26_keys.py  |  1,451 B  |  4169d0dab77e2e469a1d2cfc315d4ef461570d718427132ed7a2f7850fcc5780
+    插件包\test\probe_samples.py  |  4,150 B  |  266b48e0cd409bf1b33c9b382a4350d82a150e3adc78f713656f13b1879b3fda
+    插件包\test\probe_samples2.py  |  2,591 B  |  6651ef35788533f2b91f5305d44c6ee4593a8399bd3572a20178f871fa00856e
+    插件包\test\probe_v2_db_dtset.py  |  2,309 B  |  0daaf996d3ce20e57ac1c74b11e56ee5dfd1d9e9927786cb77cbbac54cbcffff
+    插件包\test\probe_v2_db_params.py  |  3,820 B  |  8d2edc18873ba1dc9214d344ca8eb8bf27f72aaf0ddf5ee37362025f1edf8340
+    插件包\test\probe_v2_db_source.py  |  6,692 B  |  2a0977657c4ab0ef0f80a47a97e3437262ded5f7b2035f383a3a9d6464aa3c71
+    插件包\test\probe_v2_exr_wrap.py  |  3,286 B  |  eff7f8222c70efee27410fa7b1a54ad9029cfd1dd8c6e69f78e8c765828f6733
+    插件包\test\probe_v2_kind303_slots.py  |  1,134 B  |  0050e89a185c71ea1efed66a75e4d4dc6e48fd1c6e37ccec7c316e9ebecfe927
+    插件包\test\probe_v2_shapes.py  |  4,996 B  |  041fd470ac6dc0edc22db2d9ad85e38c3dc3fb3d6d5e45a70f4c6e27a94fa45e
+    插件包\test\probe_v2_slots.py  |  5,374 B  |  579266dd6cea3e808e923482ae64b5afa9dd2657d21b48b6fa69f83d459c1d8a
+    插件包\test\probe_v2_table_keys.py  |  4,019 B  |  8bfdf8653e958f2d2a9ae943d7018da4e6ced83d1527e781aecc1037ef30e261
+    插件包\test\probe_wr_sample.py  |  13,926 B  |  5b424bf6ba69e296a85898e3ef8d5403e04f51c432ca9d7bf143e0f8df02cf3d
+    插件包\test\scan_pdt_write_refs.py  |  871 B  |  235130ad7fe9dac68109eaada2119302f92191fa3eaf5ab1278f97b7c455a693
+    插件包\test\show_from.py  |  429 B  |  baffe0dcef3fff5157081fc0506b80026d03ce1a3ae5e502cdade7681a6679bd
+    插件包\test\show_lines.py  |  406 B  |  8bf6e534bcb4e18efdee6ce29689e7ae99bdcabdca6dfe0a6b4ca99d43a14911
+    插件包\test\splice_ddl.py  |  831 B  |  6ebdada84720669afcb1b502848357472b2483662c9dc92f8b5ee369ffe10842
+    插件包\test\summary.py  |  501 B  |  2586bf781e2c41196b94642e5584906282d3f0fdc569922f8a6f3138baa6a113
+    插件包\test\summary_out.py  |  568 B  |  1ea6abe3376b4dae85a0238e0f36f5afcc757a2481bd3f91ea16d6c470e1cc17
+    插件包\test\summary_v2.py  |  549 B  |  671c262c9dc997e0f1aab7d9cf66f77ef46b53125cbae4d4d1ddc8b1bd91cb87
+    插件包\test\test_contract_selfcheck.py  |  12,564 B  |  5be593a795753eea0783f29df9e766c34cbafc855151a800058bd8a400ca5878
+    插件包\test\v2_calls_scan.py  |  852 B  |  91f8fbfc853c1dca038e0e08790a9fe6bf8ebadd75ec9961afd71cad07d5af4c
+    插件包\计划\计划_JWD导入导出.md  |  25,099 B  |  8129b749cf6d3451fc1303b63fd27c75fb15f53851eb852d582a8342f5316ca0
+    PDMS原生插件\ENGINE_IO.md  |  12,668 B  |  c11de88ed68e128d84346260d352006619bc7d1cca02043d3249fb78ff90181c
+    PDMS原生插件\EngineRunner.cs  |  9,388 B  |  611eb1d88cefabe3da54331563f4d8431327a191feef824d69fa048c400b7ae9
+    PDMS原生插件\PKLog.cs  |  2,022 B  |  82582d8d9dd4bfbe4f7e02162b9a850c3b947f988b30df6b52e08f396d6516a4
+    PDMS原生插件\PKPMJWDAddin.cs  |  6,507 B  |  98cda228734b358a2b6a31d5559384d2eaf80c1644b8365d53813ad3360fc352
+    PDMS原生插件\PKPMJWDForm.cs  |  31,951 B  |  11249541f455e95785941cc778452769e9232f06d6343a24861ae9e3baaf68b5
+    PDMS原生插件\PmlBridge.cs  |  5,153 B  |  2b24c72c10eeef8de64849c9959ab5d170679843ebc6a818c9200676fbca49de
+    PDMS原生插件\README.txt  |  11,550 B  |  1f0bf285054abf2a1f50eed9ef473f6b1285da2dc4f8e72293e53e86b1d5053b
+    PDMS原生插件\_selftest\_rootsim\build.cmd  |  1,641 B  |  112b3740ac322e64b35b2660d516f3b79dd3cb500705d1303e8efb125ea432f5
+    PDMS原生插件\_selftest\_sandbox\DesignAddins.xml  |  1,140 B  |  43e906c81e084e51125ffefb7f26fb8cc805e41722bf7694d8abebac12124efe
+    PDMS原生插件\_selftest\_sandbox\DesignAddins.xml.pkpmjwd-bak  |  1,140 B  |  43e906c81e084e51125ffefb7f26fb8cc805e41722bf7694d8abebac12124efe
+    PDMS原生插件\_selftest\_sandbox\DesignCustomization.xml  |  688 B  |  d9863eb3a9b2dcc07a74daf3ab0474622c0aed1df3182d3ea14bff1e34b7dec9
+    PDMS原生插件\_selftest\_sandbox\DesignCustomization.xml.pkpmjwd-bak  |  688 B  |  d9863eb3a9b2dcc07a74daf3ab0474622c0aed1df3182d3ea14bff1e34b7dec9
+    PDMS原生插件\_selftest\_sandbox\PKPMJWD\_uninstalled_20260925-052827\PKPMJWD.dll  |  40,960 B  |  028f61a5f2e59181276d2cbf688034be36b5d1b40e0324956f0f10b111b104ec
+    PDMS原生插件\_selftest\_sandbox\PKPMJWD\_uninstalled_20260925-052827\engine_path.txt  |  97 B  |  fddf68c886c6e1a64f221315ed279d6eb19b3c071ca7a62863c2ebb9828e0e6b
+    PDMS原生插件\_selftest\_sandbox\PKPMJWD\_uninstalled_20260925-052827\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    PDMS原生插件\_selftest\_sandbox\PKPMJWD\_uninstalled_20260925-052827\pkpmjwduniquename.pmlfnc  |  33 B  |  ce99fa6ac90a0190ea5b5116aececce756697adcb04e73d8490d1c6ffb75cb9d
+    PDMS原生插件\_selftest\_sandbox_src\fake_engine.exe  |  7 B  |  25b2d486f51a7d2d20b56f9b959b1aab4aa2e47ea5befa48d938f7d8e8fc8082
+    PDMS原生插件\_selftest\_sandbox_src\pkpmjwduniquename.pmlfnc  |  33 B  |  ce99fa6ac90a0190ea5b5116aececce756697adcb04e73d8490d1c6ffb75cb9d
+    PDMS原生插件\_selftest\audit_files.py  |  2,847 B  |  3dcd46885a992199f1ec2c733e3afaf98d74791ea943f18f95f3eba40a2def89
+    PDMS原生插件\_selftest\read_gbk.py  |  852 B  |  46c47e42233abc1f9dd5ee050be269083ffc8fe0c544a74ff99650ff0d764717
+    PDMS原生插件\_selftest\sandbox_test.py  |  7,182 B  |  8070e061c9abb23535fa60f2d7e986d2e274406e1abbbd90b2be6caeb3444b5c
+    PDMS原生插件\_selftest\verify_dll.ps1  |  1,761 B  |  797b4b92786b44e7cd7a5a02700d86e2703fb0a22d5566151915f3dd985d1128
+    PDMS原生插件\_selftest\write_static.py  |  4,371 B  |  0b98bb70289cd8de5e367441eabb4582ad2de8aebfdaa698b733dbe03c52ef32
+    PDMS原生插件\build.cmd  |  1,641 B  |  112b3740ac322e64b35b2660d516f3b79dd3cb500705d1303e8efb125ea432f5
+    PDMS原生插件\deploy\deploy_pkpmjwd.py  |  10,004 B  |  fa50df6c94641ced5e241a97d8ecc5799a03887ef9922f07280a3ca4b548e009
+    PDMS原生插件\deploy\undeploy_pkpmjwd.py  |  4,240 B  |  9a18d2c230cef187713488fdb52018c94edf5b91019640d01fc13a4724d0f340
+    PDMS原生插件\dist\PKPMJWD.dll  |  40,960 B  |  45b80ca5fff037633b18a8aaf1480323fb73bfa667b637c7525a0f6d07aa40a4
+    PDMS原生插件\dist\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+    PDMS原生插件\pkpmjwd.uic  |  1,090 B  |  8b7fbd747489c391b9bb9e27d1142b23b036de0fb8b0f6b9869617bb0d362d0e
+
+  根目录说明文件（本脚本生成，非复制）：
+    从这里开始.txt  |  （见文件本身）
+    交付清单.txt    |  （本文件）
+
+--------------------------------------------------------------------------
+五、G 盘自证（只读指纹核对，两次全量）
+--------------------------------------------------------------------------
+  开工前与收尾两次全量指纹一致：751 个文件 / 261,979,514 B / 总指纹 ffff32955cd3cb3afcc6fc82191a81d285c904008f1877d171a28fad819edf46 -> 本次对 G 盘零写入。
+
+==========================================================================
+ 清单完（2026-09-25 20:39:25 生成）
+==========================================================================

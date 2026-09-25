@@ -1,0 +1,41 @@
+sectionlib 顶层名字: ['Any', 'BUILTIN_META', 'BUILTIN_TABLE', 'CIRCLE_TEMPLATE_DEFAULT_D', 'CONFIDENCE_LEVELS', 'CSV_COLUMNS', 'Dict', 'FAMILY_KIND_26', 'FAMILY_KIND_303', 'FAMILY_TEMPLATES', 'INFERRED', 'Iterable', 'JWD_TABLE_BY_KIND', 'KIND_DIMS_KEYS', 'LOSS_DIRECTIONS', 'LOSS_REPORT_ITEMS', 'List', 'Optional', 'PARAMETRIC', 'PARAM_FAMILIES', 'ParamDef', 'RECT_TEMPLATE_DEFAULT_BH', 'RESOLVED', 'SHAPE_CODE_RECT', 'SHAPE_CODE_RECT_MIN_LIB', 'SHAPE_CODE_ROUND', 'STEEL_LIB_FAMILIES', 'Section', 'SectionRec', 'SectionTable', 'Sequence', 'TABLE_SCHEMA', 'TEMPLATE_CIRCLE_KEY', 'TEMPLATE_RECT_KEY', 'Tuple', 'UNKNOWN_DECODE_ITEMS', 'UNKNOWN_ITEM_IDS', 'UNRESOLVED', 'annotations', 'csv']
+builtin: NoneType recs 0
+引擎 idx 键数: 0
+测试 DLL 名集: 2326 索引键数: 3401
+行 250   '3-L25x16x3'     key2=L25X16X3      
+     引擎 idx[k2]=None  idx[k1]=None
+     测试 idx[k2]=['3-L25x16x3', 'L25x16x3', 'L25x16x3']（变体 ['L25x16x3', 'L25x16x3']）
+行 256   '3-L45x28x3'     key2=L45X28X3      
+     引擎 idx[k2]=None  idx[k1]=None
+     测试 idx[k2]=['L45x28x3', 'L45x28x3', '3-L45x28x3']（变体 ['L45x28x3', 'L45x28x3']）
+行 259   '3-L50X32X4'     key2=L50X32X4      
+     引擎 idx[k2]=None  idx[k1]=None
+     测试 idx[k2]=['3-L50x32x4', 'L50x32x4', 'L50x32x4']（变体 ['3-L50x32x4', 'L50x32x4', 'L50x32x4']）
+行 260   '3-L56x36x3'     key2=L56X36X3      
+     引擎 idx[k2]=None  idx[k1]=None
+     测试 idx[k2]=['L56x36x3', 'L56x36x3', '3-L56x36x3']（变体 ['L56x36x3', 'L56x36x3']）
+行 261   '3-L56x36x4'     key2=L56X36X4      
+     引擎 idx[k2]=None  idx[k1]=None
+     测试 idx[k2]=['3-L56x36x4', 'L56x36x4', 'L56x36x4']（变体 ['L56x36x4', 'L56x36x4']）
+行 262   '3-L56x36x5'     key2=L56X36X5      
+     引擎 idx[k2]=None  idx[k1]=None
+     测试 idx[k2]=['L56x36x5', 'L56x36x5', '3-L56x36x5']（变体 ['L56x36x5', 'L56x36x5']）
+行 1362  '8-B100*4.00'    key2=B100*4.00     
+     引擎 idx[k2]=None  idx[k1]=None
+     测试 idx[k2]=['8-B100*4.00', '6-B100*4.00']（变体 ['6-B100*4.00']）
+行 1523  '9-B120X80X4.00' key2=B120X80X4.00  
+     引擎 idx[k2]=None  idx[k1]=None
+     测试 idx[k2]=None（变体 []）
+包内表 dll 名总数: 0
+   包内表含 'L25x16x3'       : 0
+   包内表含 '3-L25x16x3'     : 0
+   包内表含 'L45x28x3'       : 0
+   包内表含 'L50x32x4'       : 0
+   包内表含 'L56x36x3'       : 0
+   包内表含 'L56x36x4'       : 0
+   包内表含 'L56x36x5'       : 0
+   包内表含 '6-B100*4.00'    : 0
+   包内表含 '8-B100*4.00'    : 0
+   包内表含 '7-B120*80*4.00' : 0
+   包内表含 '9-B120*80*4.00' : 0
+   包内表含 '9-B120X80X4.00' : 0

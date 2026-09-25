@@ -1,0 +1,77 @@
+源表行 3176；包内表行 3176
+== '3-L25x16x3' 源表 1 条 / 包内 1 条
+   源: family_code='71' shapeval='71,3,16,25,3,L25x16x3' spec='/L_THIN_UNEQUAL-SPEC/LTU25x16x3' in_dll='Y' dll_source='dll_explicit' dll_table_entry='3-L25x16x3' name_variants='sprfile=/LTU25x16x3 ; match=3-L25x16x3 ; dll=3-L25x16x3'
+   包: key='3-L25x16x3' family='71' kind='0' spec='/L_THIN_UNEQUAL-SPEC/LTU25x16x3' conf='high' src='macro+match+dll_explicit' dll_source='dll_explicit' dll_entry='3-L25x16x3'
+        extra.name_variants='sprfile=/LTU25x16x3 ; match=3-L25x16x3 ; dll=3-L25x16x3'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_check', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== 'L25X16X3' 源表 1 条 / 包内 1 条
+   源: family_code='71' shapeval='71,3,16,25,3,L25x16x3' spec='/L_UNEQUAL-SPEC/LU25x16x3' in_dll='Y' dll_source='dll_explicit' dll_table_entry='3-L25x16x3' name_variants='sprfile=/LU25x16x3 ; match=L25X16X3 ; dll=3-L25x16x3'
+   包: key='L25X16X3' family='71' kind='0' spec='/L_UNEQUAL-SPEC/LU25x16x3' conf='high' src='macro+match+dll_explicit+userstl' dll_source='dll_explicit' dll_entry='3-L25x16x3'
+        extra.name_variants='sprfile=/LU25x16x3 ; match=L25X16X3 ; dll=3-L25x16x3'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'in_userstl_lib', 'name_variants', 'param_check', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== '3-L45x28x3' 源表 1 条 / 包内 1 条
+   源: family_code='71' shapeval='71,3,28,45,3,L45x28x3' spec='/L_THIN_UNEQUAL-SPEC/LTU45x28x3' in_dll='Y' dll_source='dll_explicit' dll_table_entry='3-L45x28x3' name_variants='sprfile=/LTU45x28x3 ; match=3-L45x28x3 ; dll=3-L45x28x3'
+   包: key='3-L45x28x3' family='71' kind='0' spec='/L_THIN_UNEQUAL-SPEC/LTU45x28x3' conf='high' src='macro+match+dll_explicit' dll_source='dll_explicit' dll_entry='3-L45x28x3'
+        extra.name_variants='sprfile=/LTU45x28x3 ; match=3-L45x28x3 ; dll=3-L45x28x3'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_check', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== 'L45X28X3' 源表 1 条 / 包内 1 条
+   源: family_code='71' shapeval='71,3,28,45,3,L45x28x3' spec='/L_UNEQUAL-SPEC/LU45x28x3' in_dll='Y' dll_source='dll_explicit' dll_table_entry='3-L45x28x3' name_variants='sprfile=/LU45x28x3 ; match=L45X28X3 ; dll=3-L45x28x3'
+   包: key='L45X28X3' family='71' kind='0' spec='/L_UNEQUAL-SPEC/LU45x28x3' conf='high' src='macro+match+dll_explicit+userstl' dll_source='dll_explicit' dll_entry='3-L45x28x3'
+        extra.name_variants='sprfile=/LU45x28x3 ; match=L45X28X3 ; dll=3-L45x28x3'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'in_userstl_lib', 'name_variants', 'param_check', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== '3-L50X32X4' 源表 0 条 / 包内 0 条
+== 'L50X32X4' 源表 1 条 / 包内 1 条
+   源: family_code='71' shapeval='71,3,32,50,4,L50x32x4' spec='/L_UNEQUAL-SPEC/LU50x32x4' in_dll='Y' dll_source='dll_explicit' dll_table_entry='3-L50x32x4' name_variants='sprfile=/LU50x32x4 ; match=L50X32X4 ; dll=3-L50x32x4'
+   包: key='L50X32X4' family='71' kind='0' spec='/L_UNEQUAL-SPEC/LU50x32x4' conf='high' src='macro+match+dll_explicit+userstl' dll_source='dll_explicit' dll_entry='3-L50x32x4'
+        extra.name_variants='sprfile=/LU50x32x4 ; match=L50X32X4 ; dll=3-L50x32x4'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'in_userstl_lib', 'name_variants', 'param_check', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== '3-L56x36x3' 源表 1 条 / 包内 1 条
+   源: family_code='71' shapeval='71,3,36,56,3,L56x36x3' spec='/L_THIN_UNEQUAL-SPEC/LTU56x36x3' in_dll='Y' dll_source='dll_explicit' dll_table_entry='3-L56x36x3' name_variants='sprfile=/LTU56x36x3 ; match=3-L56x36x3 ; dll=3-L56x36x3'
+   包: key='3-L56x36x3' family='71' kind='0' spec='/L_THIN_UNEQUAL-SPEC/LTU56x36x3' conf='high' src='macro+match+dll_explicit' dll_source='dll_explicit' dll_entry='3-L56x36x3'
+        extra.name_variants='sprfile=/LTU56x36x3 ; match=3-L56x36x3 ; dll=3-L56x36x3'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_check', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== 'L56X36X3' 源表 1 条 / 包内 1 条
+   源: family_code='71' shapeval='71,3,36,56,3,L56x36x3' spec='/L_UNEQUAL-SPEC/LU56x36x3' in_dll='Y' dll_source='dll_explicit' dll_table_entry='3-L56x36x3' name_variants='sprfile=/LU56x36x3 ; match=L56X36X3 ; dll=3-L56x36x3'
+   包: key='L56X36X3' family='71' kind='0' spec='/L_UNEQUAL-SPEC/LU56x36x3' conf='high' src='macro+match+dll_explicit+userstl' dll_source='dll_explicit' dll_entry='3-L56x36x3'
+        extra.name_variants='sprfile=/LU56x36x3 ; match=L56X36X3 ; dll=3-L56x36x3'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'in_userstl_lib', 'name_variants', 'param_check', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== '3-L56x36x4' 源表 1 条 / 包内 1 条
+   源: family_code='71' shapeval='71,3,36,56,4,L56x36x4' spec='/L_THIN_UNEQUAL-SPEC/LTU56x36x4' in_dll='Y' dll_source='dll_explicit' dll_table_entry='3-L56x36x4' name_variants='sprfile=/LTU56x36x4 ; match=3-L56x36x4 ; dll=3-L56x36x4'
+   包: key='3-L56x36x4' family='71' kind='0' spec='/L_THIN_UNEQUAL-SPEC/LTU56x36x4' conf='high' src='macro+match+dll_explicit' dll_source='dll_explicit' dll_entry='3-L56x36x4'
+        extra.name_variants='sprfile=/LTU56x36x4 ; match=3-L56x36x4 ; dll=3-L56x36x4'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_check', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== 'L56X36X4' 源表 1 条 / 包内 1 条
+   源: family_code='71' shapeval='71,3,36,56,4,L56x36x4' spec='/L_UNEQUAL-SPEC/LU56x36x4' in_dll='Y' dll_source='dll_explicit' dll_table_entry='3-L56x36x4' name_variants='sprfile=/LU56x36x4 ; match=L56X36X4 ; dll=3-L56x36x4'
+   包: key='L56X36X4' family='71' kind='0' spec='/L_UNEQUAL-SPEC/LU56x36x4' conf='high' src='macro+match+dll_explicit+userstl' dll_source='dll_explicit' dll_entry='3-L56x36x4'
+        extra.name_variants='sprfile=/LU56x36x4 ; match=L56X36X4 ; dll=3-L56x36x4'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'in_userstl_lib', 'name_variants', 'param_check', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== '3-L56x36x5' 源表 1 条 / 包内 1 条
+   源: family_code='71' shapeval='71,3,36,56,5,L56x36x5' spec='/L_THIN_UNEQUAL-SPEC/LTU56x36x5' in_dll='Y' dll_source='dll_explicit' dll_table_entry='3-L56x36x5' name_variants='sprfile=/LTU56x36x5 ; match=3-L56x36x5 ; dll=3-L56x36x5'
+   包: key='3-L56x36x5' family='71' kind='0' spec='/L_THIN_UNEQUAL-SPEC/LTU56x36x5' conf='high' src='macro+match+dll_explicit' dll_source='dll_explicit' dll_entry='3-L56x36x5'
+        extra.name_variants='sprfile=/LTU56x36x5 ; match=3-L56x36x5 ; dll=3-L56x36x5'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_check', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== 'L56X36X5' 源表 1 条 / 包内 1 条
+   源: family_code='71' shapeval='71,3,36,56,5,L56x36x5' spec='/L_UNEQUAL-SPEC/LU56x36x5' in_dll='Y' dll_source='dll_explicit' dll_table_entry='3-L56x36x5' name_variants='sprfile=/LU56x36x5 ; match=L56X36X5 ; dll=3-L56x36x5'
+   包: key='L56X36X5' family='71' kind='0' spec='/L_UNEQUAL-SPEC/LU56x36x5' conf='high' src='macro+match+dll_explicit+userstl' dll_source='dll_explicit' dll_entry='3-L56x36x5'
+        extra.name_variants='sprfile=/LU56x36x5 ; match=L56X36X5 ; dll=3-L56x36x5'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'in_userstl_lib', 'name_variants', 'param_check', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== '8-B100*4.00' 源表 1 条 / 包内 1 条
+   源: family_code='77' shapeval='77,8' spec='/RECT_SQUARE178_2005-SPEC/BJ100*4.00' in_dll='Y' dll_source='dll_explicit' dll_table_entry='8-B100*4.00' name_variants='sprfile=/BJ100*4.00 ; match=8-B100*4.00 ; dll=8-B100*4.00'
+   包: key='8-B100*4.00' family='77' kind='0' spec='/RECT_SQUARE178_2005-SPEC/BJ100*4.00' conf='high' src='macro+match+dll_explicit' dll_source='dll_explicit' dll_entry='8-B100*4.00'
+        extra.name_variants='sprfile=/BJ100*4.00 ; match=8-B100*4.00 ; dll=8-B100*4.00'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== '6-B100*4.00' 源表 1 条 / 包内 1 条
+   源: family_code='77' shapeval='77,8' spec='/RECT_SQUARE6728_2002-SPEC/B100*4.00' in_dll='Y' dll_source='dll_explicit' dll_table_entry='8-B100*4.00' name_variants='sprfile=/B100*4.00 ; match=6-B100*4.00 ; dll=8-B100*4.00'
+   包: key='6-B100*4.00' family='77' kind='0' spec='/RECT_SQUARE6728_2002-SPEC/B100*4.00' conf='high' src='macro+match+dll_explicit' dll_source='dll_explicit' dll_entry='8-B100*4.00'
+        extra.name_variants='sprfile=/B100*4.00 ; match=6-B100*4.00 ; dll=8-B100*4.00'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== '9-B120*80*4.00' 源表 1 条 / 包内 1 条
+   源: family_code='77' shapeval='77,9' spec='/RECT_RECT178_2005-SPEC/BR120*80*4.00' in_dll='Y' dll_source='dll_explicit' dll_table_entry='9-B120*80*4.00' name_variants='sprfile=/BR120*80*4.00 ; match=9-B120*80*4.00 ; dll=9-B120*80*4.00'
+   包: key='9-B120*80*4.00' family='77' kind='0' spec='/RECT_RECT178_2005-SPEC/BR120*80*4.00' conf='high' src='macro+match+dll_explicit' dll_source='dll_explicit' dll_entry='9-B120*80*4.00'
+        extra.name_variants='sprfile=/BR120*80*4.00 ; match=9-B120*80*4.00 ; dll=9-B120*80*4.00'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']
+== '7-B120*80*4.00' 源表 1 条 / 包内 1 条
+   源: family_code='77' shapeval='77,9' spec='/RECT_RECT6728_2002-SPEC/B120*80*4.00' in_dll='Y' dll_source='dll_explicit' dll_table_entry='9-B120*80*4.00' name_variants='sprfile=/B120*80*4.00 ; match=7-B120*80*4.00 ; dll=9-B120*80*4.00'
+   包: key='7-B120*80*4.00' family='77' kind='0' spec='/RECT_RECT6728_2002-SPEC/B120*80*4.00' conf='high' src='macro+match+dll_explicit' dll_source='dll_explicit' dll_entry='9-B120*80*4.00'
+        extra.name_variants='sprfile=/B120*80*4.00 ; match=7-B120*80*4.00 ; dll=9-B120*80*4.00'
+        extra 键: ['dll_code_source', 'dll_table_entry', 'family_desc_en', 'family_label_basis', 'in_dll_table', 'in_matching_file', 'in_pdms_macro', 'name_variants', 'param_count', 'pdms_spec_owner', 'pdms_specification', 'pdms_sprfile', 'pdms_stcategory', 'stcategory_param_count', 'stcategory_params']

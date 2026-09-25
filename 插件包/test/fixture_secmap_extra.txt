@@ -1,0 +1,3 @@
+///自检夹具（GBK/CRLF/无 BOM）：与 fixture_secmap_dup.txt 配套的"补充文件"。
+X2, /S-SPEC/C
+X3,  S-SPEC/D

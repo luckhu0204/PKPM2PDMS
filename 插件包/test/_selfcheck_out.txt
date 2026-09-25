@@ -1,0 +1,164 @@
+=== A. read_pdt(G:\工作\PDMS相关\00 PDMS插件\02 实用插件\PKPM导入导出插件\1_PM.pdt) ===
+  counts = {'levels': 11, 'joints': 617, 'sections': 32, 'members': {'beam': 925, 'column': 121, 'brace': 0}, 'members_total': 1046, 'slabs': 331, 'slabs_holes': 0, 'slabs_with_thickness': 331, 'walls': 4, 'loads': {'beam-line': 120, 'joint-point': 4}, 'loads_total': 124}
+  [OK] joints == 617 got 617
+  [OK] members_total == 1046 got 1046
+  [OK] column=121 / beam=925 / brace=0 {'beam': 925, 'column': 121, 'brace': 0}
+  [OK] levels == 11 got 11
+  [OK] slabs=331 / walls=4 slabs=331 walls=4
+  [OK] sections == 32（$DEFFRAMESECTION） got 32
+  [OK] loads: joint-point 4 / beam-line 120（= 恒载 78 + 活载 42 个挂接） {'beam-line': 120, 'joint-point': 4}
+  [OK] slabs_with_thickness == 331（T120/T100） got 331
+  levels(z) = [-5000.0, -1300.0, 3000.0, 7000.0, 11700.0, 18800.0, 22800.0, 23300.0, 27300.0, 32800.0, 36800.0]
+
+=== B. validate() ===
+  E-0  W-244  分类=[('W-MEM-SHORT', 2), ('W-MEM-Z-END', 121), ('W-MEM-ZRANGE', 121)]
+  [OK] validate() 无 E- 项 []
+
+=== C. 几何抽查 ===
+  柱 start 在下端（违例 0）；梁两端等高（违例 0）
+  [OK] 柱竖直/梁水平 与 pdt_format.md §5.1 一致 
+  柱样例 id=66308 start=(24000.0, 13000.0, 7000.0) end=(24000.0, 13000.0, 11700.0) level=4 section=609 mat='C30'
+  梁样例 id=65908 start=(20000.0, 6500.0, 18800.0) end=(20000.0, 13000.0, 18800.0) level=6 section=1509 mat='C30'
+  板样例 id=184706 level=5 z=11700.0 t=120.0 dead=4.4 live=4.0 poly=4 点 no=1
+  墙样例 id=183805 level=2 z=-1300.0..3000.0 t=600.0 name='T600' loop=[(37825.0, 5275.0, -1300.0), (41500.0, 1600.0, -1300.0), (41500.0, 1600.0, 3000.0), (37825.0, 5275.0, 3000.0)]
+  Section: 矩形 29 / 型钢 2 / 圆形 1
+  矩形样例 矩750X750 dims={'B1': 750.0, 'B2': 0.0, 'B3': 0.0, 'H1': 750.0, 'H2': 0.0, 'H3': 0.0, 'T1': 0.0, 'T2': 0.0, 'T3': 0.0, 'T4': 0.0, 'T5': 0.0, 'T6': 0.0}
+  型钢样例 HN400X200 dims={'B1': 200.0, 'B2': 0.0, 'B3': 0.0, 'H1': 400.0, 'H2': 0.0, 'H3': 0.0, 'T1': 0.0, 'T2': 0.0, 'T3': 0.0, 'T4': 0.0, 'T5': 0.0, 'T6': 0.0} mat=5
+  圆形样例 圆形4800 dims={'B1': 4800.0, 'B2': 0.0, 'B3': 0.0, 'H1': 0.0, 'H2': 0.0, 'H3': 0.0, 'T1': 0.0, 'T2': 0.0, 'T3': 0.0, 'T4': 0.0, 'T5': 0.0, 'T6': 0.0}
+  [OK] SHAPE 分布 29/2/1 与 pdt_format.md §5.3 一致 
+  [OK] notes 非空（18 条） 
+  原文正则统计 (TYPE, 是否非零 ECS1/ECE1) = [(('1', 'zero'), 121), (('2', 'nonzero'), 121), (('2', 'zero'), 804)]
+  [OK] 实测：非零 ECS 的 121 条全是 TYPE=2（梁），121 柱全为 0（与 pdt_format.md §2.9 的表述相反，本实现以原文为准） 
+  [OK] notes 里留痕了偏心归属与"未并入几何"的结论 
+  [OK] 所有 Member.ecc 为空（§a.2 不猜方向） 
+  ID 规范自校验（pdt_format.md §3.2：ID = 全局序号 ×100 + 类码）：核对 3887 个带 ID 的对象；类码不符 0 个；全局序号去重后 2841 个，且密集连续 1..2841（无跨类码复用）（$NET 与 $SETELEMENT 同为 CC=8 且共用 ID，属正常）
+  [OK] ID = 全局序号×100+类码 自校验：0 类码不符 / 2841 个去重序号密集连续 / 无跨类码复用 
+  $STORY 共 5 层（pdt_format.md §2.3）：TL=[7000.0, 11700.0, 18800.0, 27300.0, 36800.0]；其中 5/5 个 TL 等于本次按节点 Z 推出的标高（其余是层内标高或夹层）；契约 §a.3 实测 11 个标高里只有 5 个是层顶，故 Level 一律按节点 Z 分组建
+  FLOORID 与节点几何不符的节点 38 个（pdt_format.md §8.3 记 38 个：4 个在基础 -5000、34 个在 22800 夹层）——这些节点一律按 Z 归入对应平面，不按 FLOORID；[4907, 6807, 11807, 14507, 14807, 15607, 16407, 19107]
+  [OK] $STORY 5 层的 TL 全部出现在节点 Z 标高里 
+  [OK] FLOORID 与几何不符 38 个节点（复现 pdt_format.md §8.3） 
+  板 184706 面积=5800000.0 mm²（期望 2900×2000=5800000）；185006=5156250.0 mm²（≈5156250）
+  [OK] 环序正确：两块板的面积与 pdt_format.md §9.3#3 的实测值逐 mm² 一致 
+  [OK] 板多边形无重复顶点（首尾也不重复） []
+
+=== D. SectionMap.load(原件, extra_path="") ===
+  stats = {'path': 'G:\\工作\\PDMS相关\\00 PDMS插件\\02 实用插件\\PKPM导入导出插件\\PKPM转PDMS截面匹配文件.txt', 'extra_path': '', 'lines': 3023, 'data': 2836, 'comments': 78, 'blank': 109, 'slash_rule': 0, 'unparsable': 0, 'extra_lines': 0, 'extra_data': 0, 'extra_comments': 0, 'extra_blank': 0, 'extra_unparsable': 0, 'extra_family_rules': 0, 'family_rules': {}, 'spec_prefixes': 53, 'extra_spec_prefixes': 0, 'unique_left': 2836}
+  [OK] 原件数据行 == 2836 got 2836
+  [OK] 规格前缀 == 53 got 53
+  [OK] 物理行 3023 / 注释 78 / 空行 109 / 无法解析 0 {'path': 'G:\\工作\\PDMS相关\\00 PDMS插件\\02 实用插件\\PKPM导入导出插件\\PKPM转PDMS截面匹配文件.txt', 'extra_path': '', 'lines': 3023, 'data': 2836, 'comments': 78, 'blank': 109, 'slash_rule': 0, 'unparsable': 0, 'extra_lines': 0, 'extra_data': 0, 'extra_comments': 0, 'extra_blank': 0, 'extra_unparsable': 0, 'extra_family_rules': 0, 'family_rules': {}, 'spec_prefixes': 53, 'extra_spec_prefixes': 0, 'prefixes': {'/USER_Z-SPEC': 1, '/USER_CROSS_I-SPEC': 1, '/USER_CROSS-SPEC': 1, '/USER_TRAPEZOID-SPEC': 1, '/USER_DOUBLE_C-SPEC': 1, '/USER_C-SPEC': 1, '/USER_XI-SPEC': 1, '/USER_H-SPEC': 1, '/USER_L-SPEC': 1, '/USER_TUBE-SPEC': 1, '/USER_PIPE-SPEC': 1, '/USER_CIRCLE-SPEC': 1, '/USER_T-SPEC': 1, '/USER_RECT-SPEC': 1, '/USER_UT-SPEC': 1, '/L_EQUAL-SPEC': 114, '/L_UNEQUAL-SPEC': 71, '/L_THIN_EQUAL-SPEC': 10, '/L_COIL_EQUAL-SPEC': 4, '/L_THIN_UNEQUAL-SPEC': 15, '/C_COMMON-SPEC': 41, '/C_LIGHT-SPEC': 22, '/C_THIN-SPEC': 12, '/C_COIL-SPEC': 30, '/T_PART-SPEC': 67, '/I_COMMON-SPEC': 45, '/I_LIGHT-SPEC': 27, '/H_HIGH_FREQUENCY-SPEC': 45, '/H_INTERNATIONAL-SPEC': 130, '/H_EUROPE-SPEC': 119, '/H_JAPAN-SPEC': 62, '/H_AMERICA-SPEC': 267, '/Z_COIL-SPEC': 13, '/Z_OBLIQUE-SPEC': 18, '/RECT_SQUARE50018-SPEC': 22, '/RECT_SQUARE6728_2002-SPEC': 121, '/RECT_SQUARE178_2005-SPEC': 157, '/RECT_RECT178_2005-SPEC': 175, '/RECT_RECT6728_2002-SPEC': 278, '/RECT_RECT-SPEC': 29, '/TUBE_TUBE50018-SPEC': 61, '/TUBE_TUBE-SPEC': 274, '/TUBE_TUBE6728_2002-SPEC': 82, '/DOUBLE_L_EQUAL-SPEC': 114, '/DOUBLE_L_EQUAL_CROSS-SPEC': 114, '/DOUBLE_L_UNEQUAL_LONG-SPEC': 71, '/DOUBLE_L_UNEQUAL_SHORT-SPEC': 71, '/DOUBLE_C_COMMON_X-SPEC': 41, '/DOUBLE_C_COMMON_TUBE-SPEC': 41, '/DOUBLE_C_LIGHT_TUBE-SPEC': 22, '/DOUBLE_C_LIGHT_X-SPEC': 22, '/STSS_DOUBLE_THIN_L-SPEC': 10, '/DOUBLE_THIN_L_COIL_EQUAL-SPEC': 4}, 'extra_prefixes': {}, 'unique_left': 2836}
+
+=== E. SectionMap.validate(目录宏) ===
+  validate -> 257 条
+  按规格前缀：[('/DOUBLE_L_EQUAL_CROSS-SPEC', 114), ('/DOUBLE_L_UNEQUAL_LONG-SPEC', 71), ('/DOUBLE_L_UNEQUAL_SHORT-SPEC', 71), ('/DOUBLE_THIN_L_COIL_EQUAL-SPEC', 1)]
+  [OK] 坏映射 == 257 got 257
+  [OK] 257 条按族分布与侦察一致 
+  带纠正建议的：257/257
+  [OK] 每条坏映射都给出建议 
+  建议目标不在目录宏里的：0
+  [OK] 全部建议目标都存在于目录宏 []
+     specmap L2565 +2L20X3 -> /DOUBLE_L_EQUAL_CROSS-SPEC/DLE20X3 : SPCOMPONENT 不存在；建议改为 /DOUBLE_L_EQUAL_CROSS-SPEC/DLEC20X3（同属主下最接近的现存截面，编辑距离 1，原件未改）
+     specmap L2566 +2L20X4 -> /DOUBLE_L_EQUAL_CROSS-SPEC/DLE20x4 : SPCOMPONENT 不存在；建议改为 /DOUBLE_L_EQUAL_CROSS-SPEC/DLEC20x4（同属主下最接近的现存截面，编辑距离 1，原件未改）
+     specmap L2982 组卷L75X20X2.5 -> /DOUBLE_THIN_L_COIL_EQUAL-SPEC/DLTC75X20X2.5-421 : SPCOMPONENT 不存在；建议改为 /DOUBLE_THIN_L_COIL_EQUAL-SPEC/DLTC75X20X2.5（同属主下最接近的现存截面，编辑距离 4，原件未改）
+
+=== F. 补充文件 secmap_extra.txt ===
+  DEFAULT_EXTRA_FILE=D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\engine\secmap_extra.txt exists=True
+  合并后 keys=2839（原件 2836 + 补充 3），warnings=0
+  [OK] 补充文件不改变原件行数 
+  [OK] 补充文件已加载（3 行） 
+  [OK] T120 来自补充文件 
+  extra_issues() -> 6 条
+     specmap[补充] L16 T120 -> /Concrete_Slab-SPEC/T120 : SPCOMPONENT 不存在
+     specmap[补充] L16 T120 -> /Concrete_Slab-SPEC/T120（补充文件 D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\engine\secmap_extra.txt） : 属主 Concrete_Slab-SPEC 不存在
+     specmap[补充] L17 T100 -> /Concrete_Slab-SPEC/T100 : SPCOMPONENT 不存在
+     specmap[补充] L17 T100 -> /Concrete_Slab-SPEC/T100（补充文件 D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\engine\secmap_extra.txt） : 属主 Concrete_Slab-SPEC 不存在
+     specmap[补充] L18 T600 -> /Concrete_Wall-SPEC/WALL-600 : SPCOMPONENT 不存在
+     specmap[补充] L18 T600 -> /Concrete_Wall-SPEC/WALL-600（补充文件 D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\engine\secmap_extra.txt） : 属主 Concrete_Wall-SPEC 不存在
+  [OK] validate() 仍为 257（只校验原件行） 
+
+=== G. resolve() 四级优先级 ===
+  name : {'spec_path': '/H_INTERNATIONAL-SPEC/HN450X200', 'desp_params': [], 'status': 'resolved', 'reason': '', 'pkpm_name': 'HN450X200', 'source': 'name', 'evidence': ''}
+  [OK] rule1 name 命中 
+  shapeval(26): {'spec_path': '/C_LIGHT-SPEC/CL18a', 'desp_params': [], 'status': 'resolved', 'reason': '', 'pkpm_name': '2-[18a', 'source': 'shapeval', 'evidence': ''}
+  [OK] rule2 Kind=26 子类型键命中 
+  shapeval(303): {'spec_path': '/RECT_SQUARE6728_2002-SPEC/B250*10.00', 'desp_params': [], 'status': 'resolved', 'reason': '', 'pkpm_name': '6-B250*10.00', 'source': 'shapeval', 'evidence': ''}
+  [OK] rule2 Kind=303 打包规格键命中 
+  family(1): {'spec_path': '/USER_RECT-SPEC/Rectangle_Profile', 'desp_params': [750.0, 750.0], 'status': 'parametric', 'reason': '', 'pkpm_name': 'RECT', 'source': 'family', 'evidence': ''}
+  [OK] rule3 Kind=1 → RECT 参数化族 
+  family(2 对称): {'spec_path': '/USER_H-SPEC/H_Profile', 'desp_params': [250.0, 250.0, 500.0, 10.0, 16.0, 16.0], 'status': 'parametric', 'reason': '', 'pkpm_name': 'H', 'source': 'family', 'evidence': ''}
+  [OK] rule3 Kind=2 对称 → H 参数化族 [B1,B2,H,Tw,T1,T2] 
+  family(2 不对称): {'spec_path': '', 'desp_params': [], 'status': 'unresolved', 'reason': 'Kind=2 的 B1/T1 交错序未证实（jwd_format.md §9.3#5），无法确定 DESP 顺序', 'pkpm_name': 'H', 'source': 'none', 'evidence': ''}
+  [OK] Kind=2 不对称 → unresolved（§12#4 冻结） 
+  none(3): {'spec_path': '', 'desp_params': [], 'status': 'unresolved', 'reason': "Kind=3 已启用推断族 CIRCLE（/USER_CIRCLE-SPEC/Circle_Profile），但截面缺参数 'd'（dims/params 均无）；契约 §e.3", 'pkpm_name': 'CIRCLE', 'source': 'none', 'evidence': ''}
+  [OK] rule4 Kind=3 → unresolved 
+  candidate_keys(HN450X200) = ['HN450X200']
+  candidate_keys([18a) = ['[18a', '2-[18a', '26#32,2,180,0,74,9,5,0']
+  candidate_keys(薄壁方钢管: B25) = ['薄壁方钢管: B25', '6-B250*10.00']
+
+=== G2. 端到端：1_PM.pdt 的截面/面板全部走 SectionMap.resolve() ===
+    id=609    kind=1   name=矩750X750     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [750.0, 750.0]
+    id=709    kind=1   name=矩800X1000    -> parametric family /USER_RECT-SPEC/Rectangle_Profile [800.0, 1000.0]
+    id=809    kind=1   name=矩1200X1200   -> parametric family /USER_RECT-SPEC/Rectangle_Profile [1200.0, 1200.0]
+    id=909    kind=1   name=矩1000X1000   -> parametric family /USER_RECT-SPEC/Rectangle_Profile [1000.0, 1000.0]
+    id=1109   kind=1   name=矩800X800     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [800.0, 800.0]
+    id=1309   kind=1   name=矩750X1000    -> parametric family /USER_RECT-SPEC/Rectangle_Profile [750.0, 1000.0]
+    id=1409   kind=1   name=矩300X700     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [300.0, 700.0]
+    id=1509   kind=1   name=矩300X600     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [300.0, 600.0]
+    id=1609   kind=1   name=矩200X400     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [200.0, 400.0]
+    id=1709   kind=1   name=矩300X800     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [300.0, 800.0]
+    id=1809   kind=1   name=矩500X900     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [500.0, 900.0]
+    id=1909   kind=1   name=矩300X500     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [300.0, 500.0]
+    id=2009   kind=1   name=矩500X1100    -> parametric family /USER_RECT-SPEC/Rectangle_Profile [500.0, 1100.0]
+    id=2109   kind=1   name=矩400X850     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [400.0, 850.0]
+    id=2309   kind=1   name=矩700X800     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [700.0, 800.0]
+    id=2609   kind=1   name=矩700X400     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [700.0, 400.0]
+    id=2709   kind=1   name=矩500X500     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [500.0, 500.0]
+    id=3009   kind=1   name=矩450X600     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [450.0, 600.0]
+    id=3109   kind=1   name=矩350X800     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [350.0, 800.0]
+    id=3209   kind=1   name=矩400X500     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [400.0, 500.0]
+    id=3309   kind=1   name=矩400X800     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [400.0, 800.0]
+    id=3409   kind=1   name=矩400X700     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [400.0, 700.0]
+    id=3509   kind=39  name=HN400X200    -> resolved  name   /H_INTERNATIONAL-SPEC/HN400X200 
+    id=3609   kind=39  name=HW200X200    -> resolved  name   /H_INTERNATIONAL-SPEC/HW200X200 
+    id=3709   kind=1   name=矩600X700     -> parametric family /USER_RECT-SPEC/Rectangle_Profile [600.0, 700.0]
+  截面 resolve 状态统计（被引用的）：{'parametric': 23, 'resolved': 2, '未使用:unresolved': 1, '未使用:parametric': 6}
+  面板 resolve：{('slab', 100.0, 'resolved'): '/Concrete_Slab-SPEC/T100', ('wall', 100.0, 'resolved'): '/Concrete_Slab-SPEC/T100', ('slab', 120.0, 'resolved'): '/Concrete_Slab-SPEC/T120', ('wall', 120.0, 'resolved'): '/Concrete_Slab-SPEC/T120', ('slab', 600.0, 'resolved'): '/Concrete_Wall-SPEC/WALL-600', ('wall', 600.0, 'resolved'): '/Concrete_Wall-SPEC/WALL-600'}
+  [OK] 被引用的 25 个截面全部 resolved/parametric {'parametric': 23, 'resolved': 2, '未使用:unresolved': 1, '未使用:parametric': 6}
+  [OK] 全部板/墙厚度 resolved（补充文件生效） {('slab', 100.0, 'resolved'): '/Concrete_Slab-SPEC/T100', ('wall', 100.0, 'resolved'): '/Concrete_Slab-SPEC/T100', ('slab', 120.0, 'resolved'): '/Concrete_Slab-SPEC/T120', ('wall', 120.0, 'resolved'): '/Concrete_Slab-SPEC/T120', ('slab', 600.0, 'resolved'): '/Concrete_Wall-SPEC/WALL-600', ('wall', 600.0, 'resolved'): '/Concrete_Wall-SPEC/WALL-600'}
+  未解析清单（0 条）：[]
+  [OK] 未解析截面 ≤ 1（样本只有 圆形4800 一个 SHAPE=3） []
+
+=== H. 面板（板/墙）与 reverse() ===
+  slab T120 -> {'spec_path': '/Concrete_Slab-SPEC/T120', 'desp_params': [], 'status': 'resolved', 'reason': '', 'pkpm_name': 'T120', 'source': 'name', 'evidence': ''}
+  slab T100 -> {'spec_path': '/Concrete_Slab-SPEC/T100', 'desp_params': [], 'status': 'resolved', 'reason': '', 'pkpm_name': 'T100', 'source': 'name', 'evidence': ''}
+  wall T600 -> {'spec_path': '/Concrete_Wall-SPEC/WALL-600', 'desp_params': [], 'status': 'resolved', 'reason': '', 'pkpm_name': 'T600', 'source': 'name', 'evidence': ''}
+  [OK] T120 由补充文件解析 
+  [OK] T600 由补充文件解析 
+  [OK] T999（补充文件没有）→ unresolved 
+  reverse(/H_INTERNATIONAL-SPEC/HN450X200) = 'HN450X200'
+  reverse(H_INTERNATIONAL-SPEC/HN450X200)  = 'HN450X200'
+  reverse(/USER_RECT-SPEC/Rectangle_Profile) = 'RECT'
+  reverse(/nope/nope) = None
+  [OK] reverse 前导斜杠容错 
+  [OK] reverse 未命中返回 None 
+  原件里"多条左值 -> 同一右值"的条数 = 0（副本 2836 条右值互不相同）
+  fixture: entries=[(3, 'X1', '/S-SPEC/A'), (4, 'X2', '/S-SPEC/A'), (5, 'X1', '/S-SPEC/B')] extra=[(2, 'X2', '/S-SPEC/C'), (3, 'X3', '/S-SPEC/D')] warnings=["匹配文件左值重复：L5 'X1' -> '/S-SPEC/B'（后者覆盖前者）", "补充文件覆盖原件左值：D:\\AI_Work\\PKPM数据解析\\PKPM-JWD导入导出\\test\\fixture_secmap_extra.txt L2 'X2' -> '/S-SPEC/C'（原值 '/S-SPEC/A'）"]
+  [OK] 夹具解析 3 + 2 条 
+  [OK] reverse 取加载顺序第一条（X1 而非 X2） 'X1'
+  [OK] 补充文件覆盖同名左值（X2 -> /S-SPEC/C） 
+  [OK] 补充文件独有条目（含缺前导斜杠的右值）可反查 
+  [OK] 重复左值与补充覆盖都记入 warnings ["匹配文件左值重复：L5 'X1' -> '/S-SPEC/B'（后者覆盖前者）", "补充文件覆盖原件左值：D:\\AI_Work\\PKPM数据解析\\PKPM-JWD导入导出\\test\\fixture_secmap_extra.txt L2 'X2' -> '/S-SPEC/C'（原值 '/S-SPEC/A'）"]
+  validate(GBK 文件当目录宏) -> UnicodeDecodeError（严格解码，符合 §g.1）：'utf-8' codec can't decode byte 0xbd in position 3: invalid start byte
+  [OK] 目录宏严格按 utf-8-sig 解码（不解码失败即报错） 
+
+=== I. Model JSON 往返 + 只读性 ===
+  to_json(bytes)=455757  from_json counts={'levels': 11, 'joints': 617, 'sections': 32, 'members': {'beam': 925, 'column': 121, 'brace': 0}, 'members_total': 1046, 'slabs': 331, 'slabs_holes': 0, 'slabs_with_thickness': 331, 'walls': 4, 'loads': {'beam-line': 120, 'joint-point': 4}, 'loads_total': 124}
+  [OK] JSON 往返逐字节相同（§a.6 规范形式） 
+  [OK] 往返后计数与 joint 键一致（int 键还原） 
+  1_PM.pdt size=808069 mtime=1790177332
+  PKPM转PDMS截面匹配文件.txt size=133377 mtime=1790177332
+  PKPM（PDMS数据库）.txt size=1406051 mtime=1703678127
+  [OK] 样本仅以 mode="rb"/"r" 读取（无写路径） 
+
+=== 结论 ===
+  FAIL 项: 0 []
+DONE (read-only)
