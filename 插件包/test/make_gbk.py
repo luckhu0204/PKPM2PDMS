@@ -8,8 +8,8 @@
                        存成 GBK 既能被 5.1 正确解析，又满足契约 §g「不得写 BOM」。
 
 用法：
-    python PKPM-JWD导入导出\\test\\make_gbk.py            # 转换 pdms/ 与 install/ 下全部文件
-    python PKPM-JWD导入导出\\test\\make_gbk.py --check    # 只检查（门禁用），不写文件
+    python PKPM2PDMS导入导出\\test\\make_gbk.py            # 转换 pdms/ 与 install/ 下全部文件
+    python PKPM2PDMS导入导出\\test\\make_gbk.py --check    # 只检查（门禁用），不写文件
 
 只改写包内 pdms/ 与 install/ 的文件，不触碰样本与 PDMS 安装内任何文件。
 """

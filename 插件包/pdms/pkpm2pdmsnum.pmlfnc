@@ -1,0 +1,62 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: !!pkpm2pdmsRenamesCount -> "PML: Function not found"；
+--    P7_export_1: "(46,85) PML: Wrong Function found"）。故一函数一文件。
+-- 源     : pkpm2pdmsexport.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmsnum
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- 数值转文本：!toMm 为真时先由数据库单位换算成 mm（契约 §c.1）
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsnum(!value is REAL, !toMm is BOOLEAN) is STRING
+
+   -- 〔R6 实机修复〕本机实测 !!comUnitsConvert(角度值, 'DIST', 'MM') 报
+   --   (2,812) Variable is not of the expected dimension of format object(L)
+   --   （17:12 实机：!!pkpm2pdmsexport -> !!pkpm2pdmssctn -> !!pkpm2pdmsnum(!bang,..)
+   --   的调用链把整条导出打挂）；且换算结果的 .string() 本机不可用
+   --   （P5_unitprobe：Object does not have a member STRING）。
+   --   本库 DIST 单位 = mm（同次实机 UNIT=[mm]；此时 !toMm=FALSE，不走换算）。
+   --   改成：需要换算时试一次，成功用换算值、任何异常退回原值字符串。
+   -- ① 先取"数值文本"：两条既有路径（R6 原样，逐字未改）
+   !converted = FALSE
+   !s = ''
+   if (!toMm) then
+      !s = !value.string()
+   else
+      !okC = TRUE
+      !convS = ''
+      !convS = !!comUnitsConvert(!value, 'DIST', 'MM').string()
+      handle any
+         !okC = FALSE
+      endhandle
+      !s = !value.string()
+      if (!okC.eq(TRUE)) then
+         !s = !convS
+         !converted = TRUE
+      endif
+   endif
+
+   -- ② 〔R7 实机修复·量纲后缀〕未走换算时改用 .real() 先脱量纲（契约 §c.1 禁止单位后缀）
+   if (!converted.eq(FALSE)) then
+      !realS = ''
+      !realS = !value.real().string()
+      handle any
+         !realS = ''
+      endhandle
+      if (!realS.length() gt 0) then
+         !s = !realS
+      endif
+   endif
+
+   -- ③ 兜底：万一本机 .real() 不脱量纲，也把单位词去掉（本机实测的后缀 = 'degree'）
+   !s = !s.replace('degrees', '')
+   !s = !s.replace('degree', '')
+   !s = !s.replace('radians', '')
+   !s = !s.replace('radian', '')
+   !s = !s.replace('rad', '')
+   !s = !s.replace('deg', '')
+   return !s
+
+endfunction
+-- End of function !!pkpm2pdmsnum

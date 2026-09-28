@@ -1,6 +1,0 @@
-===== ApplicationFramework.Presentation.xml len=361354 macro_hits=2
-'         Property which holds the current application context, which is used to manage the\r\n            state of all commands.\r\n            </summary>\r\n        </member>\r\n        <member name="P:Aveva.ApplicationFramework.Presentation.CommandManager.MacroCommand">\r\n            <summary>\r\n            Property which holds the type of a class which implements a command to execute a macro in the context of the host application. (e.g. A PML command)\r\n            </summary>\r\n        </member>\r\n       '
----
-'        </summary>\r\n        </member>\r\n        <member name="P:Aveva.ApplicationFramework.Presentation.CommandManager.MacroCommand">\r\n            <summary>\r\n            Property which holds the type of a class which implements a command to execute a macro in the context of the host application. (e.g. A PML command)\r\n            </summary>\r\n        </member>\r\n        <member name="P:Aveva.ApplicationFramework.Presentation.CommandManager.CommandTypes">\r\n            <summary>\r\n            Property '
----
-===== Aveva.Pdms.Design.xml len=639 macro_hits=0

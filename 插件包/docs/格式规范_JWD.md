@@ -406,7 +406,7 @@ Member.hdiff_*   = 原始 HDiffB / HDiff1,HDiff2（柱的 hdiff_end = 0）
 ## 9. 怎么复现本文的核对
 
 ```bat
-cd /d D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出
+cd /d D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出
 
 :: ① 表数/行数/编码/关键列（只读 sqlite_master + PRAGMA table_info）
 python test\check_deliverables.py            :: 原件指纹：46 表 / 6480 行 / UTF-8 / user_version=0
@@ -421,5 +421,5 @@ python test\test_contract_selfcheck.py
 ::    见 _recon\jwd_dump\*.txt（全表导出）或自行用 sqlite3 mode=ro 打开
 ```
 
-> 说明：本文中的"本次实测"数字来自 `PKPM-JWD导入导出/` 包内的测试与只读探针；
+> 说明：本文中的"本次实测"数字来自 `PKPM2PDMS导入导出/` 包内的测试与只读探针；
 > `_recon/` 下的侦察报告是**结论来源**，其"43 张表"等处与本次实测不一致的地方，**以本文与契约的实测值为准**。

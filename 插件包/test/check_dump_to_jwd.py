@@ -288,12 +288,12 @@ check(me2.slabs[1].thickness == 150.0 and me2.slabs[1].z == 3000.0,
 
 # ---------------------------------------------------------------- 3. E-PARSE 负例
 print('\n=== 3. E-PARSE 负例（契约 §c.3，CLI 按 §f.2 码 2 退出）===')
-HEAD = '#PKPM-JWD-PDMSDUMP 1.0\nUNITS mm\n#SITE /S\n#ZONE /Z\n#STRU /R\n#FRMW /F\n'
+HEAD = '#PKPM2PDMS-PDMSDUMP 1.0\nUNITS mm\n#SITE /S\n#ZONE /Z\n#STRU /R\n#FRMW /F\n'
 BAD = [
     ('缺 #END', HEAD + '#SBFR /COLUMN\n'
      '#SCTN /C COLUMN /H_INTERNATIONAL-SPEC/HN300X150 0 0 0 0 0 1000 U na na 0\n'),
     ('首行不是头', 'XXX 1.0\nUNITS mm\n#END\n'),
-    ('#SBFR 缺 #FRMW 父级', '#PKPM-JWD-PDMSDUMP 1.0\nUNITS mm\n#SITE /S\n#ZONE /Z\n'
+    ('#SBFR 缺 #FRMW 父级', '#PKPM2PDMS-PDMSDUMP 1.0\nUNITS mm\n#SITE /S\n#ZONE /Z\n'
      '#STRU /R\n#SBFR /COLUMN\n#END\n'),
     ('#SCTN token 不足 14', HEAD + '#SBFR /COLUMN\n#SCTN /C COLUMN - 0 0 0 U na na 0\n'),
     ('#SCTN 的 desp 非数字', HEAD + '#SBFR /COLUMN\n'
@@ -309,7 +309,7 @@ BAD = [
      '#PANE /P 100 0 0 0 1000 0 0 1000 1000 5\n'),
     ('#STWALL token 数非法', HEAD + '#SBFR /WALL\n#STWALL /W /A 3000 0 0 -1 100\n'),
     ('未知记录', HEAD + '#SBFR /COLUMN\n#FOO bar\n'),
-    ('UNITS 值非法', '#PKPM-JWD-PDMSDUMP 1.0\nUNITS inch\n#END\n'),
+    ('UNITS 值非法', '#PKPM2PDMS-PDMSDUMP 1.0\nUNITS inch\n#END\n'),
     ('#END 之后有内容', HEAD + '#END\n#SITE /S2\n'),
     ('name 含 ~', HEAD + '#SBFR /COLUMN\n'
      '#SCTN /C~1 COLUMN - 0 0 0 0 0 1000 U na na 0\n'),
@@ -326,7 +326,7 @@ for label, text in BAD:
 
 # ---------------------------------------------------------------- 4. 单位
 print('\n=== 4. 单位（契约 §c.1：只有长度量换算；bangle 恒为度）===')
-t_m = ('#PKPM-JWD-PDMSDUMP 1.0\nUNITS m\n#SITE /S\n#ZONE /Z\n#STRU /R\n#FRMW /F\n'
+t_m = ('#PKPM2PDMS-PDMSDUMP 1.0\nUNITS m\n#SITE /S\n#ZONE /Z\n#STRU /R\n#FRMW /F\n'
        '#SBFR /COLUMN\n#SCTN /C1 COLUMN - 0.5 0.5 -3 0.5 0.5 0 U na na 45\n#END\n')
 mm = pdms_dump.parse_dump(t_m, smap)
 check(mm.members[0].start == (500.0, 500.0, -3000.0)
@@ -346,7 +346,7 @@ check(pdms_dump.UNIT_FACTOR == {'mm': 1.0, 'cm': 10.0, 'm': 1000.0}, '单位系�
 # ---------------------------------------------------------------- 5. 其他接口约束
 print('\n=== 5. 接口约束（契约 §b.1 / §c.1）===')
 try:
-    pdms_dump.parse_dump(b'#PKPM-JWD-PDMSDUMP 1.0\n#END\n')
+    pdms_dump.parse_dump(b'#PKPM2PDMS-PDMSDUMP 1.0\n#END\n')
     check(False, 'parse_dump 拒绝 bytes（要求 str）')
 except TypeError as exc:
     check(True, 'parse_dump 拒绝 bytes（要求 str）', str(exc)[:80])

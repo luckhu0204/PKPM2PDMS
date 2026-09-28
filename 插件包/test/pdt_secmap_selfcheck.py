@@ -3,7 +3,7 @@
 
 跑法::
 
-    cd /d "D:\\AI_Work\\PKPM数据解析\\PKPM-JWD导入导出"
+    cd /d "D:\\AI_Work\\PKPM数据解析\\PKPM2PDMS导入导出"
     python test\\pdt_secmap_selfcheck.py
 
 覆盖（每项都打印实测数字）::

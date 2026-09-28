@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""PKPM-JWD导入导出 —— 截面匹配文件解析与 PDMS 规格解析（契约 §e 的唯一实现）。
+"""PKPM2PDMS导入导出 —— 截面匹配文件解析与 PDMS 规格解析（契约 §e 的唯一实现）。
 
 契约：``spec/CONTRACT.md`` §b.1/§e（版本 ``CONTRACT_VERSION = "1.0"``）。
 

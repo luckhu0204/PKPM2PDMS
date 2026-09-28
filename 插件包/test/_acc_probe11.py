@@ -6,7 +6,7 @@ import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 JWD = r"G:\工作\PDMS相关\00 PDMS插件\02 实用插件\PKPM导入导出插件\JLCJ2.jwd"
-RT = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\_acceptance_out\JLCJ2.roundtrip.jwd"
+RT = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\test\_acceptance_out\JLCJ2.roundtrip.jwd"
 
 
 def dec(b):

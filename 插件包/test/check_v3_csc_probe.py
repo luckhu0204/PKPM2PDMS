@@ -2,9 +2,9 @@
 r"""v3 工具链探针：证明契约 §p.2 的 csc 3.5 命令能编译出 CLR2/x86 的 DLL。
 
 产物（全部留在 test/_v3_csc_check/，作为证据）：
-  stub_pkpmjwd.cs   最小 IAddin 桩（引用 AVEVA 5 件套）
+  stub_pkpm2pdms.cs   最小 IAddin 桩（引用 AVEVA 5 件套）
   build.cmd         契约 §p.2 编译命令的原样实例
-  stub_pkpmjwd.dll  编译产物
+  stub_pkpm2pdms.dll  编译产物
   _csc_probe.txt    本次运行输出
 
 只读 D:\AVEVA（/reference 只是读）；不写 G 盘、不启动 PDMS、不部署。
@@ -23,16 +23,16 @@ WORK = os.path.join(HERE, '_v3_csc_check')
 CSC = r'C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe'
 PDMS = r'D:\AVEVA\Plant\PDMS12.1.SP4'
 
-STUB = r'''// stub_pkpmjwd.cs - 契约 §p.2 编译命令的探针桩（不是交付的 Add-in 源码）
+STUB = r'''// stub_pkpm2pdms.cs - 契约 §p.2 编译命令的探针桩（不是交付的 Add-in 源码）
 using System;
 using Aveva.ApplicationFramework;
 using Aveva.ApplicationFramework.Presentation;
 
-namespace PKPMJWD
+namespace PKPM2PDMS
 {
     public class StubAddin : IAddin
     {
-        public string Name { get { return "PKPMJWD-stub"; } }
+        public string Name { get { return "PKPM2PDMS-stub"; } }
         public string Description { get { return "compile probe only"; } }
         public void Start(ServiceManager services)
         {
@@ -46,7 +46,7 @@ namespace PKPMJWD
     {
         public StubCommand()
         {
-            Key = "PKPMJWD.StubProbe";
+            Key = "PKPM2PDMS.StubProbe";
             Description = "probe";
         }
         public override bool IsValid { get { return true; } }
@@ -65,7 +65,7 @@ set HERE=%~dp0
 if not exist "%CSC%" set CSC=C:\\Windows\\Microsoft.NET\\Framework64\\v3.5\\csc.exe
 
 "%CSC%" /nologo /target:library /platform:x86 /optimize+ /utf8output /codepage:65001 ^
- /warnaserror- /out:"%HERE%stub_pkpmjwd.dll" ^
+ /warnaserror- /out:"%HERE%stub_pkpm2pdms.dll" ^
  /r:"%PDMS%\\Aveva.ApplicationFramework.dll" ^
  /r:"%PDMS%\\Aveva.ApplicationFramework.Presentation.dll" ^
  /r:"%PDMS%\\Aveva.Pdms.Database.dll" ^
@@ -73,13 +73,13 @@ if not exist "%CSC%" set CSC=C:\\Windows\\Microsoft.NET\\Framework64\\v3.5\\csc.
  /r:"%PDMS%\\Aveva.Pdms.Geometry.dll" ^
  /r:System.dll /r:System.Core.dll /r:System.Drawing.dll ^
  /r:System.Windows.Forms.dll ^
- "%HERE%stub_pkpmjwd.cs"
+ "%HERE%stub_pkpm2pdms.cs"
 
 if errorlevel 1 (
   echo BUILD FAILED
   exit /b 1
 )
-echo BUILD OK: %HERE%stub_pkpmjwd.dll
+echo BUILD OK: %HERE%stub_pkpm2pdms.dll
 '''
 
 PE_CLAMP = 0x4000  # PE 头在文件头；CLR 元数据根对大文件可能靠后 → 版本串全文件搜
@@ -109,7 +109,7 @@ def pe_machine_and_corflags(path):
 def main():
     print('=== v3 csc 工具链探针 ===')
     os.makedirs(WORK, exist_ok=True)
-    open(os.path.join(WORK, 'stub_pkpmjwd.cs'), 'w', encoding='utf-8').write(STUB)
+    open(os.path.join(WORK, 'stub_pkpm2pdms.cs'), 'w', encoding='utf-8').write(STUB)
     # .cmd 必须 CRLF（LF-only 的批处理会被 cmd 误解析——本次实测教训，写进契约 §g）
     open(os.path.join(WORK, 'build.cmd'), 'w', encoding='ascii', newline='').write(
         BUILD.replace('\n', '\r\n'))
@@ -147,8 +147,8 @@ def main():
         print('    ' + line)
     check(p.returncode == 0, 'csc 退出码 0', str(p.returncode))
     check('BUILD OK' in out, 'BUILD OK 出现')
-    dll = os.path.join(WORK, 'stub_pkpmjwd.dll')
-    check(os.path.exists(dll), '产物存在 stub_pkpmjwd.dll',
+    dll = os.path.join(WORK, 'stub_pkpm2pdms.dll')
+    check(os.path.exists(dll), '产物存在 stub_pkpm2pdms.dll',
           '%d B' % os.path.getsize(dll) if os.path.exists(dll) else '')
     ver, off = clr_version(dll)
     check(ver == 'v2.0.50727', 'CLR 运行时版本 = v2.0.50727', '%s @0x%x' % (ver, off))

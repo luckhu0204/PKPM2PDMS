@@ -5,6 +5,10 @@ install/ —— 安装与卸载脚本
 ------------------------
   install.ps1     把 pmllib 包复制到 <PDMS根>\PMLLIB\<包名>\，并在
                   <PDMS根>\design.uic 与 <PDMS根>\DesignAddins.xml 里**追加**菜单/加载项
+                  R6（2026-09-28）起：复制的是 插件包\pdms\ 下的**全部** .pmlfnc/.pmlfrm/
+                  .mac/.txt（不再只搬 4 个入口文件）—— 本机实测 PMLLIB 的 .pmlfnc 自动加载
+                  规则是「文件名（忽略大小写）= 函数名」，PML 包因此是一函数一文件；
+                  装完必须重启 PDMS 重新索引（见 pdms\README.txt「R6 运行入口与文件拆分」）。
   uninstall.ps1   反向移除（只删本包新增的文件与本次追加的条目）
 
 硬性纪律（见 spec/CONTRACT.md §i 与 §g）

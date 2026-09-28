@@ -3,7 +3,7 @@
 import os
 import re
 
-OUT = open(r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\_r3_probe_ofchains.txt", "w",
+OUT = open(r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\test\_r3_probe_ofchains.txt", "w",
            encoding="utf-8")
 DB = (r"G:\工作\PDMS相关\00 PDMS插件\02 实用插件\PKPM导入导出插件"
       r"\PKPM（PDMS数据库）.txt")

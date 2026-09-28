@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """S3 自检：gui.py 的真实构件（建窗口）+ 通过 GUI 自己的代码路径跑一次转换。
 
-跑法：``python PKPM-JWD导入导出\\test\\_s3_cli\\check_gui.py``
+跑法：``python PKPM2PDMS导入导出\\test\\_s3_cli\\check_gui.py``
 
 不做假：真的 ``Tk()`` 建窗口（无显示器时 Tk 自己会报 TclError，本脚本如实报"未能在
 图形环境启动"而不是伪造通过）；真的把界面上的输入框填成样本路径，调用
@@ -23,6 +23,8 @@ PLUG = u"G:/工作/PDMS相关/00 PDMS插件/02 实用插件/PKPM导入导出插�
 SECMAP = PLUG + u"/PKPM转PDMS截面匹配文件.txt"
 JWD = PLUG + u"/JLCJ2.jwd"
 PDT = PLUG + u"/1_PM.pdt"
+#: 〔R7〕建模型宏的 SITE 名（引擎必填参数；实际由 .NET 侧直查试出后传入，引擎不改名）
+SITE_NAME = "/PKPM2PDMS"
 
 sys.path.insert(0, ENGINE)
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
@@ -85,9 +87,11 @@ def main():
         check(hasattr(t, "btn_report") and str(t.btn_report["text"]) == "打开报告",
               "[%s] 有「打开报告」按钮" % t.tool)
     check(sorted(t0.vars) == sorted(["jwd", "secmap", "extra", "out", "report", "project",
-                                     "base_e", "base_n", "base_u", "angle", "unit"] +
+                                     "site_name", "base_e", "base_n", "base_u", "angle",
+                                     "unit"] +
                                     ["cat_" + c for c in G.cli_mod.CATEGORIES]),
-          "[jwd2pdms] 输入项逐项对应 §f.1（含 --base/--angle/--unit/--extra/--project）",
+          "[jwd2pdms] 输入项逐项对应 §f.1（含 --base/--angle/--unit/--extra/--project/"
+          "〔R7〕--site-name）",
           sorted(t0.vars))
     check(sorted(t1.vars) == sorted(["dump", "secmap", "out", "report", "dump_unit"] +
                                     ["cat_" + c for c in G.cli_mod.CATEGORIES]),
@@ -104,6 +108,7 @@ def main():
     t0.vars["out"].set(mac)
     t0.vars["report"].set(rep)
     t0.vars["project"].set("JLCJ2")
+    t0.vars["site_name"].set(SITE_NAME)       # 〔R7〕建模型宏必填的 SITE 名
     t0.vars["base_e"].set("0")
     t0.vars["base_n"].set("0")
     t0.vars["base_u"].set("0")

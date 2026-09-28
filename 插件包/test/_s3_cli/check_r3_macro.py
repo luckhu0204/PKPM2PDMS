@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """R3 验收③：核对生成的**真实**宏里每个创建元素之前都有唯一化调用，并把计数对平。
 
-跑法：``python PKPM-JWD导入导出\\test\\_s3_cli\\check_r3_macro.py``
+跑法：``python PKPM2PDMS导入导出\\test\\_s3_cli\\check_r3_macro.py``
 
 依据：契约 §o.4 的**逐字模板**（engine/macgen.py:581-608 的 ``emit_new`` 是生成侧唯一出处）::
 
-    !pkpmjwdType = '<TYPE>'
-    !n = !!pkpmjwdUniquename('<名>')
+    !pkpm2pdmsType = '<TYPE>'
+    !n = !!pkpm2pdmsUniquename('<名>')
     if (!n eq '') then
-      var !pkpmjwdFatal EXIST /$!n
+      var !pkpm2pdmsFatal EXIST /$!n
     endif
     NEW <TYPE> $!n
 
@@ -52,14 +52,14 @@ def audit(mac_name, report_name, expect):
     # ---- 头/尾（§o.5 + §o.4 前置） ----
     stripped = [l.strip() for l in lines]
     check(stripped[0].startswith("$S-"), "首行 $S-", stripped[0][:60])
-    check("ONERROR GOLABEL /PKPMJWDERR" in stripped, "宏头 ONERROR GOLABEL /PKPMJWDERR（§o.5）")
-    check("if (defined(!!pkpmjwdUniquename)) then" in stripped,
+    check("ONERROR GOLABEL /PKPM2PDMSERR" in stripped, "宏头 ONERROR GOLABEL /PKPM2PDMSERR（§o.5）")
+    check("if (defined(!!pkpm2pdmsUniquename)) then" in stripped,
           "唯一化函数可用性检查（defined()，§o.4）")
-    check("var !pkpmjwdFuncMissing EXIST /" in stripped,
+    check("var !pkpm2pdmsFuncMissing EXIST /" in stripped,
           "函数缺失 ⇒ 故障注入行（§o.4 机制）")
-    tail = [l for l in stripped if l in ("LABEL /PKPMJWDERR", "handle ANY", "$S+",
+    tail = [l for l in stripped if l in ("LABEL /PKPM2PDMSERR", "handle ANY", "$S+",
                                          "RETURN ERROR", "endhandle")]
-    check(tail == ["LABEL /PKPMJWDERR", "handle ANY", "$S+", "RETURN ERROR", "endhandle"],
+    check(tail == ["LABEL /PKPM2PDMSERR", "handle ANY", "$S+", "RETURN ERROR", "endhandle"],
           "宏尾 LABEL/handle/$S+/RETURN ERROR/endhandle 依次齐全（§o.5）", str(tail))
 
     # ---- 每个 NEW 都有前置模板 ----
@@ -80,10 +80,10 @@ def audit(mac_name, report_name, expect):
             bad.append((i + 1, "NEW 名不是 $!n", l.strip()[:80]))
             continue
         tmpl = [
-            ind + "!pkpmjwdType = '%s'" % etype,
-            ind + "!n = !!pkpmjwdUniquename('",
+            ind + "!pkpm2pdmsType = '%s'" % etype,
+            ind + "!n = !!pkpm2pdmsUniquename('",
             ind + "if (!n eq '') then",
-            ind + "  var !pkpmjwdFatal EXIST /$!n",
+            ind + "  var !pkpm2pdmsFatal EXIST /$!n",
             ind + "endif",
         ]
         if i < len(tmpl):
@@ -97,10 +97,10 @@ def audit(mac_name, report_name, expect):
                 break
         else:
             uniq_calls += 1
-            uniq_names.append(block[1].split("!!pkpmjwdUniquename('", 1)[1].rsplit("')", 1)[0])
+            uniq_names.append(block[1].split("!!pkpm2pdmsUniquename('", 1)[1].rsplit("')", 1)[0])
     check(not bad, "每个 NEW <TYPE> $!n 之前都是 §o.4 逐字模板（5 行）", bad[:3])
     check(all(n.startswith("/") for n in uniq_names),
-          "传给 !!pkpmjwdUniquename 的名字都带前导 /（§o.1）",
+          "传给 !!pkpm2pdmsUniquename 的名字都带前导 /（§o.1）",
           "" if all(n.startswith("/") for n in uniq_names)
           else [n for n in uniq_names if not n.startswith("/")][:3])
 

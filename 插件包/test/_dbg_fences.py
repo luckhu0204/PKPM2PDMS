@@ -11,5 +11,5 @@ for line in b.split('\n'):
     if 'define' in line or 'EXIST' in line or 'handle' in line or 'FAIL' in line:
         print(repr(line))
 print('---')
-print('sig in b:', 'define function !!pkpmjwdUniquename(!base is STRING) is STRING' in b)
+print('sig in b:', 'define function !!pkpm2pdmsUniquename(!base is STRING) is STRING' in b)
 print('has eq-op:', "if (!base eq '')" in b)

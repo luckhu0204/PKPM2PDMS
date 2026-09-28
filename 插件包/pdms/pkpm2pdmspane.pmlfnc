@@ -1,0 +1,71 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: !!pkpm2pdmsRenamesCount -> "PML: Function not found"；
+--    P7_export_1: "(46,85) PML: Wrong Function found"）。故一函数一文件。
+-- 源     : pkpm2pdmsexport.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmspane
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- #PANE 记录（契约 §c.2 / §c.5）；顶点不足 3 个时返回空串，由调用方计入 skip
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmspane(!el is DBREF, !toMm is BOOLEAN) is STRING
+
+   !msg = ''
+   !loop = !!findFirstMember(!el, 'PLOO', '', !msg)
+   if (!loop.unset()) then
+      return ''
+   endif
+   if (!loop.badref()) then
+      return ''
+   endif
+
+   -- 〔R6 实机修复·handle 语义〕块体只在报错时执行 -> 语句移出，块只兜错。
+   !thk = 0.0
+   !thk = !loop.heig
+   handle any
+      !thk = 0.0
+   endhandle
+
+   !rec = '#PANE ' & !!pkpm2pdmsname(!el.name) & ' ' & !!pkpm2pdmsnum(!thk, !toMm)
+   !nv = 0
+   do !i from 1 to !loop.mCount()
+      !v = !loop.members[!i]
+      !pv = !v.pos
+      !rec = !rec & ' ' & !!pkpm2pdmsnum(!pv.east, !toMm) & ' ' & !!pkpm2pdmsnum(!pv.north, !toMm) & ' ' & !!pkpm2pdmsnum(!pv.up, !toMm)
+      !nv = !nv + 1
+   enddo
+   if (!nv lt 3) then
+      return ''
+   endif
+
+   -- 〔R6 实机修复·handle 语义〕块体只在报错时执行 -> 语句移出，块只兜错。
+   !spec = ''
+   !spec = !el.spref.flnn
+   handle any
+      !spec = ''
+   endhandle
+
+   -- 〔R7 实机修复·空值哨兵〕与 pkpm2pdmssctn 同一类缺陷：SJUS 为空串时 handle 块不触发，
+   --   尾部会只剩 "~ spref YNZU" 两个 token，读方按契约 §c.3.3 要求「~ 之后恰 3 个 token」
+   --   -> E-PARSE。本轮实机 dump 里 #PANE 因 spref 为空而整段省略尾部、尚未触发；
+   --   一旦板规格存在（如库里补上 /Concrete_Slab-SPEC）即会触发，故一并补足。
+   --   契约 §c.5 规定 sjus「无 → dbot」，空串/unset 一律回落 dbot。
+   !sjus = 'dbot'
+   !sraw = !el.sjus
+   handle any
+      !sraw = ''
+   endhandle
+   if (!sraw.unset().not()) then
+      if (!sraw.length() gt 0) then
+         !sjus = !sraw
+      endif
+   endif
+
+   if (!spec.length() gt 0) then
+      !rec = !rec & ' ~ ' & !spec & ' YNZU ' & !sjus
+   endif
+   return !rec
+
+endfunction
+-- End of function !!pkpm2pdmspane

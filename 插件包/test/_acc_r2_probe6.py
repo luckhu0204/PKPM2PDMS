@@ -12,7 +12,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='repla
 S = r"G:\工作\PDMS相关\00 PDMS插件\02 实用插件\PKPM导入导出插件"
 MAP = os.path.join(S, "PKPM转PDMS截面匹配文件.txt")
 DLL = os.path.join(S, "P-TRANS", "PDMSxCA_Addin121.dll")
-PKG = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出"
+PKG = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出"
 BUILTIN = os.path.join(PKG, "engine", "section_table.csv")
 CJK = re.compile(r"^[\u4e00-\u9fff]+")
 NUMP = re.compile(r"^\d+-")

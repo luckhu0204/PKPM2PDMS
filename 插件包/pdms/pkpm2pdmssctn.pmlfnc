@@ -1,0 +1,83 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: !!pkpm2pdmsRenamesCount -> "PML: Function not found"；
+--    P7_export_1: "(46,85) PML: Wrong Function found"）。故一函数一文件。
+-- 源     : pkpm2pdmsexport.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmssctn
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- #SCTN 记录（契约 §c.2 / §c.5）
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmssctn(!el is DBREF, !sbname is STRING, !toMm is BOOLEAN) is STRING
+
+   !p1 = !el.poss
+   !p2 = !el.pose
+   !dE = !p2.east - !p1.east
+   !dN = !p2.north - !p1.north
+   !dU = !p2.up - !p1.up
+
+   -- 〔R6 实机修复·handle 语义〕块体只在报错时执行 -> 语句移出，块只兜错。
+   -- 〔R7 实机修复·空值哨兵〕与下面 JUSL/MEML 同构：spref 在契约 §c.2 里是**恒在**的
+   --   `card`（name 或 '-'）。`flnn` 若返回空串而不报错，就会写出空 token、整行少 1 个
+   --   token、读方按尾部定位整体错位。故空串/unset 一律写 '-' 哨兵。
+   !spec = '-'
+   !sraw = !el.spref.flnn
+   handle any
+      !sraw = ''
+   endhandle
+   if (!sraw.unset().not()) then
+      if (!sraw.length() gt 0) then
+         !spec = !sraw
+      endif
+   endif
+
+   -- 〔R7 实机修复·空值哨兵〕本机实测（验收/R7日志/P8_P10_dump_token_stats.txt）：
+   --   SCTN 的 JUSL/MEML 未设时 !!el.jusl 返回**空串**而不是报错，handle 块不触发，
+   --   于是 !rec 里写出两个空 token（"… U   0degree"）-> 811 条 #SCTN 全是 25 token，
+   --   而契约 §c.3.2 的尾部固定 10 个 token 要求共 27。读方按尾部定位即整体错位 2 格，
+   --   把几何数当成 ori：E-PARSE 第 8 行 #SCTN 的 ori='0' 不在 E/N/U/S
+   --   （证据 P8_P10_export.report.json）-> R7 实机「PDMS导出PDT/JWD」两个功能全灭。
+   --   契约 §c.5 规定 jusl/meml「无 → '-'」，故这里补足哨兵：空串/unset 一律写 '-'。
+   !jusl = '-'
+   !jraw = !el.jusl
+   handle any
+      !jraw = ''
+   endhandle
+   if (!jraw.unset().not()) then
+      if (!jraw.length() gt 0) then
+         !jusl = !jraw
+      endif
+   endif
+
+   -- 〔R7 实机修复·空值哨兵〕与上面 JUSL 同一处缺陷（同一个尾部语法位），同理补 '-'。
+   !meml = '-'
+   !mraw = !el.meml
+   handle any
+      !mraw = ''
+   endhandle
+   if (!mraw.unset().not()) then
+      if (!mraw.length() gt 0) then
+         !meml = !mraw
+      endif
+   endif
+
+   -- 〔R6 实机修复·handle 语义〕块体只在报错时执行 -> 语句移出，块只兜错。
+   !bang = 0.0
+   !bang = !el.bang
+   handle any
+      !bang = 0.0
+   endhandle
+
+   !rec = '#SCTN ' & !!pkpm2pdmsname(!el.name)
+   !rec = !rec & ' ' & !!pkpm2pdmsctype(!sbname, !dE, !dN, !dU)
+   !rec = !rec & ' ' & !spec
+   !rec = !rec & !!pkpm2pdmsdesp(!el, !toMm)
+   !rec = !rec & ' ' & !!pkpm2pdmsnum(!p1.east, !toMm) & ' ' & !!pkpm2pdmsnum(!p1.north, !toMm) & ' ' & !!pkpm2pdmsnum(!p1.up, !toMm)
+   !rec = !rec & ' ' & !!pkpm2pdmsnum(!p2.east, !toMm) & ' ' & !!pkpm2pdmsnum(!p2.north, !toMm) & ' ' & !!pkpm2pdmsnum(!p2.up, !toMm)
+   !rec = !rec & ' ' & !!pkpm2pdmsori(!dE, !dN, !dU)
+   !rec = !rec & ' ' & !jusl & ' ' & !meml & ' ' & !!pkpm2pdmsnum(!bang, FALSE)
+   return !rec
+
+endfunction
+-- End of function !!pkpm2pdmssctn

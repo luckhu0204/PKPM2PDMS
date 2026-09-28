@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """S3-v2 GUI 自检：④ 数据库转化 / ⑤ 格式互转 两个新页签（真实 Tk + 真实转换）。
 
-跑法：``python PKPM-JWD导入导出\\test\\_s3_cli\\check_v2_gui.py``
+跑法：``python PKPM2PDMS导入导出\\test\\_s3_cli\\check_v2_gui.py``
 
 不做假：真的建 Tk 窗口；真的按方向切换（并断言不相关的行被隐藏）；真的用界面收集到的
 参数调用 ``cli.run_*``（= 按钮背后的那条路径，见 gui.ToolTab.work）；核对产物与报告。
@@ -127,7 +127,7 @@ def main():
     check(res.exit_code == 0 and os.path.isfile(mac), "GUI 路径生成目录宏成功",
           "rc=%d" % res.exit_code)
     txt = open(mac, "rb").read().decode("ascii", "replace")
-    check("/PKPM_JWD_USER_GUITEST" in txt and "-- clean" not in txt,
+    check("/PKPM2PDMS_USER_GUITEST" in txt and "-- clean" not in txt,
           "容器名带 --suffix 后缀；未勾 --clean ⇒ 无清场块")
     r = json.load(io.open(rep, encoding="utf-8"))
     check((r["db"]["generated"] or {}).get("sprfile") and r["db"]["safety"]["ascii_only"],

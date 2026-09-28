@@ -6,9 +6,9 @@ import sqlite3
 import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-ENG = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\engine"
+ENG = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\engine"
 sys.path.insert(0, ENG)
-OUT = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\_acc_tmp"
+OUT = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\test\_acc_tmp"
 os.makedirs(OUT, exist_ok=True)
 
 import jwd_read, jwd_write, pdt_read  # noqa: E402

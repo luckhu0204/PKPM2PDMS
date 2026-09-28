@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """S3-v2 自检：把本轮 6 组真实命令的产物逐条对照契约（§j/§k/§l/§m/§h）。
 
-跑法：``python PKPM-JWD导入导出\\test\\_s3_cli\\check_v2_cli.py``
+跑法：``python PKPM2PDMS导入导出\\test\\_s3_cli\\check_v2_cli.py``
 
 只读产物与样本原件；不写任何文件。每个检查都打印"实际值"，失败即 FAIL。
 证据口径：命令输出见本文件的 $ 行；行号引用指 ``spec/CONTRACT.md``。

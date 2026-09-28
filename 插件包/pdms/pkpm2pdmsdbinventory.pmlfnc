@@ -1,0 +1,33 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: "PML: Function not found"；P7_export_1: "(46,85) PML: Wrong
+--    Function found"；本工程 lint-pml.ps1 的 PKG-04 同指此文件）。故一函数一文件。
+-- 源     : pkpm2pdmsdbexport.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmsdbinventory
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- 按类型计数清单（预检 + 给 dbparse 的交叉核对提供地面真值）
+-- 类型码全部来自本机安装（见文件头出处）；某类型在该库不存在时得 0，不报错
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsdbinventory() is STRING
+
+   !out = 'INV'
+   !out = !out & '|CATA=' & arraySize(!!collectAllFor('CATA', '', WORLD)).string()
+   !out = !out & '|SPWL=' & arraySize(!!collectAllFor('SPWL', '', WORLD)).string()
+   !out = !out & '|STSE=' & arraySize(!!collectAllFor('STSE', '', WORLD)).string()
+   !out = !out & '|STCA=' & arraySize(!!collectAllFor('STCA', '', WORLD)).string()
+   !out = !out & '|TEXT=' & arraySize(!!collectAllFor('TEXT', '', WORLD)).string()
+   !out = !out & '|DTSE=' & arraySize(!!collectAllFor('DTSE', '', WORLD)).string()
+   !out = !out & '|DATA=' & arraySize(!!collectAllFor('DATA', '', WORLD)).string()
+   !out = !out & '|PTSE=' & arraySize(!!collectAllFor('PTSE', '', WORLD)).string()
+   !out = !out & '|PLIN=' & arraySize(!!collectAllFor('PLIN', '', WORLD)).string()
+   !out = !out & '|GMSE=' & arraySize(!!collectAllFor('GMSE', '', WORLD)).string()
+   !out = !out & '|SPRF=' & arraySize(!!collectAllFor('SPRF', '', WORLD)).string()
+   !out = !out & '|SPEC=' & arraySize(!!collectAllFor('SPEC', '', WORLD)).string()
+   !out = !out & '|SELE=' & arraySize(!!collectAllFor('SELE', '', WORLD)).string()
+   !out = !out & '|SPCO=' & arraySize(!!collectAllFor('SPCO', '', WORLD)).string()
+   return !out
+
+endfunction
+-- End of function !!pkpm2pdmsdbinventory

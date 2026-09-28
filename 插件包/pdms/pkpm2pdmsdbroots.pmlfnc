@@ -1,0 +1,26 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: "PML: Function not found"；P7_export_1: "(46,85) PML: Wrong
+--    Function found"；本工程 lint-pml.ps1 的 PKG-04 同指此文件）。故一函数一文件。
+-- 源     : pkpm2pdmsdbexport.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmsdbroots
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- 自动遍历出导出根：全部 CATALOGUE（CATA）+ 全部 SPWLD（SPWL），空格分隔的全名
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsdbroots() is STRING
+
+   !out = ''
+   !cates = !!collectAllFor('CATA', '', WORLD)
+   do !c values !cates
+      !out = !out & !c.fullName & ' '
+   enddo
+   !spwls = !!collectAllFor('SPWL', '', WORLD)
+   do !w values !spwls
+      !out = !out & !w.fullName & ' '
+   enddo
+   return !out
+
+endfunction
+-- End of function !!pkpm2pdmsdbroots

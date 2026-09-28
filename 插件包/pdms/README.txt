@@ -3,11 +3,11 @@ pdms/ —— PDMS 端 PML 包（**GBK 无 BOM + CRLF**）
 
 计划文件（S2 实施包负责；本目录为其落点）
 ----------------------------------------
-  pkpmjwd_import.pmlfnc    执行 Python 生成的 .mac（或直接读 PDMSDUMP 文本建结构）
-  pkpmjwd_export.pmlfnc    遍历 STRU/FRMW/SBFR/SCTN/PANE/STWALL → 写 PDMSDUMP 文本
-                           格式契约见 spec/CONTRACT.md §c（首行 #PKPM-JWD-PDMSDUMP 1.0）
-  pkpmjwd.pmlfrm           操作窗体（选文件 / 勾选构件类别 / 基点与转角 / 导出）
-  pkpmjwd_run.mac          命令行入口示例（$S- … $S+ 包裹）
+  pkpm2pdms_import.pmlfnc    执行 Python 生成的 .mac（或直接读 PDMSDUMP 文本建结构）
+  pkpm2pdms_export.pmlfnc    遍历 STRU/FRMW/SBFR/SCTN/PANE/STWALL → 写 PDMSDUMP 文本
+                           格式契约见 spec/CONTRACT.md §c（首行 #PKPM2PDMS-PDMSDUMP 1.0）
+  pkpm2pdms.pmlfrm           操作窗体（选文件 / 勾选构件类别 / 基点与转角 / 导出）
+  pkpm2pdms_run.mac          命令行入口示例（$S- … $S+ 包裹）
 
 必须遵守
 --------
@@ -26,7 +26,7 @@ pdms/ —— PDMS 端 PML 包（**GBK 无 BOM + CRLF**）
   D:\AVEVA\Plant\PDMS12.1.SP4\PMLLIB\MYTOOLS\test\Tekla2PDMS\sdnf\functions\sdnfinver3.pmlfnc
                                                                         SCTN 全属性清单（最同构）
 
-导出数据库（目录/规格）—— pkpmjwddbexport.pmlfnc
+导出数据库（目录/规格）—— pkpm2pdmsdbexport.pmlfnc
 ================================================
 
 做什么
@@ -37,12 +37,12 @@ pdms/ —— PDMS 端 PML 包（**GBK 无 BOM + CRLF**）
 
 入口（PML，双击或命令行）
 ------------------------
-  !!pkpmjwddbexport( <输出文件全路径> )       缺省入口：自动遍历根 + 缺省选项
-  !!pkpmjwddbexportWith( <文件>, <根串>, <选项> )  显式给根（空格分隔的元素全名）与选项
-  !!pkpmjwddbroots()                          遍历出根：全部 CATALOGUE(CATA) + 全部 SPWLD(SPWL)
-  !!pkpmjwddbinventory()                      按类型计数（预检 / 给 dbparse 做地面真值核对）
-  !!pkpmjwddbcounts( <元素> )                 某容器的直接子元素按类型计数
-窗体 `pkpmjwd.pmlfrm` 的「③ 导出目录/规格」按钮就是调 `!!pkpmjwddbexport`；
+  !!pkpm2pdmsdbexport( <输出文件全路径> )       缺省入口：自动遍历根 + 缺省选项
+  !!pkpm2pdmsdbexportWith( <文件>, <根串>, <选项> )  显式给根（空格分隔的元素全名）与选项
+  !!pkpm2pdmsdbroots()                          遍历出根：全部 CATALOGUE(CATA) + 全部 SPWLD(SPWL)
+  !!pkpm2pdmsdbinventory()                      按类型计数（预检 / 给 dbparse 做地面真值核对）
+  !!pkpm2pdmsdbcounts( <元素> )                 某容器的直接子元素按类型计数
+窗体 `pkpm2pdms.pmlfrm` 的「③ 导出目录/规格」按钮就是调 `!!pkpm2pdmsdbexport`；
 返回值形如 `OK|file=…|bytes=…|roots=…|cata=…|spwl=…|sprf=…|spco=…|first=…`。
 
 怎么做的（关键：不是手写这份文本）
@@ -108,22 +108,22 @@ pdms/ —— PDMS 端 PML 包（**GBK 无 BOM + CRLF**）
 --------------
 本目录上方「计划文件（S2 实施包负责）」一节的三个文件名是架构包的计划名；
 本次（实施包⑩）按任务要求交付的实际文件名是：
-  `pkpmjwdexport.pmlfnc`（几何导出）、`pkpmjwd.pmlfrm`（窗体）、`pkpmjwdrun.mac`（入口宏）、
-  `pkpmjwddbexport.pmlfnc`（本文件所述的目录/规格导出）。
+  `pkpm2pdmsexport.pmlfnc`（几何导出）、`pkpm2pdms.pmlfrm`（窗体）、`pkpm2pdmsrun.mac`（入口宏）、
+  `pkpm2pdmsdbexport.pmlfnc`（本文件所述的目录/规格导出）。
 
-【R3 新增（契约 §o / 附录 F；S2 落点，**尚未实现**）】
-  pkpmjwduniquename.pmlfnc   `define function !!pkpmjwdUniquename(!base is STRING) is STRING`
+【R3 新增（契约 §o / 附录 F）—— 已实现；R6 起拆成一函数一文件，见文末】
+  pkpm2pdmsuniquename.pmlfnc   `define function !!pkpm2pdmsUniquename(!base is STRING) is STRING`
                              命名唯一化：候选 `原名 → 原名re → 原名re2 … 原名re99`（共 100 个），
                              占用判定 = `VAR !probe EXIST /$!cand` + `handle (2,109)`
                              （出处 abaarealib.pmlfrm:107-114；备选 NEW+handle(41,12)
-                             abaarea.pmlfrm:523-528）；改名记录进全局 `!!pkpmjwdRenames`
+                             abaarea.pmlfrm:523-528）；改名记录进全局 `!!pkpm2pdmsRenames`
                              （`TYPE|原名|实际名`，FAIL 条目以 `'FAIL|'` 开头）；候选耗尽返回
                              空串 ⇒ 宏内故障注入中止（§o.4/§o.5）。逐字夹具 = 契约附录 F.1/F.2。
   * 用户对用户的最终入口是 **pdms-net/ 的 .NET 窗体**（契约 §p，S8 落点）：PDMS 原生菜单
-    「PKPM JWD」→ 窗体；本目录的 PML 窗体/宏保留为开发与无 .NET 环境的执行路径。
+    「PKPM2PDMS」→ 窗体；本目录的 PML 窗体/宏保留为开发与无 .NET 环境的执行路径。
   * v1 的 install/（PML 菜单注入）自 §p.8 起为 legacy，文件保留不删。
 
-命名唯一化（重名加 re）—— pkpmjwduniquename.pmlfnc
+命名唯一化（重名加 re）—— pkpm2pdmsuniquename.pmlfnc
 ==================================================
 
 需求与契约
@@ -133,21 +133,24 @@ pdms/ —— PDMS 端 PML 包（**GBK 无 BOM + CRLF**）
 
 入口
 ----
-  !!pkpmjwdUniquename(!base)   主函数：候选 = base, base&'re', base&'re2'…base&'re99'（共 100 个），
+  !!pkpm2pdmsUniquename(!base)   主函数：候选 = base, base&'re', base&'re2'…base&'re99'（共 100 个），
                                返回第一个可用名；全部占用 ⇒ 记 FAIL 并返回 ''（导入宏的
-                               ONERROR GOLABEL /PKPMJWDERR 会中止整宏，绝不跳过）。
-  !!pkpmjwdRenamesCount()      改名记录条数（窗体统计用）
-  !!pkpmjwdRenamesFailCount()  其中 FAIL 条数
-  !!pkpmjwdRenamesShow()       逐条 $P 输出 TYPE|原名|实际名（窗体「改名清单」按钮）
-预载：入口宏 pkpmjwdrun.mac 先行 `$M "%PMLLIB%/pkpmjwd/pkpmjwduniquename.pmlfnc"`
-（$M 加载 %PMLLIB% 下 .pmlfnc 的本机出处：admin\forms\adminapplic.pmlfrm:205）；
-macgen 生成的导入宏头部也自带同样的 $M 预载行（契约 §o.4 模板）。
+                               ONERROR GOLABEL /PKPM2PDMSERR 会中止整宏，绝不跳过）。
+  !!pkpm2pdmsRenamesCount()      改名记录条数（窗体统计用）
+  !!pkpm2pdmsRenamesFailCount()  其中 FAIL 条数
+  !!pkpm2pdmsRenamesShow()       逐条 $P 输出 TYPE|原名|实际名（窗体「改名清单」按钮）
+预载（R6 起改法，见文末「R6 运行入口与文件拆分」）：不再用 `$M <文件>.pmlfnc` ——
+本机实测 $M 加载 .pmlfnc 无效（(46,80) PML: Invalid syntax in the current context，
+见 验收\实机日志_R4\E_series.txt 与 <PDMS根>\PKPM2PDMS\addin.log）。
+现在由运行入口 `pdms\pkpm2pdmsrunmac.pmlfnc` 的 `!!pkpm2pdmsRunMac` 提前**调用**
+一次 `!!pkpm2pdmsUniquename(...)`，靠 PMLLIB 自动加载（文件名 = 函数名）把函数带进来；
+导入宏本体里不再有任何预载/检查代码。
 
 窗体显示
 --------
-`pkpmjwd.pmlfrm` 的「改名统计」栏在每次「运行导入宏」后显示
+`pkpm2pdms.pmlfrm` 的「改名统计」栏在每次「运行导入宏」后显示
 「本次因重名改名 N 个，失败 M 个（累计 K 条）」——用运行前后
-`!!pkpmjwdRenamesCount()/!!pkpmjwdRenamesFailCount()` 的差值计算；
+`!!pkpm2pdmsRenamesCount()/!!pkpm2pdmsRenamesFailCount()` 的差值计算；
 宏报错（ONERROR 中止）时也能给出统计（$m 包在 handle any / elsehandle any 里）。
 「改名清单」按钮把记录逐条输出到命令窗。窗体不消毁记录；
 report.renames（§o.7）才是唯一真相，生成文件里仍是原名。
@@ -169,8 +172,8 @@ VAR 正常返回时按 (a) 判值（'TRUEA' ⇒ 占用，否则可用）。冻�
 
 与 F.1 的另一处必要偏差：TYPE 通道
 ----------------------------------
-F.1 在函数内读 `!pkpmjwdType`（单 !）。PML 单 ! 变量只在定义作用域可见，
-跨作用域须用双 ! 全局。本函数读 `!!pkpmjwdType`（undefined ⇒ '?'）；
+F.1 在函数内读 `!pkpm2pdmsType`（单 !）。PML 单 ! 变量只在定义作用域可见，
+跨作用域须用双 ! 全局。本函数读 `!!pkpm2pdmsType`（undefined ⇒ '?'）；
 调用方两个名字都赋值，兼容两种作用域模型。
 defined()/undefined() 出处：nucdesogwall.pmlobj:206 / tginjectdesignmenu.pmlfnc:16,33。
 
@@ -180,3 +183,60 @@ defined()/undefined() 出处：nucdesogwall.pmlobj:206 / tginjectdesignmenu.pmlf
 （含任务指定场景：库里已有 NAME、NAMEre ⇒ 返回 NAMEre2；19 项断言）。
 **这是逻辑等价复刻，不是 PML 实机**：本包全程未启动 PDMS、未部署
 （§p.10：不运行 install/deploy、不改 D:/AVEVA、不写 G 盘）。
+
+
+R6 运行入口与文件拆分（2026-09-28）
+====================================
+
+一、本机实测的两条 PDMS 规则（口径来源：验收\实机日志_R4\E_series.txt、F_series.txt、
+    P7_export_1.txt；<PDMS根>\PKPM2PDMS\addin.log）
+------------------------------------------------------------------------------
+1. `$M <文件>.pmlfnc` **无效**：DESIGN 下报 (46,80) PML: Invalid syntax in the
+   current context（E1/E2/E3 三种形态全失败；addin 每次启动的预载也 5/5 FAILED）。
+   —— `$M` 只能跑宏（.mac 命令文件），不能装载函数定义。
+2. `.pmlfnc` 由 PMLLIB **自动加载**，规则 = **文件名（忽略大小写）= 函数名**：
+   * `!!p2pdiag()` 在 `p2pdiag.pmlfnc` 放进 PMLLIB\pkpm2pdms\ 后可直接调用（F1）；
+   * 同一个多函数文件里的第二个函数解析不到 —— "PML: Function not found"（F4 对
+     `!!pkpm2pdmsRenamesCount`）；
+   * 文件名与首个 define 不符时：调用报 (46,85) PML: Wrong Function found -
+     definition for !!pkpm2pdmsexport expected（P7_export_1）。
+   * 新放进 PMLLIB 的文件，重启 PDMS（或 PML REHASH ALL）后才进索引 ——
+     安装后必须重启（install\install.ps1 尾部同款提示）。
+
+二、因此本目录（R6 起）一函数一文件（每个文件的 basename = 函数名，小写）
+------------------------------------------------------------------------------
+  pkpm2pdmsrun.mac             入口宏（开窗体 / 带宏路径跑导入宏）
+  pkpm2pdmsrunmac.pmlfnc       !!pkpm2pdmsRunMac(!macPath) ← 入口函数（预载 + $M + 回传）
+  pkpm2pdmsuniquename.pmlfnc   !!pkpm2pdmsUniquename
+  pkpm2pdmsrenamescount.pmlfnc        !!pkpm2pdmsRenamesCount
+  pkpm2pdmsrenamesfailcount.pmlfnc    !!pkpm2pdmsRenamesFailCount
+  pkpm2pdmsrenamesshow.pmlfnc         !!pkpm2pdmsRenamesShow
+  pkpm2pdmsexport.pmlfnc       !!pkpm2pdmsexport（导出当前模型 → PDMSDUMP 文本）
+  pkpm2pdmsname / num / desp / group / ctype / ori / groupof /
+  sctn / pane / stwall / exportce .pmlfnc    ← 导出函数的 11 个帮手（R6 拆出）
+  pkpm2pdmsdbexport.pmlfnc     目录/规格导出（缺省入口；见本文件上一节）
+  pkpm2pdmsdbexportwith / dbroots / dbinventory / dbcounts / dbdate .pmlfnc
+                               ← 目录/规格导出函数的 5 个帮手（R6 拆出）
+  pkpm2pdms.pmlfrm             PML 操作窗体
+  README.txt                   本文件
+
+  拆分前的三个单体文件（export/uniquename/dbexport）留档在 验收\_R6_pml_split_backup\（函数体逐字节原样切出，
+  见 验收 下 check_pml_balance.py 的静态自查输出）。
+
+三、运行入口的接口约定（.NET 窗体 / PML 窗体 / 命令行三方共用）
+------------------------------------------------------------------------------
+* 入口宏：`$m "<PDMS根>/PMLLIB/pkpm2pdms/pkpm2pdmsrun.mac"`
+  - 无参数  → 只 `show !!pkpm2pdms`（开 PML 窗体），状态置 'FORM|'；
+  - 带参数  → `$m "<入口宏>" "<宏全路径>"`，或先写全局量
+              `!!pkpm2pdmsRunMacPath = '<宏全路径>'` 再无参调用（本宏读完即清空）。
+* 入口函数（推荐 .NET 侧用，一次调用即得返回值）：
+      PmlBridge.RunPmlWithResult("!!pkpm2pdmsRunMac('<宏全路径>')")
+  返回（同一串也写进全局 `!!pkpm2pdmsRunStatus`）：
+      'OK|<宏路径>|renames=<累计改名条数>'
+      'ERR|<宏路径>|<原因>|renames=<n>'
+      'FORM|'                                        （入口宏无参路径）
+* 改名条数真相来源仍是 `!!pkpm2pdmsRenames`（ENGINE_IO.md §6），本入口只做搬运；
+  宏报错（ONERROR GOLABEL /PKPM2PDMSERR → RETURN ERROR）由入口 handle 接住并回 'ERR|…'。
+* 入口函数做两件事：① 提前调用一次 !!pkpm2pdmsUniquename('/PKPM2PDMS_PRELOAD')
+  触发自动加载（失败 ⇒ 返回 ERR 并中止，不静默继续 = 原宏内故障注入的语义）；
+  ② `$M "<宏路径>"` 执行宏。**宏本体不再有预载/可用性检查代码**（问题②）。

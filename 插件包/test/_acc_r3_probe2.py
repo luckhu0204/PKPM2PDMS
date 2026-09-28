@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""探针 R3-2：build.cmd 编译 + PE 解析 + PMLLIB 出处核对 + pkpmjwdrun.mac 预载 + 沙箱幂等/卸载。"""
+"""探针 R3-2：build.cmd 编译 + PE 解析 + PMLLIB 出处核对 + pkpm2pdmsrun.mac 预载 + 沙箱幂等/卸载。"""
 import hashlib
 import io
 import os
@@ -10,7 +10,7 @@ import time
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = r"D:\AI_Work\PKPM数据解析"
-PKG = os.path.join(ROOT, "PKPM-JWD导入导出")
+PKG = os.path.join(ROOT, "PKPM2PDMS导入导出")
 OUT3 = os.path.join(PKG, "test", "_acc_r3_out")
 
 # ---- 1) build.cmd
@@ -19,7 +19,7 @@ p = subprocess.run([os.path.join(PKG, "pdms-net", "build.cmd")], capture_output=
 print("build.cmd exit=%d  %.1fs" % (p.returncode, time.time() - t0))
 print("stdout:", p.stdout.decode("gbk", "replace")[:300])
 print("stderr:", p.stderr.decode("gbk", "replace")[:300])
-dll = os.path.join(PKG, "pdms-net", "dist", "PKPMJWD.dll")
+dll = os.path.join(PKG, "pdms-net", "dist", "PKPM2PDMS.dll")
 print("dll exists:", os.path.isfile(dll), os.path.getsize(dll) if os.path.isfile(dll) else -1)
 b = open(dll, "rb").read()
 print("literal v2.0.50727 in dll:", b"v2.0.50727" in b, "at", b.find(b"v2.0.50727"))
@@ -76,11 +76,11 @@ for rel, a, z, needles in checks:
     print("%s :%d-%d -> %s" % (rel, a, z,
           {n: any(n in l for l in seg) for n in needles}))
 
-# ---- 3) pkpmjwdrun.mac 预载 + Addin 预载
-run_mac = open(os.path.join(PKG, "pdms", "pkpmjwdrun.mac"), "rb").read().decode("gbk")
-print("pkpmjwdrun.mac has $M uniquename:", "pkpmjwduniquename" in run_mac)
-ad = open(os.path.join(PKG, "pdms-net", "PKPMJWDAddin.cs"), encoding="utf-8").read()
-print("Addin preloads pmlfnc:", "pkpmjwduniquename" in ad, "| Start() has $M:", "$M" in ad)
+# ---- 3) pkpm2pdmsrun.mac 预载 + Addin 预载
+run_mac = open(os.path.join(PKG, "pdms", "pkpm2pdmsrun.mac"), "rb").read().decode("gbk")
+print("pkpm2pdmsrun.mac has $M uniquename:", "pkpm2pdmsuniquename" in run_mac)
+ad = open(os.path.join(PKG, "pdms-net", "PKPM2PDMSAddin.cs"), encoding="utf-8").read()
+print("Addin preloads pmlfnc:", "pkpm2pdmsuniquename" in ad, "| Start() has $M:", "$M" in ad)
 
 # ---- 4) 沙箱幂等 + 卸载恢复
 sand = os.path.join(OUT3, "sandbox_idem")
@@ -92,7 +92,7 @@ open(os.path.join(sand, "DesignAddins.xml"), "wb").write(
 open(os.path.join(sand, "DesignCustomization.xml"), "wb").write(
     ('<?xml version="1.0"?>\r\n<UICustomizationFiles>\r\n'
      '  <CustomizationFile Name="TGTEXT" Path="tgtext.uic" />\r\n</UICustomizationFiles>\r\n').encode("utf-8-sig"))
-dep = [sys.executable, os.path.join(PKG, "pdms-net", "deploy", "deploy_pkpmjwd.py"),
+dep = [sys.executable, os.path.join(PKG, "pdms-net", "deploy", "deploy_pkpm2pdms.py"),
        "--pdms-root", sand, "--engine-entry", r"C:\nonexistent\engine.exe"]
 r1 = subprocess.run(dep + ["--execute"], capture_output=True)
 print("deploy#1 exit", r1.returncode)
@@ -103,16 +103,16 @@ r2 = subprocess.run(dep + ["--execute"], capture_output=True)
 print("deploy#2 exit", r2.returncode)
 a2 = open(os.path.join(sand, "DesignAddins.xml"), "rb").read()
 c2 = open(os.path.join(sand, "DesignCustomization.xml"), "rb").read()
-print("idempotent:", a2 == a1 and c2 == c1, "| addins occurrences:", a2.count(b"PKPMJWD"))
-d1 = subprocess.run([sys.executable, os.path.join(PKG, "pdms-net", "deploy", "undeploy_pkpmjwd.py"),
+print("idempotent:", a2 == a1 and c2 == c1, "| addins occurrences:", a2.count(b"PKPM2PDMS"))
+d1 = subprocess.run([sys.executable, os.path.join(PKG, "pdms-net", "deploy", "undeploy_pkpm2pdms.py"),
                      "--pdms-root", sand, "--execute"], capture_output=True)
 print("undeploy exit", d1.returncode)
-bak1 = open(os.path.join(sand, "DesignAddins.xml.pkpmjwd-bak"), "rb").read()
-bak2 = open(os.path.join(sand, "DesignCustomization.xml.pkpmjwd-bak"), "rb").read()
+bak1 = open(os.path.join(sand, "DesignAddins.xml.pkpm2pdms-bak"), "rb").read()
+bak2 = open(os.path.join(sand, "DesignCustomization.xml.pkpm2pdms-bak"), "rb").read()
 now1 = open(os.path.join(sand, "DesignAddins.xml"), "rb").read()
 now2 = open(os.path.join(sand, "DesignCustomization.xml"), "rb").read()
 print("restore byte-equal:", now1 == bak1, now2 == bak2)
-und = os.path.join(sand, "PKPMJWD")
+und = os.path.join(sand, "PKPM2PDMS")
 moved = []
 for dp, dn, fn in os.walk(und):
     for x in fn:

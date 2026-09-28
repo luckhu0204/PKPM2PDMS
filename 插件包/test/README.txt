@@ -37,7 +37,7 @@ test/ —— 测试与证据
 
 【R3 新增（契约 §o/§p 与附录 F/G）】
   check_v3_csc_probe.py     C13：§p.2 编译命令实测 —— csc 3.5 + `/platform:x86` 编译最小 IAddin 桩
-                            （test/_v3_csc_check/stub_pkpmjwd.cs）⇒ 退出码 0、产物 CLR=v2.0.50727、
+                            （test/_v3_csc_check/stub_pkpm2pdms.cs）⇒ 退出码 0、产物 CLR=v2.0.50727、
                             PE machine=I386；旁证样例 TGTEXT.dll（备份副本）同为 CLR2/x86；
                             并核对编译前后 D:\AVEVA 监视文件零变化。当前 0 FAIL
   check_v3_notouch.py       C14：无接触基准（G:\…\PKPM导入导出插件 递归 751 文件 +

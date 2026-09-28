@@ -6,7 +6,7 @@ import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
-P = r'D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\spec\CONTRACT.md'
+P = r'D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\spec\CONTRACT.md'
 KEYS = sys.argv[1:] or ['pdt_write', 'db2pdt', 'pdt2db', 'pdt']
 t = open(P, encoding='utf-8').read().split('\n')
 print('total lines = %d' % len(t))

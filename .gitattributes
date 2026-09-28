@@ -1,0 +1,12 @@
+# 行尾保真（重要，勿删）——本仓库里有多种「字节形态被契约冻结」的文件：
+#   * 插件包/pdms/**.pmlfrm/.pmlfnc/.mac 与 插件包/install/*.ps1 —— GBK 无 BOM + CRLF
+#   * 插件包/engine/section_table.csv —— UTF-8 带 BOM + CRLF，且
+#     engine/sectionlib.py 的 verify_builtin_table() 会对「是否纯 CRLF」与
+#     「去 BOM 后的 sha256」硬校验（见 插件包/engine/sectionlib.py:1086-1104 与
+#     插件包/engine/section_table.meta.json 的 line_ending / output_sha256_no_bom）
+#   * 插件包/pdms-net/*.uic —— UTF-8 无 BOM + LF
+#      （口径见 交付清单.txt 头部「编码」段与 插件包/spec/CONTRACT.md §k.2）
+# 若让 git 做行尾转换（core.autocrlf 等），clone/checkout 出来的字节就会与交付树不同，
+# 直接触发引擎自检的 E-EOL / E-SHA 失败。因此整树关闭行尾转换，
+# 保证 clone 结果与交付树逐字节一致（文本 diff 不受影响）。
+* -text

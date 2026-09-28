@@ -207,8 +207,8 @@ check(bool(comp) and cat and sprf and comp[0][0] == cat[0] and comp[0][1] == spr
 check(fixture.isascii(), '夹具纯 ASCII')
 check('INPUT BEGIN' not in fixture and 'INPUT END' not in fixture, '不写 INPUT BEGIN/END')
 containers = re.findall(r'^NEW (CATALOGUE|SPWLD) (\S+)$', fixture, re.M)
-check(bool(containers) and all(c.startswith('/PKPM_JWD_') for _, c in containers),
-      '容器名全部以 /PKPM_JWD_ 开头', str(containers))
+check(bool(containers) and all(c.startswith('/PKPM2PDMS_') for _, c in containers),
+      '容器名全部以 /PKPM2PDMS_ 开头', str(containers))
 USER_NAMES = ('/PKPM_USER', '/PKPM_STSS', '/PKPMDATA', '/PKPM_USER_SECTION', '/PKPM_LIB')
 hits = [n for n in USER_NAMES
         if re.search(r'^(NEW|OLD|DELETE) \S*\s*' + re.escape(n) + r'(\s|$)', fixture, re.M)]

@@ -2,8 +2,8 @@
 """唯一化函数的逻辑等价自测（CONTRACT v3 §o / 附录 F.1）。
 
 ⚠ 这是 **逻辑等价复刻，不是 PML 实机**：本包全程未启动 PDMS（本轮范围边界），
-  PML 函数 !!pkpmjwdUniquename 本身无法在 Python 里执行。本脚本把
-  pdms/pkpmjwduniquename.pmlfnc 的**算法**逐条复刻成 Python（同一候选序列、
+  PML 函数 !!pkpm2pdmsUniquename 本身无法在 Python 里执行。本脚本把
+  pdms/pkpm2pdmsuniquename.pmlfnc 的**算法**逐条复刻成 Python（同一候选序列、
   同一记录格式、同一 FAIL 语义），对它做单元断言。
 
 与 PML 的对应关系（逐条）：
@@ -12,9 +12,9 @@
         (2,109) 命中 ⇒ 可用（契约 §o.3 写法①冻结语义）
         VAR 正常返回 'FALSEA' ⇒ 可用 / 'TRUEA' ⇒ 占用
       两种结局在逻辑层都归约为「cand 不在 occupied ⇒ 可用」
-  PML `!!pkpmjwdRenames.append(...)`                 → renames.append(...)
-  PML 记录 'TYPE|原名|实际名'（TYPE 取 !!pkpmjwdType） → ('TYPE', 原名, 实际名) 三元组
-  PML `!!pkpmjwdRenames.append('FAIL|' & base & '|' & base & 're99')` + return ''
+  PML `!!pkpm2pdmsRenames.append(...)`                 → renames.append(...)
+  PML 记录 'TYPE|原名|实际名'（TYPE 取 !!pkpm2pdmsType） → ('TYPE', 原名, 实际名) 三元组
+  PML `!!pkpm2pdmsRenames.append('FAIL|' & base & '|' & base & 're99')` + return ''
                                                       → ('FAIL', base, base+'re99') + None
   PML 空基名 append('FAIL||') + return ''             → ('FAIL', '', '') + None
 
@@ -37,23 +37,23 @@ def candidates(base):
 
 
 class PmlWorld:
-    """PML 运行期的最小模型： occupied = 库里已有名字；renames = !!pkpmjwdRenames。"""
+    """PML 运行期的最小模型： occupied = 库里已有名字；renames = !!pkpm2pdmsRenames。"""
 
     def __init__(self, occupied=()):
         self.occupied = set(occupied)
         self.renames = []          # ('TYPE'|'FAIL', 原名, 实际名)
-        self.type_var = None       # !!pkpmjwdType
+        self.type_var = None       # !!pkpm2pdmsType
 
     # PML: var !probe EXIST /$!cand —— 值判定（'TRUEA'=占用）+ (2,109)=可用 的逻辑归约
     def probe_occupied(self, cand):
         return cand in self.occupied
 
-    # PML: !!pkpmjwdUniquename
+    # PML: !!pkpm2pdmsUniquename
     def uniquename(self, base):
         if base is None or len(base) == 0:            # PML: unset / length() le 0
             self.renames.append(('FAIL', '', ''))
             return ''
-        t = self.type_var if self.type_var else '?'   # PML: defined(!!pkpmjwdType)
+        t = self.type_var if self.type_var else '?'   # PML: defined(!!pkpm2pdmsType)
         final = ''
         for idx, cand in enumerate(candidates(base)):  # PML: do !idx from 0 to 99
             if not self.probe_occupied(cand):          # 可用（两种探测结局的归约）
@@ -82,7 +82,7 @@ def check(cond, label, detail=''):
 
 def main():
     print('=' * 76)
-    print('唯一化逻辑等价自测（Python 复刻 pdms/pkpmjwduniquename.pmlfnc；非 PML 实机）')
+    print('唯一化逻辑等价自测（Python 复刻 pdms/pkpm2pdmsuniquename.pmlfnc；非 PML 实机）')
     print('=' * 76)
 
     # 1) 候选序列形状（§o.1）
@@ -107,8 +107,8 @@ def main():
     print('--- 3. 全新库')
     w = PmlWorld()
     w.type_var = 'SITE'
-    got = w.uniquename('/PKPM_JWD')
-    check(got == '/PKPM_JWD', '全新库 → 原名', got)
+    got = w.uniquename('/PKPM2PDMS')
+    check(got == '/PKPM2PDMS', '全新库 → 原名', got)
     check(w.renames == [], '不留改名记录', str(w.renames))
 
     # 4) 仅 NAME 占用 → NAMEre（契约附录 F/check_v3_contract 的同款场景）

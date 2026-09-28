@@ -1,0 +1,25 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: !!pkpm2pdmsRenamesCount -> "PML: Function not found"；
+--    P7_export_1: "(46,85) PML: Wrong Function found"）。故一函数一文件。
+-- 源     : pkpm2pdmsexport.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmsgroupof
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- #SBFR 组名（仅用于 FRMW 直挂构件的情形，本包生成的树走 !sb.name）
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsgroupof(!el is DBREF) is STRING
+
+   if (!el.type eq |PANE|) then
+      return '/SLAB'
+   endif
+   if (!el.type eq |STWALL|) then
+      return '/WALL'
+   endif
+   !p1 = !el.poss
+   !p2 = !el.pose
+   return '/' & !!pkpm2pdmsctype('', !p2.east - !p1.east, !p2.north - !p1.north, !p2.up - !p1.up)
+
+endfunction
+-- End of function !!pkpm2pdmsgroupof

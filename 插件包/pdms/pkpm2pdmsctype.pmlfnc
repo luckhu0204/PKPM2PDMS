@@ -1,0 +1,49 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: !!pkpm2pdmsRenamesCount -> "PML: Function not found"；
+--    P7_export_1: "(46,85) PML: Wrong Function found"）。故一函数一文件。
+-- 源     : pkpm2pdmsexport.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmsctype
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- ctype：优先用所属 SBFR 名（COLUMN/BEAM/HBRACE/VBRACE），否则按几何判定（契约 §c.5）
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsctype(!sbname is STRING, !dE is REAL, !dN is REAL, !dU is REAL) is STRING
+
+   if (!!pkpm2pdmsgroup(!sbname, 'COLUMN')) then
+      return 'COLUMN'
+   endif
+   if (!!pkpm2pdmsgroup(!sbname, 'BEAM')) then
+      return 'BEAM'
+   endif
+   if (!!pkpm2pdmsgroup(!sbname, 'HBRACE')) then
+      return 'HBRACE'
+   endif
+   if (!!pkpm2pdmsgroup(!sbname, 'VBRACE')) then
+      return 'VBRACE'
+   endif
+
+   -- 几何兜底：竖向 → COLUMN；水平 → BEAM；其余斜置 → VBRACE
+   !aE = !dE
+   if (!aE lt 0.0) then
+      !aE = - !aE
+   endif
+   !aN = !dN
+   if (!aN lt 0.0) then
+      !aN = - !aN
+   endif
+   !aU = !dU
+   if (!aU lt 0.0) then
+      !aU = - !aU
+   endif
+   if (!aU gt 1.0) then
+      if (!aE le 1.0 and !aN le 1.0) then
+         return 'COLUMN'
+      endif
+      return 'VBRACE'
+   endif
+   return 'BEAM'
+
+endfunction
+-- End of function !!pkpm2pdmsctype

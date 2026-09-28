@@ -1,4 +1,4 @@
-// PmlBridge.cs - .NET -> PML / PML -> .NET bridge for PKPMJWD.
+// PmlBridge.cs - .NET -> PML / PML -> .NET bridge for PKPM2PDMS.
 // 混写边界（契约 CONTRACT.md §p.4，冻结三层职责）：.NET 只做 UI/参数/进程编排；
 //   PDMS 库内一切取数与执行走 PML；本类是 .NET 调 PML 的唯一接缝。
 //
@@ -19,7 +19,7 @@
 using System;
 using PmlCommand = Aveva.Pdms.Utilities.CommandLine.Command;   // recon §2.1：避免 CS0104 二义
 
-namespace PKPMJWD
+namespace PKPM2PDMS
 {
     public static class PmlBridge
     {
@@ -60,7 +60,7 @@ namespace PKPMJWD
         }
 
         // 契约 §p.4 冻结方法 3：object ImportDotnet(string dllPathNoExt, string ns, string className)
-        // PML->.NET 方向：把 .NET 程序集注入 PML 并实例化到 PML 全局 !!pkpmjwdImported，
+        // PML->.NET 方向：把 .NET 程序集注入 PML 并实例化到 PML 全局 !!pkpm2pdmsImported，
         // 之后 PML 侧可直接调用该对象（recon §3.5B 的 SolidSupport 实战写法）。
         // 返回值：成功 = 所用的 PmlCommand 对象（可查 .Result）；失败 = null。
         public static object ImportDotnet(string dllPathNoExt, string ns, string className)
@@ -71,7 +71,7 @@ namespace PKPMJWD
                 "handle any\n" +
                 "endhandle\n" +
                 "using namespace '" + ns + "'\n" +
-                "!!pkpmjwdImported = object " + className + "()";
+                "!!pkpm2pdmsImported = object " + className + "()";
             PmlCommand c = PmlCommand.CreateCommand(pml);          // recon §3.4
             if (c == null) return null;
             if (!c.Run())

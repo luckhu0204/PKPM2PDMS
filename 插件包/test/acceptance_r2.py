@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""PKPM-JWD导入导出 —— 独立验收测试 R2（14 条 = v1 的 7 条 + 计划 §9.4 的 9–14）。
+"""PKPM2PDMS导入导出 —— 独立验收测试 R2（14 条 = v1 的 7 条 + 计划 §9.4 的 9–14）。
 
 用法（工作目录 = 工作区根 ``D:\\AI_Work\\PKPM数据解析``）::
 
-    python PKPM-JWD导入导出/test/acceptance_r2.py
+    python PKPM2PDMS导入导出/test/acceptance_r2.py
 
 输出：逐条结论文本 + **最后一行**机器可读汇总 JSON
 ``{"passed":true,"passedCount":14,"failedCount":0}``（键名 ASCII）。全通过 ⇒ 退出码 0；
@@ -18,7 +18,7 @@
   ``PDMSxCA_Addin121.dll`` 字节里搜 UTF-16LE 格式串；``engine/`` 只作为**被测对象**被调用
   （``cli.py`` 子进程）。
 * 确定性：不依赖时间/随机/网络（生成的宏内日期不参与比对）；只读用户原件；
-  自建产物写入 ``PKPM-JWD导入导出/test/_acceptance_r2_out/``，不删除任何文件。
+  自建产物写入 ``PKPM2PDMS导入导出/test/_acceptance_r2_out/``，不删除任何文件。
 """
 
 from __future__ import annotations
@@ -48,6 +48,9 @@ SAMPLE_JWD = os.path.join(SAMPLE_DIR, "JLCJ2.jwd")
 SAMPLE_PDT = os.path.join(SAMPLE_DIR, "1_PM.pdt")
 SAMPLE_MAP = os.path.join(SAMPLE_DIR, "PKPM转PDMS截面匹配文件.txt")
 SAMPLE_DB = os.path.join(SAMPLE_DIR, "PKPM（PDMS数据库）.txt")
+
+#: 〔R7〕建模型宏的 SITE 名（引擎必填参数；由 .NET 侧直查试出后传入，引擎不改名）
+SITE_NAME = "/PKPM2PDMS"
 SAMPLE_DLL = os.path.join(SAMPLE_DIR, "P-TRANS", "PDMSxCA_Addin121.dll")
 RECON_DBSECT = os.path.join(ROOT, "_recon", "dbsect")
 DLL_TOKENS = os.path.join(RECON_DBSECT, "_dll_tokens.json")
@@ -336,29 +339,21 @@ def _fields(text):
 def macro_levels(path):
     """→ (FRMW 名列表, 分组内的 U 集合, 各 SBFR 下 SCTN/PANE/STWALL 条数)
 
-    两种宏格式都支持（契约 v3 / §o.4：R3 起每个具名 NEW 的名字经唯一化函数走 $!n 变量，
-    字面名被 acceptance_r3 检查 20 冻结为禁止项 literal_named==0）：
-      v1/R2 字面形：NEW FRMW /STL_FRAME/EL1     → 名 = 行尾 token
-      R3 变量形：  !n = !!pkpmjwdUniquename('/STL_FRAME/EL1') + NEW FRMW $!n
-                   → 名 = 唯一化调用的**基名实参**（意图名）
+    〔R7 命名方案〕名字 = /<SITE名>_<段>；底层 SCTN/PANE/STWALL 一律**无名**创建：
+      R7 形：NEW FRMW /PKPM2PDMS_EL1 → 名 = 行尾 token（`_EL<n>` 段即层号）
+      v1/R2 字面形（历史宏，仍容忍）：NEW FRMW /STL_FRAME/EL1 → 名 = 行尾 token
     """
     lines = _lines_gbk(path)
     frmw, cur, us = [], None, collections.defaultdict(set)
     counts = collections.Counter()
     group = None
-    call_re = re.compile(r"!\w+\s*=\s*!!pkpmjwdUniquename\('(.+)'\)")
-    pending = None
     for ln in lines:
         s = ln.strip()
-        mo = call_re.match(s)
-        if mo:
-            pending = mo.group(1)
-            continue
         if s.startswith("NEW FRMW"):
-            cur = pending if pending else s.split()[-1]
+            cur = s.split()[-1]
             frmw.append(cur)
         elif s.startswith("NEW SBFR"):
-            group = pending if pending else s.split()[-1]
+            group = s.split()[-1]
         elif s.startswith("NEW SCTN") and group:
             counts["SCTN" + group] += 1
         elif s.startswith("NEW PANE"):
@@ -691,11 +686,14 @@ def check_10(ch, raw_pdt):
     mac_j = os.path.join(OUT, "r2_jwd2pdms.mac")
     mac_p = os.path.join(OUT, "r2_pdt2pdms.mac")
     c1, o1, e1 = _run(["jwd2pdms", SAMPLE_JWD, "--out", mac_j,
-                       "--report", os.path.join(OUT, "r2_jwd2pdms.report.json")])
+                       "--report", os.path.join(OUT, "r2_jwd2pdms.report.json"),
+                       "--site-name", SITE_NAME])
     c2, o2, e2 = _run(["pdt2pdms", SAMPLE_PDT, "--out", mac_p,
-                       "--report", os.path.join(OUT, "r2_pdt2pdms.report.json")])
+                       "--report", os.path.join(OUT, "r2_pdt2pdms.report.json"),
+                       "--site-name", SITE_NAME])
     det.append("命令：jwd2pdms JLCJ2.jwd → r2_jwd2pdms.mac（退出码 %d）；"
-               "pdt2pdms 1_PM.pdt → r2_pdt2pdms.mac（退出码 %d）" % (c1, c2))
+               "pdt2pdms 1_PM.pdt → r2_pdt2pdms.mac（退出码 %d）；"
+               "两侧 --site-name %s（〔R7〕引擎必填、不改名）" % (c1, c2, SITE_NAME))
     for f in (mac_j, mac_p):
         blob = _read(f)
         try:
@@ -743,10 +741,11 @@ def check_10(ch, raw_pdt):
                % (sorted(v[1] for v in raw_j["level"].values()), want_j))
     det.append("独立锚②（.pdt → 我自算）：$NODECOOR 不同 Z %d 个（%s）；构件/板/墙环端点 Z %d 个"
                % (len(node_z), node_z, len(sorted(elem_z))))
-    # 层数锚：FRMW 的 /STL_FRAME/ELn 个数 == 该样本的 Level 数
-    n_level_j = len([f for f in fj if f.startswith("/STL_FRAME/EL")])
-    n_level_p = len([f for f in fp if f.startswith("/STL_FRAME/EL")])
-    det.append("FRMW：jwd 宏 %d 个 /STL_FRAME/ELn（原始 .jwd 有 %d 层）；"
+    # 层数锚：FRMW 的 `_EL<n>` 个数 == 该样本的 Level 数（〔R7〕名 = /<SITE名>_EL<n>；
+    # 另有 `_FW`（板墙）与 `_GR`（轴网）两个 FRMW，不带层号，不计入）
+    n_level_j = len([f for f in fj if re.search(r"_EL\d+$", f)])
+    n_level_p = len([f for f in fp if re.search(r"_EL\d+$", f)])
+    det.append("FRMW：jwd 宏 %d 个 `_EL<n>`（原始 .jwd 有 %d 层）；"
                "pdt 宏 %d 个（$NODECOOR 不同 Z %d 个）"
                % (n_level_j, len(raw_j["level"]), n_level_p, len(node_z)))
     if n_level_j != len(raw_j["level"]):
@@ -981,7 +980,7 @@ def check_11(ch):
 # 检查 12：数据库导入（jwd2db / pdt2db 覆盖 + 宏结构 + 只动本包容器）
 # --------------------------------------------------------------------------
 USER_CONTAINERS = ("/PKPM_USER", "/PKPM_STSS", "/PKPMDATA", "/PKPM_USER_SECTION", "/PKPM_LIB")
-OWN_CONTAINERS = ("/PKPM_JWD_USER", "/PKPM_JWD_STSS", "/PKPM_JWD_USER_SECTION", "/PKPM_JWD_LIB")
+OWN_CONTAINERS = ("/PKPM2PDMS_USER", "/PKPM2PDMS_STSS", "/PKPM2PDMS_USER_SECTION", "/PKPM2PDMS_LIB")
 
 
 def _resolve_specs(fwd, sec_list):
@@ -1089,8 +1088,8 @@ def _macro_structure_checks(tag, path, det, errs):
         errs.append("%s：宏内操作了用户既有容器：%s" % (tag, hits[:5]))
     containers = [s["name"] for s in db.by_type("CATALOGUE", "NEW")] + \
                  [s["name"] for s in db.by_type("SPWLD", "NEW")]
-    det.append("   [%s] 新建容器：%s（要求 /PKPM_JWD_ 前缀）" % (tag, containers))
-    if not all(c.startswith("/PKPM_JWD_") for c in containers):
+    det.append("   [%s] 新建容器：%s（要求 /PKPM2PDMS_ 前缀）" % (tag, containers))
+    if not all(c.startswith("/PKPM2PDMS_") for c in containers):
         errs.append("%s：新建容器名不在本包前缀下：%s" % (tag, containers))
     # 同一父级内重名（PDMS 无 OVERRIDE，重名必失败）
     dup = []
@@ -1454,13 +1453,13 @@ def main(argv=None):
         except Exception:
             pass
     ap = argparse.ArgumentParser(
-        description="PKPM-JWD导入导出 独立验收测试 R2（v1 的 7 条 + 计划 §9.4 的 9–14）",
+        description="PKPM2PDMS导入导出 独立验收测试 R2（v1 的 7 条 + 计划 §9.4 的 9–14）",
         epilog="v1 的 7 条由 test/acceptance.py 的检查函数执行（验收标准允许复用）。")
     ap.parse_args(list(argv) if argv is not None else None)
     os.makedirs(OUT, exist_ok=True)
 
     print("=" * 78)
-    print(" PKPM-JWD导入导出 验收测试 R2（14 条：v1 的 7 条 + 计划 §9.4 的 9–14）")
+    print(" PKPM2PDMS导入导出 验收测试 R2（14 条：v1 的 7 条 + 计划 §9.4 的 9–14）")
     print("=" * 78)
     print("工作区根 : %s" % ROOT)
     print("交付包   : %s" % PKG)

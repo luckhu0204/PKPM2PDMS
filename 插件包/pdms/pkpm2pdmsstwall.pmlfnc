@@ -1,0 +1,70 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: !!pkpm2pdmsRenamesCount -> "PML: Function not found"；
+--    P7_export_1: "(46,85) PML: Wrong Function found"）。故一函数一文件。
+-- 源     : pkpm2pdmsexport.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmsstwall
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- #STWALL 记录（契约 §c.2 / §c.5）；厚度尾部取不到时整段省略
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsstwall(!el is DBREF, !toMm is BOOLEAN) is STRING
+
+   !p1 = !el.poss
+   !p2 = !el.pose
+
+   -- 〔R6 实机修复·handle 语义〕块体只在报错时执行 -> 语句移出，块只兜错。
+   !h = 0.0
+   !h = !el.heig
+   handle any
+      !h = 0.0
+   endhandle
+
+   -- 〔R7 实机修复·空值哨兵〕与 pkpm2pdmssctn 同一类缺陷：SPRE 为空串时 handle 块不触发，
+   --   !rec 里写出空 token，读方按契约 §c.3.4 只认 10/12 个 token -> E-PARSE。
+   --   契约 §c.3.5 的 '-' 是「无规格」哨兵，故空串/unset 一律回落 '-'。
+   !spre = '-'
+   !praw = !el.spre.flnn
+   handle any
+      !praw = ''
+   endhandle
+   if (!praw.unset().not()) then
+      if (!praw.length() gt 0) then
+         !spre = !praw
+      endif
+   endif
+   if (!spre eq '-') then
+      -- 兜底：若该墙把规格挂在 SPREF 上（契约 §12#2 的反例写法），也照实导出
+      -- 〔R6 实机修复·handle 语义〕同上：if 块移出，handle 只兜错。
+      -- 〔R7 实机修复·空值哨兵〕与上面同理：空串也算"没有"，落回 '-' 哨兵。
+      !praw = !el.spref.flnn
+      handle any
+         !praw = ''
+      endhandle
+      if (!praw.unset().not()) then
+         if (!praw.length() gt 0) then
+            !spre = !praw
+         endif
+      endif
+   endif
+
+   !rec = '#STWALL ' & !!pkpm2pdmsname(!el.name) & ' ' & !spre & ' ' & !!pkpm2pdmsnum(!h, !toMm)
+   !rec = !rec & ' ' & !!pkpm2pdmsnum(!p1.east, !toMm) & ' ' & !!pkpm2pdmsnum(!p1.north, !toMm) & ' ' & !!pkpm2pdmsnum(!p1.up, !toMm)
+   !rec = !rec & ' ' & !!pkpm2pdmsnum(!p2.east, !toMm) & ' ' & !!pkpm2pdmsnum(!p2.north, !toMm) & ' ' & !!pkpm2pdmsnum(!p2.up, !toMm)
+
+   -- 〔R6 实机修复·handle 语义〕块体只在报错时执行 -> 语句移出，块只兜错。
+   !tOk = TRUE
+   !t = !el.desp[1]
+   handle any
+      !tOk = FALSE
+   endhandle
+   if (!tOk.eq(TRUE)) then
+      if (!t.unset().not()) then
+         !rec = !rec & ' ~ ' & !!pkpm2pdmsnum(!t, !toMm)
+      endif
+   endif
+   return !rec
+
+endfunction
+-- End of function !!pkpm2pdmsstwall

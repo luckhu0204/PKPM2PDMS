@@ -6,7 +6,7 @@
 """
 import os
 
-P = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\pdms\pkpmjwduniquename.pmlfnc"
+P = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\pdms\pkpm2pdmsuniquename.pmlfnc"
 
 raw = open(P, "rb").read()
 t = raw.decode("gbk")

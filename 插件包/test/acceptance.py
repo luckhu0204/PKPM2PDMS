@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""PKPM-JWD导入导出 —— **独立验收测试**（7 条验收标准，逐条实现为检查项）。
+"""PKPM2PDMS导入导出 —— **独立验收测试**（7 条验收标准，逐条实现为检查项）。
 
 用法（工作目录 = 工作区根 ``D:\\AI_Work\\PKPM数据解析``）::
 
-    python PKPM-JWD导入导出/test/acceptance.py
-    python PKPM-JWD导入导出/test/acceptance.py --allow-unresolved-sections   # 见下
+    python PKPM2PDMS导入导出/test/acceptance.py
+    python PKPM2PDMS导入导出/test/acceptance.py --allow-unresolved-sections   # 见下
 
 输出：先打印逐条结论与关键数字；**最后一行**打印机器可读的汇总 JSON
 ``{"passed":true,"passedCount":7,"failedCount":0}``（键名 ASCII）。全部通过 ⇒ 退出码 0；
@@ -18,7 +18,7 @@
 * 重算用到的规则只来自 ``spec/CONTRACT.md``（§a.3 z 推导、§a.4 ShapeVal 解码、
   §a.5 几何公式、§e.1 候选键与四级优先级），并在本文件内**另行实现**一份。
 * 测试确定性：不依赖时间/随机/网络；只读用户原件；自建产物写入
-  ``PKPM-JWD导入导出/test/_acceptance_out/``（同目录同名文件覆盖写，不删除任何文件）。
+  ``PKPM2PDMS导入导出/test/_acceptance_out/``（同目录同名文件覆盖写，不删除任何文件）。
 
 一处**曾经**的判据与契约冲突（现已由契约变更消解，本测试**未**放宽任何判定）
 --------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ import sys
 # 路径（本文件位置推导；样本路径来自验收标准）
 # --------------------------------------------------------------------------
 HERE = os.path.dirname(os.path.abspath(__file__))
-PKG = os.path.dirname(HERE)                      # PKPM-JWD导入导出/
+PKG = os.path.dirname(HERE)                      # PKPM2PDMS导入导出/
 ROOT = os.path.dirname(PKG)                      # 工作区根
 ENGINE = os.path.join(PKG, "engine")
 OUT = os.path.join(HERE, "_acceptance_out")      # 自建产物（可重复覆盖）
@@ -68,8 +68,11 @@ SAMPLE_MAP = os.path.join(SAMPLE_DIR, "PKPM转PDMS截面匹配文件.txt")
 EXTRA_MAP = os.path.join(ENGINE, "secmap_extra.txt")
 CLI = os.path.join(ENGINE, "cli.py")
 
+#: 〔R7〕建模型宏的 SITE 名（引擎必填参数；由 .NET 侧直查试出后传入，引擎不改名）
+SITE_NAME = "/PKPM2PDMS"
+
 PDMS_PKG = os.path.join(PKG, "pdms")
-PDMS_FILES = ("pkpmjwd.pmlfrm", "pkpmjwdexport.pmlfnc", "pkpmjwdrun.mac")
+PDMS_FILES = ("pkpm2pdms.pmlfrm", "pkpm2pdmsexport.pmlfnc", "pkpm2pdmsrun.mac")
 INSTALL_PS1 = os.path.join(PKG, "install", "install.ps1")
 PDMS_ROOT = r"D:\AVEVA\Plant\PDMS12.1.SP4"
 DESIGN_UIC = os.path.join(PDMS_ROOT, "design.uic")
@@ -467,9 +470,10 @@ def check_1(ch, raw, allow_unresolved):
     mac = os.path.join(OUT, "JLCJ2.mac")
     rep_path = os.path.join(OUT, "JLCJ2.report.json")
     code, out, err = _run([sys.executable, CLI, "jwd2pdms", SAMPLE_JWD,
-                           "--out", mac, "--report", rep_path])
+                           "--out", mac, "--report", rep_path,
+                           "--site-name", SITE_NAME])
     det.append("命令：python engine/cli.py jwd2pdms <样本 JLCJ2.jwd> --out _acceptance_out/JLCJ2.mac"
-               " --report _acceptance_out/JLCJ2.report.json")
+               " --report _acceptance_out/JLCJ2.report.json --site-name %s" % SITE_NAME)
     det.append("退出码 = %d" % code)
     if code != 0:
         errs.append("jwd2pdms 退出码 %d ≠ 0" % code)
@@ -506,21 +510,18 @@ def check_1(ch, raw, allow_unresolved):
     det.append("无 BOM、孤立 LF = %d" % lone)
 
     # --- 计数：按 SBFR 分组数 NEW SCTN / NEW PANE（期望值取自原始 .jwd 行数）
-    # 两种宏格式都支持（契约 v3 / §o.4：R3 起每个具名 NEW 的名字经唯一化函数走 $!n 变量，
-    # 字面名为**禁止**项——acceptance_r3 检查 20 断言 literal_named==0）：
-    #   v1/R2 字面形：NEW SBFR /BEAM          → 组名 = 行尾 token
-    #   R3 变量形：  !n = !!pkpmjwdUniquename('/BEAM') + NEW SBFR $!n
-    #                → 组名 = 唯一化调用的**基名实参**（意图名）
-    group, got, pending = None, {}, None
-    call_re = re.compile(r"!\w+\s*=\s*!!pkpmjwdUniquename\('(.+)'\)")
+    # 〔R7 命名方案〕SBFR 名 = /<SITE名>_EL<层号>_<类别段>（类别段 ∈ COLUMN/BEAM/HBRACE/
+    # VBRACE/SLAB/WALL），底层 SCTN/PANE 一律无名创建 ⇒ 组名取自 SBFR 名的**类别段**：
+    #   R7 形：NEW SBFR /PKPM2PDMS_EL1_BEAM   → 组名 = /BEAM
+    #   v1/R2 字面形（历史宏，仍容忍）：NEW SBFR /BEAM → 组名 = /BEAM
+    group, got = None, {}
+    seg_re = re.compile(r"_(COLUMN|BEAM|HBRACE|VBRACE|SLAB|WALL)$")
     for ln in text.split("\r\n"):
         s = ln.strip()
-        mo = call_re.match(s)
-        if mo:
-            pending = mo.group(1)
-            continue
         if s.startswith("NEW SBFR"):
-            group = pending if pending else s.split()[-1]
+            tok = s.split()[-1]
+            mo = seg_re.search(tok)
+            group = "/" + (mo.group(1) if mo else tok.lstrip("/"))
         elif s.startswith("NEW SCTN") and group:
             got[group] = got.get(group, 0) + 1
         elif s.startswith("NEW PANE"):
@@ -1176,9 +1177,9 @@ def check_5(ch, raw):
 # ==========================================================================
 #: 本测试自造的 dump 文本（依据契约 §c.2/§c.4 的文法；GBK+CRLF 写盘）
 FIXTURE_DUMP = [
-    "#PKPM-JWD-PDMSDUMP 1.0",
+    "#PKPM2PDMS-PDMSDUMP 1.0",
     "UNITS mm",
-    "#SITE /PKPM_JWD",
+    "#SITE /PKPM2PDMS",
     "#ZONE /ACCTEST",
     "#STRU /MAINFRAME",
     "#FRMW /STL_FRAME/EL1",
@@ -1380,7 +1381,7 @@ def main(argv=None):
         except Exception:
             pass
     ap = argparse.ArgumentParser(
-        description="PKPM-JWD导入导出 独立验收测试（7 条验收标准）",
+        description="PKPM2PDMS导入导出 独立验收测试（7 条验收标准）",
         epilog="默认按字面判定「每个构件都有 SPREF 或 DESP」（本样本 811/811，含契约 §e.1a 的 "
                "12 根 Kind=3 推断圆形构件）；--allow-unresolved-sections 只是诊断开关，"
                "把该句放宽为「SPREF/DESP 或契约 §d.4-2 的显式 UNRESOLVED 标记」，不是通过路径。")
@@ -1390,7 +1391,7 @@ def main(argv=None):
 
     os.makedirs(OUT, exist_ok=True)
     print("=" * 78)
-    print(" PKPM-JWD导入导出 验收测试（独立复算；确定性）")
+    print(" PKPM2PDMS导入导出 验收测试（独立复算；确定性）")
     print("=" * 78)
     print("工作区根 : %s" % ROOT)
     print("交付包   : %s" % PKG)

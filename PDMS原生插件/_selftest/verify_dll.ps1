@@ -1,9 +1,9 @@
-# verify_dll.ps1 - acceptance check for pdms-net\dist\PKPMJWD.dll
+# verify_dll.ps1 - acceptance check for pdms-net\dist\PKPM2PDMS.dll
 # 1) [System.Reflection.AssemblyName]::GetAssemblyName()  (ask-named check)
 # 2) ReflectionOnlyLoadFrom -> ImageRuntimeVersion (CLR version)
 # 3) manual PE header parse -> machine type (0x014c = I386 x86)
 $ErrorActionPreference = 'Stop'
-$dll = Join-Path $PSScriptRoot '..\dist\PKPMJWD.dll'
+$dll = Join-Path $PSScriptRoot '..\dist\PKPM2PDMS.dll'
 if (-not (Test-Path $dll)) { Write-Host 'FAIL: DLL not found'; exit 1 }
 $item = Get-Item $dll
 Write-Host ('DLL path : ' + $item.FullName)
@@ -26,7 +26,7 @@ $machineTxt = ' (NOT I386!)'
 if ($machine -eq 0x14C) { $machineTxt = ' (I386, x86)' }
 Write-Host ('PE: e_lfanew=0x' + $e_lfanew.ToString('X') + ' machine=0x' + $machine.ToString('X') + $machineTxt)
 
-$ok = ($asm.ImageRuntimeVersion -eq 'v2.0.50727') -and ($machine -eq 0x14C) -and ($an.Name -eq 'PKPMJWD')
-if ($ok) { Write-Host 'RESULT: OK (CLR v2.0.50727 + I386 + name PKPMJWD)'; exit 0 }
+$ok = ($asm.ImageRuntimeVersion -eq 'v2.0.50727') -and ($machine -eq 0x14C) -and ($an.Name -eq 'PKPM2PDMS')
+if ($ok) { Write-Host 'RESULT: OK (CLR v2.0.50727 + I386 + name PKPM2PDMS)'; exit 0 }
 Write-Host 'RESULT: FAIL'
 exit 2

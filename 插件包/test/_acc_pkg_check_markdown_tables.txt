@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\check_markdown_tables.py", line 9, in <module>
-    lines = open(path, encoding='utf-8').read().split('\n')
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: 'spec/CONTRACT.md'

@@ -1,0 +1,276 @@
+------------------------------------------------------------------------------
+-- PKPM2PDMS导入导出 —— 操作窗体（对应 CONTRACT v1.0 §c / §d）
+-- 文件   : pkpm2pdms.pmlfrm        落盘: GBK 无 BOM + CRLF，注释一律用 --
+-- 入口   : show !!pkpm2pdms        （命令行 / 入口宏 pkpm2pdmsrun.mac / design.uic 菜单）
+-- 功能   : ① 运行导入宏（Python 侧 macgen 生成的 .mac）；R6 起经运行入口
+--             !!pkpm2pdmsRunMac 执行（入口先确保唯一化函数可用，再 $M 该宏；
+--             本机实测 $M .pmlfnc 无效，故预载不能在宏/入口里用 $M ——
+--             见 pdms\pkpm2pdmsrunmac.pmlfnc 文件头与 pdms\README.txt）
+--          ② 导出当前模型到 #PKPM2PDMS-PDMSDUMP 文本（调用 !!pkpm2pdmsexport）
+--          ④ 命名唯一化统计：导入宏自动对重名加 re/re2/…（CONTRACT v3 §o），
+--            运行前后调 !!pkpm2pdmsRenamesCount()/!!pkpm2pdmsRenamesFailCount()
+--            算出「本次因重名改名 N 个」并显示；「改名清单」按钮逐条输出
+-- 语法出处（均为本机 PMLLIB 内既有写法，未自造窗体语法）：
+--   setup form !!名 resizeable / title / path down / path right
+--        mypml\forms\StlGrating.pmlfrm:7-22     common\forms\runmacro.pmlfrm:28-37
+--   text .x '标签' tagwid $!n width m is string / !this.x.val = 值
+--        mypml\forms\StlGrating.pmlfrm:13-14
+--   para .x '文本'                          SBSPEC\forms\sbspectools.pmlfrm:24
+--   button .x '标题' width n callback '!this.m()' / reset
+--        mypml\forms\StlGrating.pmlfrm:20,22
+--   $m "$!局部变量" 运行宏                    aba\Forms\abafilelist.pmlfrm:367
+--   $m "$!this.<成员>" 运行宏                 common\forms\runmacro.pmlfrm:76-86
+--   object FILE / .exists                   common\forms\runmacro.pmlfrm:55-57
+--   !!alert.message('…')                    aba\Forms\ababatchmode.pmlfrm:573
+--   $P 输出到命令窗                          accommodation\forms\accclnheight.pmlfrm:238
+--   字符串 .length()/.dbref()/.badref()/.string()/.before()/.replace()
+--        common\functions\findfirstmember.pmlfnc:41
+--        aba\Forms\abaarea.pmlfrm:271,275
+--        common\functions\deleteselection.pmlfnc:63
+--        aba\Functions\abamisslabel.pmlfnc:242   aba\Forms\ababatchmode.pmlfrm:375
+--   !this.kill() 关闭窗体                    accommodation\forms\stchooseselection.pmlfrm:424
+------------------------------------------------------------------------------
+setup form !!pkpm2pdms resizeable
+   title 'PKPM2PDMS 导入导出'
+   !tw = 26
+
+   path down
+   para .line1 text '① 运行导入宏：填写 Python 侧 macgen 生成的 .mac 全路径'
+   path down
+   text .macroPath '宏文件' tagwid $!tw width 62 is string
+   path right
+   button .runMac '运行导入宏' width 16 callback '!this.runMac()'
+   path down
+   text .renCount '改名统计' tagwid $!tw width 62 is string
+   !this.renCount.val = '尚未运行导入宏'
+   path right
+   button .showRenames '改名清单' width 12 callback '!this.showRenames()'
+
+   path down
+   para .line2 text '② 导出当前模型到文本：#PKPM2PDMS-PDMSDUMP 1.0（GBK）'
+   path down
+   text .scopePath '导出范围' tagwid $!tw width 62 is string
+   path right
+   button .pickCE '取当前元素' width 16 callback '!this.pickCE()'
+
+   path down
+   text .dumpPath '导出文件' tagwid $!tw width 62 is string
+   !this.dumpPath.val = '%PDMSUSER%\pkpm2pdms_dump.txt'
+   path right
+   button .runExp '导出当前模型到文本' width 22 callback '!this.runExp()'
+
+   path down
+   para .line6 text '③ 导出数据库（目录/规格）：PDMS DB Listing 文本，供 Python 侧 dbparse 解析'
+   path down
+   text .dbPath '导出文件' tagwid $!tw width 62 is string
+   !this.dbPath.val = '%PDMSUSER%/pkpm2pdms_dboutput.txt'
+   path right
+   button .runDb '导出目录/规格' width 16 callback '!this.runDb()'
+
+   path down
+   text .status '状态' tagwid $!tw width 62 is string
+   !this.status.val = '就绪'
+   path right
+   button .reset '复位' width 8 reset
+   path right
+   button .close '关闭' width 8 callback '!this.close()'
+
+   path down
+   para .line3 text '说明：导出范围留空 = 当前元素（!!CE）所在 SITE；'
+   path down
+   para .line4 text '      导出文件缺省写到 %PDMSUSER%/pkpm2pdms_dump.txt'
+   path down
+   para .line5 text '      命令行入口： $m "%PMLLIB%/pkpm2pdms/pkpm2pdmsrun.mac"'
+   path down
+   para .line7 text '      命令行导出目录/规格： !!pkpm2pdmsdbexport( <输出文件> )'
+   path down
+   para .line8 text '      地面真值计数：       !!pkpm2pdmsdbinventory()'
+   path down
+   para .line9 text '      唯一化：导入宏对重名自动加 re/re2/…（CONTRACT v3 §o）；'
+   path down
+   para .lineA text '      改名清单按钮把 TYPE|原名|实际名 逐条输出到命令窗'
+exit
+
+
+------------------------------------------------------------------------------
+-- 取当前元素 !!CE 的路径作为导出范围
+------------------------------------------------------------------------------
+define method .pickCE()
+   !this.scopePath.val = !!ce.string()
+   !this.status.val = '已取当前元素： ' & !this.scopePath.val
+endmethod
+-- End of method .pickCE
+
+
+------------------------------------------------------------------------------
+-- ① 运行导入宏：R6 起经运行入口 !!pkpm2pdmsRunMac（pdms\pkpm2pdmsrunmac.pmlfnc）
+--    执行；入口内 $M "<宏全路径>"（$m 全路径的出处 aba\Forms\abafilelist.pmlfrm:367
+--    与 common\forms\runmacro.pmlfrm:76-86）
+------------------------------------------------------------------------------
+define method .runMac()
+   !p = !this.macroPath.val
+   if (!p.unset() or !p.length() le 0) then
+      !this.status.val = '请先填写导入宏的完整路径'
+      !!alert.message('请先填写导入宏的完整路径')
+      return
+   endif
+   !f = object FILE(!p)
+   if (!f.exists().not()) then
+      !this.status.val = '宏文件不存在： ' & !p
+      !!alert.message('宏文件不存在： ' & !p)
+      return
+   endif
+   !this.status.val = '正在运行导入宏 …'
+   $P PKPM2PDMS：开始运行导入宏 $!p
+
+   -- 运行前取改名记录基线（函数未加载时 handle any 兜底，t0/f0 保持 -1）
+   !t0 = -1
+   !f0 = -1
+   -- 〔R6 实机修复·handle 语义〕块体只在报错时执行 -> 调用移到块外，各自紧跟一个兜错块。
+   !t0 = !!pkpm2pdmsRenamesCount()
+   handle any
+      !t0 = -1
+   endhandle
+   !f0 = !!pkpm2pdmsRenamesFailCount()
+   handle any
+      !f0 = -1
+   endhandle
+
+   -- R6：经运行入口 !!pkpm2pdmsRunMac 执行（pdms\pkpm2pdmsrunmac.pmlfnc）——
+   -- 预载唯一化函数 + $M 宏 + 回传状态；宏内 ONERROR …RETURN ERROR 报错时
+   -- 入口的 elsehandle 接住并返回 'ERR|…'（不静默）。
+   !res = ''
+   -- 〔R6 实机修复·handle 语义〕调用移到块外（块内语句正常时不执行）。
+   !res = !!pkpm2pdmsRunMac(!p)
+   handle any
+      !res = ''
+   endhandle
+   if (!res.length() le 0) then
+      !this.status.val = '运行入口 !!pkpm2pdmsRunMac 未就绪（需 PMLLIB\pkpm2pdms\pkpm2pdmsrunmac.pmlfnc）'
+      $P PKPM2PDMS：$!this.status.val
+      !!alert.message('运行入口未就绪：请把 pdms\ 下全部文件部署到 PMLLIB\pkpm2pdms\ 并重启 PDMS')
+      return
+   endif
+   !macOk = !res.before('|').eq('OK')
+
+   -- 运行后取计数，算「本次」改名/失败个数（契约 §o.7：report.renames 是唯一真相，
+   -- 这里的数字只是窗体显示）
+   !t1 = -1
+   !f1 = -1
+   !t1 = !!pkpm2pdmsRenamesCount()
+   handle any
+      !t1 = -1
+   endhandle
+   !f1 = !!pkpm2pdmsRenamesFailCount()
+   handle any
+      !f1 = -1
+   endhandle
+   if (!t0 ge 0 and !t1 ge 0) then
+      !nr = (!t1 - !f1) - (!t0 - !f0)
+      !nf = !f1 - !f0
+      !this.renCount.val = '本次因重名改名 ' & !nr.string() & ' 个，失败 ' & !nf.string() & ' 个（累计 ' & !t1.string() & ' 条）'
+   else
+      !this.renCount.val = '唯一化函数未加载（pkpm2pdmsuniquename.pmlfnc），无法统计'
+   endif
+   $P PKPM2PDMS：$!this.renCount.val
+
+   if (!macOk.not()) then
+      !this.status.val = '导入宏执行报错（详见命令窗，ONERROR 已中止）；改名统计已更新'
+      !!alert.message('导入宏执行报错（ONERROR 已中止）；改名统计见「改名统计」栏')
+      return
+   endif
+
+   !this.status.val = '导入宏已执行： ' & !p
+   $P PKPM2PDMS：导入宏执行完毕
+   !!alert.message('导入宏已执行完毕：' & !p)
+endmethod
+-- End of method .runMac
+
+
+------------------------------------------------------------------------------
+-- 改名清单：调 !!pkpm2pdmsRenamesShow() 把 TYPE|原名|实际名 逐条 $P 到命令窗
+-- （函数未加载时 elsehandle any 兜底）
+------------------------------------------------------------------------------
+define method .showRenames()
+   !okShow = TRUE
+   !!pkpm2pdmsRenamesShow()
+   handle any
+      !okShow = FALSE
+   endhandle
+   if (!okShow.not()) then
+      !this.status.val = '唯一化函数未加载：请用入口宏 pkpm2pdmsrun.mac 重开窗体'
+      !!alert.message('唯一化函数未加载（pkpm2pdmsuniquename.pmlfnc）；入口宏会自动 $M 预载')
+   else
+      !this.status.val = '改名清单已输出到命令窗'
+   endif
+endmethod
+-- End of method .showRenames
+
+
+------------------------------------------------------------------------------
+-- ② 导出当前模型到文本（调用 !!pkpm2pdmsexport）
+------------------------------------------------------------------------------
+define method .runExp()
+   !p = !this.scopePath.val
+   !scope = !!ce
+   if (!p.unset().not() and !p.length() gt 0) then
+      !scope = !p.dbref()
+      if (!scope.badref()) then
+         !this.status.val = '导出范围无效： ' & !p
+         !!alert.message('导出范围无效（不是有效的元素路径）： ' & !p)
+         return
+      endif
+   endif
+   !out = !this.dumpPath.val
+   if (!out.unset() or !out.length() le 0) then
+      !this.status.val = '请先填写导出文件路径'
+      !!alert.message('请先填写导出文件路径')
+      return
+   endif
+   !this.status.val = '正在导出到 ' & !out & ' …'
+   $P PKPM2PDMS：开始导出到 $!out
+   !res = !!pkpm2pdmsexport(!scope, !out)
+   if (!res.before('|') neq 'OK') then
+      !this.status.val = '导出失败： ' & !res
+      $P PKPM2PDMS：导出失败 $!res
+      !!alert.message('导出失败： ' & !res)
+      return
+   endif
+   !this.status.val = '导出完成： ' & !out & '  ' & !res
+   $P PKPM2PDMS：导出完成 $!res
+   !!alert.message('导出完成： ' & !out & '  ' & !res)
+endmethod
+-- End of method .runExp
+
+
+------------------------------------------------------------------------------
+-- ③ 导出数据库（目录/规格）为 DB Listing 文本（调用 !!pkpm2pdmsdbexport）
+--    机制、出处与未验证项见 pdms/pkpm2pdmsdbexport.pmlfnc 文件头与 pdms/README.txt
+------------------------------------------------------------------------------
+define method .runDb()
+   !out = !this.dbPath.val
+   if (!out.unset() or !out.length() le 0) then
+      !this.status.val = '请先填写目录/规格导出文件路径'
+      !!alert.message('请先填写目录/规格导出文件路径')
+      return
+   endif
+   !this.status.val = '正在导出目录/规格到 ' & !out & ' …'
+   $P PKPM2PDMS：开始导出目录/规格（DB Listing）到 $!out
+   !res = !!pkpm2pdmsdbexport(!out)
+   !this.status.val = '目录/规格导出： ' & !res
+   $P PKPM2PDMS：$!res
+   !!alert.message('目录/规格导出结果： ' & !res)
+endmethod
+-- End of method .runDb
+
+
+------------------------------------------------------------------------------
+-- 关闭窗体
+------------------------------------------------------------------------------
+define method .close()
+   !this.kill()
+endmethod
+-- End of method .close
+
+$.
+-- End of file pkpm2pdms.pmlfrm

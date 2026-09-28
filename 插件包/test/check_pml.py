@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""PKPM-JWD导入导出 —— PDMS 侧 PML 源静态检查（编码 / 换行 / 括号 / 块配对）
+"""PKPM2PDMS导入导出 —— PDMS 侧 PML 源静态检查（编码 / 换行 / 括号 / 块配对）
 
 用法：
-    python PKPM-JWD导入导出\\test\\check_pml.py                     # 检查包内 pdms/ 全部 PML
-    python PKPM-JWD导入导出\\test\\check_pml.py <文件或目录> [...]    # 检查指定目标
-    python PKPM-JWD导入导出\\test\\check_pml.py --selftest           # 用本机 PDMS 安装内的
+    python PKPM2PDMS导入导出\\test\\check_pml.py                     # 检查包内 pdms/ 全部 PML
+    python PKPM2PDMS导入导出\\test\\check_pml.py <文件或目录> [...]    # 检查指定目标
+    python PKPM2PDMS导入导出\\test\\check_pml.py --selftest           # 用本机 PDMS 安装内的
                                                                      # 既有 PML 反测检查器本身
 
 检查项（每项逐文件打印 PASS/FAIL）：
@@ -195,7 +195,7 @@ def main():
     nfail = 0
     nwarn = 0
     print('=' * 78)
-    print('%s：%d 个文件' % ('--selftest（本机既有 PML，只读）' if selftest else 'PKPM-JWD导入导出 静态检查', len(files)))
+    print('%s：%d 个文件' % ('--selftest（本机既有 PML，只读）' if selftest else 'PKPM2PDMS导入导出 静态检查', len(files)))
     print('=' * 78)
     for path in files:
         fails, warns, stats = check_file(path, selftest)

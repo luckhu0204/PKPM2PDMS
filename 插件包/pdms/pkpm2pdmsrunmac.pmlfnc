@@ -1,0 +1,115 @@
+------------------------------------------------------------------------------
+-- PKPM2PDMS导入导出 —— 运行入口函数（导入宏执行 + 唯一化函数预载）
+-- 文件   : pkpm2pdmsrunmac.pmlfnc        落盘: GBK 无 BOM + CRLF，注释用 --
+-- 函数   : !!pkpm2pdmsRunMac(!macPath is STRING) is STRING
+-- 调用方 : ① 入口宏 pdms\pkpm2pdmsrun.mac（命令行 / 菜单 / PML 窗体）
+--          ② .NET 窗体 PKPM2PDMSForm（「PKPM导入PDMS」一键导入）——
+--             首选一次调用：PmlBridge.RunPmlWithResult("!!pkpm2pdmsRunMac('<宏全路径>')")
+--             （返回值即下面的状态串；宏路径含空格时本形式也安全）
+--          ③ PML 窗体 pkpm2pdms.pmlfrm 的「运行导入宏」按钮
+-- 返回值 : 'OK|<宏路径>|renames=<累计改名条数>'
+--          'ERR|<宏路径>|<原因>|renames=<n>'
+--          同一串同时写入全局 !!pkpm2pdmsRunStatus（.NET 也可事后
+--          RunPmlWithResult("!!pkpm2pdmsRunStatus") 读；与 ENGINE_IO.md §6
+--          的 !!pkpm2pdmsRenames 是同一套"全局量当回传通道"的惯例）。
+-- 唯一化 : R6 起唯一化函数的"预载"从导入宏搬到这里（宏本体不再有 $M 行）。
+--          **本机实测**：$M <文件>.pmlfnc 在 PDMS 12.1 SP4 DESIGN 下无效 ——
+--          (46,80) PML: Invalid syntax in the current context
+--          （验收\实机日志_R4\E_series.txt E1/E2/E3；<PDMS根>\PKPM2PDMS\addin.log
+--            里 5 次 addin 启动预载全 FAILED 同因）。.pmlfnc 只能靠 PMLLIB
+--          自动加载：**文件名（忽略大小写）= 函数名**
+--          （验收\实机日志_R4\F_series.txt F1/F3/F4、P7_export_1.txt）。
+--          故这里的"预载" = 提前**调用**一次 !!pkpm2pdmsUniquename(...) 触发
+--          自动加载，把"函数没部署 / 没索引"在动模型之前暴露出来；
+--          失败即返回 ERR 并中止（不静默继续；= 原宏内故障注入的语义）。
+-- 语法出处（均为本机 PMLLIB 内既有写法，未自造）：
+--   define function … is STRING        assembly\functions\assybuildname.pmlfnc:32
+--   $M "<全路径>" 在 define function 内   common\functions\comaddcurclaim.pmlfnc:75
+--   $M 目标用引号 + 变量               pdms\pkpm2pdms.pmlfrm:133（$m "$!p"）
+--   handle any / elsehandle any         pdms\pkpm2pdms.pmlfrm:130-136
+--   if (…) then … elsehandle any        Building_Design\...\nucdesmanchor.mac:72-94
+--   elseif                             pdms\pkpm2pdmsuniquename.pmlfnc（候选序列分支）
+--   defined(!!全局量)                   nucdesogwall.pmlobj:206
+--   .length() / .string() / .unset()    见 pdms\pkpm2pdmsexport.pmlfnc 头注出处
+--   ARRAY .size()                      aba\Functions\ababuildeditform.pmlfnc:40
+--   $P 输出                            Building_Design\...\nucdesmexpandrooms.pmlfnc:34
+-- 安装前提 : <PDMS根>\PMLLIB\pkpm2pdms\ 内本文件与 pkpm2pdmsuniquename.pmlfnc
+--            都已就位，且**重启过 PDMS**（新 PML 文件要重新索引；
+--            见 install\install.ps1 尾部说明与 pdms\README.txt）。
+------------------------------------------------------------------------------
+
+
+define function !!pkpm2pdmsRunMac(!macPath is STRING) is STRING
+
+   -- 0) 参数检查（形态同 !!pkpm2pdmsexport 的参数检查）
+   !!pkpm2pdmsRunStatus = ''
+   if (!macPath.unset() or !macPath.length() le 0) then
+      !!pkpm2pdmsRunStatus = 'ERR||宏路径为空'
+      return !!pkpm2pdmsRunStatus
+   endif
+
+   -- 1) 唯一化函数提前加载（见文件头"唯一化"一节；失败即中止）
+   --    探测基名用本插件自己的前缀，正常库里不会被占用（占用时只会多 1 条改名记录）
+   -- 〔R6 实机修复·handle 语义〕本机实测 handle 块是**错误路径**：块体只在紧邻其前的
+   --   一条语句报错时执行（证据 验收/R6日志/P5_h1.txt、P5_h3.txt、P5_h7.txt、
+   --   P5_h9.txt、P5_h10.txt、P5_h11.txt）。原写法把调用放在块里 -> 永不执行，
+   --   于是恒报「唯一化函数未就绪」。改为「先调用，紧跟 handle 兜错」。
+   !p2pUniq = !!pkpm2pdmsUniquename('/PKPM2PDMS_PRELOAD')
+   handle any
+      !p2pUniq = ''
+   endhandle
+   if (!p2pUniq.length() le 0) then
+      !!pkpm2pdmsRunStatus = 'ERR|' & !macPath & '|唯一化函数 pkpm2pdmsUniquename 未就绪（需 <PDMS根>\PMLLIB\pkpm2pdms\pkpm2pdmsuniquename.pmlfnc 已部署且 PDMS 已重启）'
+      $P PKPM2PDMS：$!!pkpm2pdmsRunStatus
+   -- 〔R6 实机修复·回传通道〕把状态串写到 <宏全路径>.status.txt，供 .NET 直接读文件
+   --   （CreateCommand().Result 对 PML 表达式命令取不到返回值，实机 16:55 证据）。
+   if (!macPath.length() gt 0) then
+      !stLines = object ARRAY()
+      !stLines[1] = !!pkpm2pdmsRunStatus
+      !stFile = !macPath & '.status.txt'
+      !stF = object FILE(!stFile)
+      !stF.open('OVERWRITE')
+      !stF.writeFile('OVERWRITE', !stLines)
+      !stF.close()
+   endif
+      return !!pkpm2pdmsRunStatus
+   endif
+
+   -- 2) 运行导入宏（$M 全路径；宏自带 ONERROR GOLABEL /PKPM2PDMSERR 与 $S-/$S+）
+   $P PKPM2PDMS：开始运行导入宏 $!macPath
+   -- 〔R6 实机修复·同上〕$M 必须紧贴 handle 之前；放在块里等于不执行（导入宏不跑）。
+   !p2pRan = TRUE
+   $M "$!macPath"
+   handle any
+      !p2pRan = FALSE
+   endhandle
+
+   -- 3) 改名条数（累计；真相来源同 ENGINE_IO.md §6 的 !!pkpm2pdmsRenames）
+   !p2pN = 0
+   if (defined(!!pkpm2pdmsRenames)) then
+      !p2pN = arraySize(!!pkpm2pdmsRenames)
+   endif
+
+   if (!p2pRan.not()) then
+      !!pkpm2pdmsRunStatus = 'ERR|' & !macPath & '|宏执行报错（ONERROR 已中止，详见命令窗）|renames=' & !p2pN.string()
+   else
+      !!pkpm2pdmsRunStatus = 'OK|' & !macPath & '|renames=' & !p2pN.string()
+   endif
+   $P PKPM2PDMS：$!!pkpm2pdmsRunStatus
+   -- 〔R6 实机修复·回传通道〕把状态串写到 <宏全路径>.status.txt，供 .NET 直接读文件
+   --   （CreateCommand().Result 对 PML 表达式命令取不到返回值，实机 16:55 证据）。
+   if (!macPath.length() gt 0) then
+      !stLines = object ARRAY()
+      !stLines[1] = !!pkpm2pdmsRunStatus
+      !stFile = !macPath & '.status.txt'
+      !stF = object FILE(!stFile)
+      !stF.open('OVERWRITE')
+      !stF.writeFile('OVERWRITE', !stLines)
+      !stF.close()
+   endif
+   return !!pkpm2pdmsRunStatus
+
+endfunction
+-- End of function !!pkpm2pdmsRunMac
+
+-- End of file pkpm2pdmsrunmac.pmlfnc

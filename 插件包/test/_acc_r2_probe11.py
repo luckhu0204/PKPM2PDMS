@@ -8,7 +8,7 @@ import os
 import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-PKG = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出"
+PKG = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出"
 OUT = os.path.join(PKG, "test", "_acceptance_r2_out")
 p = os.path.join(OUT, "r2_jwd2pdt.pdt")
 raw = open(p, "rb").read()

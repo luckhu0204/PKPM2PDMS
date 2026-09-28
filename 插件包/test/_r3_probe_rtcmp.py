@@ -3,12 +3,12 @@
 import sqlite3
 import sys
 
-sys.path.insert(0, r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\engine")
+sys.path.insert(0, r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\engine")
 from canonical import Model  # noqa: E402
 import jwd_read  # noqa: E402
 
-a = jwd_read.read_jwd(r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\_acc_tmp\r3_db2jwd.jwd")
-b = jwd_read.read_jwd(r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\_acc_tmp\r2old_db2jwd.jwd")
+a = jwd_read.read_jwd(r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\test\_acc_tmp\r3_db2jwd.jwd")
+b = jwd_read.read_jwd(r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\test\_acc_tmp\r2old_db2jwd.jwd")
 import json
 ja = json.loads(a.to_json())
 jb = json.loads(b.to_json())

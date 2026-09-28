@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""PKPM-JWD导入导出 —— tkinter 图形界面（契约 ``spec/CONTRACT.md`` §(f).3）。
+"""PKPM2PDMS导入导出 —— tkinter 图形界面（契约 ``spec/CONTRACT.md`` §(f).3）。
 
 三条纪律（§f.3 逐条）::
 
@@ -56,6 +56,9 @@ _HINT_SECMAP = u"留空 ⇒ 取与输入同目录的 %s（不存在则报错退�
 _HINT_EXTRA = "留空 ⇒ 自动加载 engine/secmap_extra.txt（若存在）；给定则只加载该文件（§f.1）"
 _HINT_PROJECT = "留空 ⇒ 取 pkpmSysInfo.ID=2（如 JLCJ2），再取不到用 PKPM_PROJECT（§f.1）"
 _HINT_UNIT = "只影响宏内数值缩放；须先把 PDMS 当前单位设成同一个值（契约 §d.4-1）"
+#: 〔R7〕SITE 名（建模型宏必填）：由 .NET 侧直查试出可用名后传入；引擎不默认、不改名
+_HINT_SITE = ("建模型宏必填：SITE 名（如 /PKPM2PDMS）。.NET 侧执行前直查试出可用名后传入，"
+              "引擎原样使用、不默认、不改名；留空 ⇒ 退出码 2")
 _HINT_DUMP_UNIT = "只在 dump 缺 UNITS 行时生效；有 UNITS 行时以该行为准（§f.1/§c.1）"
 _HINT_CATEGORIES = ("勾选要导出的构件类别（全部勾选 = 与命令行逐项等价）；"
                     "被取消的类别会逐类记入报告的 warnings/skipped，不静默丢弃")
@@ -82,10 +85,10 @@ _HINT_DIRECTION = ("方向决定输入/输出类型与可用选项（与 §m.1 �
 _HINT_DB_PROJECT = ("--project 只记进报告的 options.project 与宏头注释"
                     "（目录宏没有 ZONE 概念；§m.1 的可选参数列里没有它）")
 _HINT_SUFFIX = ("--suffix：4 个顶层容器名的唯一后缀；留空用 _YYYYMMDD。"
-                "宏只操作本包自己的 /PKPM_JWD_* 容器（§l.1）")
+                "宏只操作本包自己的 /PKPM2PDMS_* 容器（§l.1）")
 _HINT_CLEAN = ("--clean：生成清场版（OLD … DELETE … MEM），只清本包自己的容器；"
                "CATE/SPWL 的 MEM 语义未直证（§12#16）")
-_HINT_CATALOGUE = "必须是本包前缀（/PKPM_JWD_…）；填用户既有容器名会被安全闸拒绝（码 2）"
+_HINT_CATALOGUE = "必须是本包前缀（/PKPM2PDMS_…）；填用户既有容器名会被安全闸拒绝（码 2）"
 _HINT_SKELETON = ("full（13 段，缺省）| sections-only（只写首行+$VERSION+$DESIGNPARA+"
                   "$DEFFRAMESECTION+$END，§j.7.6）")
 _HINT_FROM_BUILTIN = ("勾选 ⇒ 直接导出 engine/section_table.csv（§k.2 的冻结表），"
@@ -533,6 +536,7 @@ class Jwd2PdmsTab(ToolTab):
         self.file_row("report", "--report 报告 json", save=True, filetypes=JSON_FILETYPES,
                       hint=_HINT_REPORT)
         self.entry_row("project", "--project 工程名（ZONE）", hint=_HINT_PROJECT)
+        self.entry_row("site_name", "--site-name SITE 名", hint=_HINT_SITE)
         self.base_row("基点单位 = --unit（mm/cm/m）；缺省 0 0 0")
         self.entry_row("angle", "--angle 转角（度，+U 俯视逆时针）", default="0", width=10)
         self.combo_row("unit", "--unit 宏内单位", cli_mod.macgen.UNITS, "mm", _HINT_UNIT)
@@ -547,6 +551,7 @@ class Jwd2PdmsTab(ToolTab):
             "secmap": _opt_text(self.vars.get("secmap")),
             "extra": _opt_text(self.vars.get("extra")),
             "project": _opt_text(self.vars.get("project")),
+            "site_name": _opt_text(self.vars.get("site_name")),
             "base": base,
             "angle": _float_text(self.vars["angle"], "转角"),
             "unit": str(self.vars["unit"].get()),
@@ -759,6 +764,7 @@ class ConvTab(_DirTab):
 
         b = self._row
         self.entry_row("project", "--project 工程名（ZONE）", hint=_HINT_PROJECT)
+        self.entry_row("site_name", "--site-name SITE 名", hint=_HINT_SITE)
         self.base_row("基点单位 = --unit（mm/cm/m）；缺省 0 0 0")
         self.entry_row("angle", "--angle 转角（度，+U 俯视逆时针）", default="0", width=10)
         self.combo_row("unit", "--unit 宏内单位", cli_mod.macgen.UNITS, "mm", _HINT_UNIT)
@@ -782,6 +788,7 @@ class ConvTab(_DirTab):
             args.update({"pdt": _need_text(self.vars["src"], "输入 .pdt 文件"),
                          "extra": _opt_text(self.vars.get("extra")),
                          "project": _opt_text(self.vars.get("project")),
+                         "site_name": _opt_text(self.vars.get("site_name")),
                          "base": base,
                          "angle": _float_text(self.vars["angle"], "转角"),
                          "unit": str(self.vars["unit"].get()),
@@ -808,7 +815,8 @@ class App(tk.Tk):
 
     def __init__(self) -> None:
         super().__init__()
-        self.title("PKPM-JWD导入导出 —— 图形界面（契约 v%s）" % cli_mod.C.CONTRACT_VERSION)
+        self.title("PKPM2PDMS导入导出 v2.1.0 —— 图形界面（契约模型 schema 版本 v%s）"
+                   % cli_mod.C.CONTRACT_VERSION)
         self.geometry("1000x760")
         self.minsize(880, 640)
 
@@ -821,7 +829,7 @@ class App(tk.Tk):
             "构件计数、未解析截面清单、db 块（目录宏/解析/交叉核对/闭环/安全）与警告。\n"
             "PDMS 侧产物（.mac/.pdt/目录宏）为 GBK 或纯 ASCII + CRLF、无 BOM；"
             "Python/JSON 产物为 UTF-8 无 BOM。转换只读用户原件，绝不改写输入文件；"
-            "目录宏只新建/清理本包自己的 /PKPM_JWD_* 容器（§l.1）。"
+            "目录宏只新建/清理本包自己的 /PKPM2PDMS_* 容器（§l.1）。"
         )).pack(anchor="w")
 
         nb = ttk.Notebook(self)

@@ -9,13 +9,13 @@ import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 ROOT = r"D:\AI_Work\PKPM数据解析"
-OUT = os.path.join(ROOT, "PKPM-JWD导入导出", "test", "_acc_tmp")
+OUT = os.path.join(ROOT, "PKPM2PDMS导入导出", "test", "_acc_tmp")
 MAP = r"G:\工作\PDMS相关\00 PDMS插件\02 实用插件\PKPM导入导出插件\PKPM转PDMS截面匹配文件.txt"
 
 DUMP = [
-    '#PKPM-JWD-PDMSDUMP 1.0',
+    '#PKPM2PDMS-PDMSDUMP 1.0',
     'UNITS mm',
-    '#SITE /PKPM_JWD',
+    '#SITE /PKPM2PDMS',
     '#ZONE /ACCTEST',
     '#STRU /MAINFRAME',
     '#FRMW /STL_FRAME/EL1',
@@ -41,7 +41,7 @@ with open(dpath, 'wb') as fh:
     fh.write(("\r\n".join(DUMP) + "\r\n").encode('gbk'))
 jpath = os.path.join(OUT, "acc_fixture.jwd")
 rpath = os.path.join(OUT, "acc_fixture.report.json")
-cmd = [sys.executable, os.path.join(ROOT, "PKPM-JWD导入导出", "engine", "cli.py"),
+cmd = [sys.executable, os.path.join(ROOT, "PKPM2PDMS导入导出", "engine", "cli.py"),
        "pdms2jwd", dpath, "--out", jpath, "--secmap", MAP, "--report", rpath]
 p = subprocess.run(cmd, capture_output=True, cwd=ROOT)
 print("exit", p.returncode)

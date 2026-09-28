@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""PKPM-JWD导入导出 —— 独立验收测试 R3（契约 v3 验收标准 15–19 + 把关项）。
+r"""PKPM2PDMS导入导出 —— 独立验收测试 R3（契约 v3 验收标准 15–19 + 把关项）。
 
 用法（工作目录 = 工作区根 ``D:\\AI_Work\\PKPM数据解析``）::
 
-    python PKPM-JWD导入导出/test/acceptance_r3.py
+    python PKPM2PDMS导入导出/test/acceptance_r3.py
 
 输出：逐条结论文本 + **最后一行**机器可读汇总 JSON
 ``{"passed":true,"passedCount":N,"failedCount":0}``（键名 ASCII）。全通过 ⇒ 退出码 0；
@@ -11,22 +11,23 @@
 
 检查项（契约 v3 §q；v1 的 1–8 由 test/acceptance.py 把关、R2 的 9–14 由 test/acceptance_r2.py 把关）
 --------------------------------------------------------------------------------
-15  重名唯一化：PML 函数静态逐条（签名/候选序列/EXIST+(2,109) 探测/记录格式/FAIL 语义）
-    + **逻辑对照**（本文件自实现的 §o.1 参考算法对构造占用表跑候选序列）
-    + renames 键（§o.7）+ 宏侧"不跳过/不覆盖"（ONERROR 尾 + 故障注入 + 全部经 $!n）
+15  旧唯一化函数（**R7 起保留在工作树但不再部署/不再被引用**）静态逐条 + 逻辑对照
+    + renames 键（〔R7〕语义 = SITE 名探测记录）+ 宏侧"不跳过/不覆盖"改由 20 把关
 16  .NET 插件真编译：跑 pdms-net/build.cmd（退出码 0、产物存在），PE 头核对
-    machine=I386(0x14c)、PE32(0x10b)、CLI 运行时 2.5、字面 v2.0.50727；D:\\AVEVA 编译前后零变化
+    machine=I386(0x14c)、PE32(0x10b)、CLI 运行时 2.5、字面 v2.0.50727；D:\AVEVA 编译前后零变化
 17  注册脚本静态检查：缺省 dry-run 清单（8 项、无"删除"）、幂等（--execute 两次 XML 逐字节不变）、
-    卸载=恢复+移动（XML 与 .bak 逐字节相等、4 文件进 _uninstalled_*）、**未对真实 D:\\AVEVA 执行过**
-18  界面清单完整：pkpmjwd.uic 与 tgtext.uic 逐条同构对照 + PKPMJWDForm.cs 全部控件
+    卸载=恢复+移动（XML 与 .bak 逐字节相等、4 文件进 _uninstalled_*）、**未对真实 D:\AVEVA 执行过**
+18  界面清单完整：pkpm2pdms.uic 与 tgtext.uic 逐条同构对照 + PKPM2PDMSForm.cs 全部控件
     + Key 三处一致（.uic/Addin/Command 构造器）+ 编译通过（=16）
 19  交付落点与"没动过"：R3 交付物齐备于工作区、交付目录含 pdms-net/哈希清单、
-    docs 含 §p.10-5 未部署声明、G 盘与 D:\\AVEVA 在整轮前后清单+哈希零变化
-把关  宏里创建元素之前的唯一化调用计数 == 元素总数（全部命名元素经 !!pkpmjwdUniquename）
+    docs 含 §p.10-5 未部署声明、G 盘与 D:\AVEVA 在整轮前后清单+哈希零变化
+把关  〔R7〕宏内**零运行期函数依赖**（0 处 !!pkpm2pdms / $M 预载 / 旧错误块）+
+    名字全宏唯一（/<SITE名>_<段>，含层号）+ 底层 SCTN/PANE/STWALL 无名创建 +
+    宏头 ONERROR CONTINUE、宏尾 $S+ + 分隔线的标准形态；pdms/ 交付物不得再引用唯一化函数
 
 独立性：期望值全部由本文件独立重算（PE 头自解析、占用表模拟自实现、uic 同构对照自建、
 基线快照自建）；engine/pdms-net 只作为被测对象被调用。确定性：无时间/随机/网络依赖；
-自建产物写入 ``PKPM-JWD导入导出/test/_acc_r3_out/``（覆盖写，不删除任何文件）。
+自建产物写入 ``PKPM2PDMS导入导出/test/_acc_r3_out/``（覆盖写，不删除任何文件）。
 """
 
 from __future__ import annotations
@@ -47,23 +48,25 @@ SAMPLE_DIR = r"G:\工作\PDMS相关\00 PDMS插件\02 实用插件\PKPM导入导�
 SAMPLE_JWD = os.path.join(SAMPLE_DIR, "JLCJ2.jwd")
 SAMPLE_PDT = os.path.join(SAMPLE_DIR, "1_PM.pdt")
 SAMPLE_MAP = os.path.join(SAMPLE_DIR, "PKPM转PDMS截面匹配文件.txt")
+#: 〔R7〕建模型宏的 SITE 名（引擎必填参数；由 .NET 侧直查试出后传入，引擎不改名）
+SITE_NAME = "/PKPM2PDMS"
 G_PLUGIN = SAMPLE_DIR
 AVEVA = r"D:\AVEVA\Plant\PDMS12.1.SP4"
 PMLLIB = os.path.join(AVEVA, "PMLLIB")
 TGTEXT_BAK = r"D:\AI_Work\pmds三维文字程序-备份\TGTEXT"
 TGTEXT_TASK = r"D:\AI_Work\PDMS三维文字程序\TGTEXT"
-DELIVERY = os.path.join(ROOT, "交付_PKPM-JWD插件")
+DELIVERY = os.path.join(ROOT, "交付_PKPM2PDMS插件")
 
-PMLFN = os.path.join(PKG, "pdms", "pkpmjwduniquename.pmlfnc")
+PMLFN = os.path.join(PKG, "pdms", "pkpm2pdmsuniquename.pmlfnc")
 NET = os.path.join(PKG, "pdms-net")
 BUILD_CMD = os.path.join(NET, "build.cmd")
-DIST_DLL = os.path.join(NET, "dist", "PKPMJWD.dll")
-DIST_UIC = os.path.join(NET, "dist", "pkpmjwd.uic")
-UIC = os.path.join(NET, "pkpmjwd.uic")
-ADDIN_CS = os.path.join(NET, "PKPMJWDAddin.cs")
-FORM_CS = os.path.join(NET, "PKPMJWDForm.cs")
-DEPLOY_PY = os.path.join(NET, "deploy", "deploy_pkpmjwd.py")
-UNDEPLOY_PY = os.path.join(NET, "deploy", "undeploy_pkpmjwd.py")
+DIST_DLL = os.path.join(NET, "dist", "PKPM2PDMS.dll")
+DIST_UIC = os.path.join(NET, "dist", "pkpm2pdms.uic")
+UIC = os.path.join(NET, "pkpm2pdms.uic")
+ADDIN_CS = os.path.join(NET, "PKPM2PDMSAddin.cs")
+FORM_CS = os.path.join(NET, "PKPM2PDMSForm.cs")
+DEPLOY_PY = os.path.join(NET, "deploy", "deploy_pkpm2pdms.py")
+UNDEPLOY_PY = os.path.join(NET, "deploy", "undeploy_pkpm2pdms.py")
 CLI = os.path.join(PKG, "engine", "cli.py")
 
 TOL_TYPES = ("SITE", "ZONE", "STRU", "FRMW", "SBFR", "SCTN", "PANE", "STWALL")
@@ -152,15 +155,20 @@ def ref_pick(base, occupied, typ="SCTN"):
 # ==========================================================================
 def check_15(ch):
     det, errs = [], []
+    # 〔R7〕本检查的对象（pdms/pkpm2pdmsuniquename.pmlfnc）自 R7 起**不再部署、不再被引用**
+    # （旧文件保留在工作树，只是不进部署清单）；这里保留其静态纪律与算法对照，作为
+    # "若将来有人误把它装回去"的门槛，同时也证明它确实还在工作树里（不是被删掉）。
+    det.append("〔R7〕本检查的对象已**不再部署/不再被引用**（宏内零 !!pkpm2pdms 调用；"
+               "部署清单里已移除）：以下静态逐条只作为历史留档与误装门槛")
     # ---------- ① 文件级纪律 + 静态逐条
     if not os.path.isfile(PMLFN):
-        ch.add(15, "重名唯一化（静态+逻辑对照+renames+宏侧不跳过）",
+        ch.add(15, "旧唯一化函数（R7 起不部署）静态纪律 + 逻辑对照 + renames 键语义",
                ["缺 %s" % PMLFN], det)
         return
     b = _read(PMLFN)
     try:
         text = b.decode("gbk")
-        det.append("pdms/pkpmjwduniquename.pmlfnc %d 字节：GBK 严格解码通过" % len(b))
+        det.append("pdms/pkpm2pdmsuniquename.pmlfnc %d 字节：GBK 严格解码通过" % len(b))
     except UnicodeDecodeError as exc:
         errs.append("PML 函数不是 GBK：%s" % exc)
         text = b.decode("gbk", "replace")
@@ -170,8 +178,8 @@ def check_15(ch):
         errs.append("PML 含 %d 个孤立 LF（要求 CRLF）" % _lone_lf(b))
     det.append("无 BOM、孤立 LF=%d" % _lone_lf(b))
     frozen = [
-        ("签名", "define function !!pkpmjwdUniquename(!base is STRING) is STRING"),
-        ("defined 守卫", "defined(!!pkpmjwdRenames)"),
+        ("签名", "define function !!pkpm2pdmsUniquename(!base is STRING) is STRING"),
+        ("defined 守卫", "defined(!!pkpm2pdmsRenames)"),
         ("数组建立", "object ARRAY()"),
         ("循环 0..99", "do !idx from 0 to 99"),
         ("候选 0=原名", "!cand = !base"),
@@ -267,19 +275,31 @@ def check_15(ch):
     if len(ref_candidates("/X")) != 100:
         errs.append("候选序列长度 ≠ 100")
 
-    # ---------- ④ renames 键（§o.7：键必须存在；首跑 = []）
+    # ---------- ④ renames 键（〔R7〕语义变更：键必须存在；宏方向的三个命令 = SITE 名探测记录）
     rep_p = os.path.join(OUT, "r3.report.json")
     if os.path.isfile(rep_p):
         rep = json.load(open(rep_p, encoding="utf-8"))
         has = "renames" in rep
-        det.append("  [%s] report.json 含 renames 键（§o.7），首跑值 = %s"
-                   % ("OK" if has else "MISS", json.dumps(rep.get("renames"))))
+        ren = rep.get("renames") or []
+        is_probe = bool(ren) and all(isinstance(x, dict) and x.get("kind") == "site-name-probe"
+                                     for x in ren)
+        det.append("  [%s] report.json 含 renames 键（§o.7/〔R7〕），值 = %s（SITE 名探测记录=%s）"
+                   % ("OK" if has else "MISS", json.dumps(ren, ensure_ascii=False)[:120],
+                      is_probe))
         if not has:
             errs.append("报告缺 renames 键（§o.7：键必须存在）")
+        elif ren and not is_probe:
+            errs.append("〔R7〕renames 应为 SITE 名探测记录（kind=site-name-probe），实际 %s"
+                        % (json.dumps(ren, ensure_ascii=False)[:120],))
+        elif ren and ren[0].get("site_name") != SITE_NAME:
+            errs.append("〔R7〕renames.site_name=%r ≠ 传入的 %r"
+                        % (ren[0].get("site_name"), SITE_NAME))
+        else:
+            det.append("  [OK] renames 语义 = SITE 名探测结果（引擎不改名；.NET 传入什么就记什么）")
     else:
         det.append("  [info] 报告尚未生成（把关项会生成）")
 
-    ch.add(15, "重名唯一化（静态+逻辑对照+renames+宏侧不跳过）", errs, det)
+    ch.add(15, "旧唯一化函数（R7 起不部署）静态纪律 + 逻辑对照 + renames 键语义", errs, det)
 
 
 # ==========================================================================
@@ -346,7 +366,7 @@ def check_16(ch, aveva_before):
         ch.add(16, ".NET 插件真编译（build.cmd 退出码 0 + CLR v2.0.50727/x86）", errs, det)
         return
     info = _pe_info(DIST_DLL)
-    det.append("产物 dist\\PKPMJWD.dll：%d 字节；PE=%s" % (info["size"], json.dumps(info)))
+    det.append("产物 dist\\PKPM2PDMS.dll：%d 字节；PE=%s" % (info["size"], json.dumps(info)))
     if info["machine"] != 0x14C:
         errs.append("PE machine=0x%x ≠ 0x14c(I386/x86)" % info["machine"])
     if info["magic"] != 0x10B:
@@ -396,10 +416,10 @@ def check_17(ch, aveva_before):
         f.write(FIX_CUST.encode("utf-8-sig"))
 
     dep = [sys.executable, DEPLOY_PY, "--pdms-root", SB,
-           "--engine-entry", r"C:\nonexistent\pkpmjwd_engine.exe"]
+           "--engine-entry", r"C:\nonexistent\pkpm2pdms_engine.exe"]
     # ---------- ① 缺省 dry-run：清单 = 8 项，无"删除"
     code, out, err = _run(dep)
-    det.append("命令：python pdms-net/deploy/deploy_pkpmjwd.py --pdms-root <沙箱>（缺省 dry-run）→ 退出码 %d"
+    det.append("命令：python pdms-net/deploy/deploy_pkpm2pdms.py --pdms-root <沙箱>（缺省 dry-run）→ 退出码 %d"
                % code)
     if code != 0:
         errs.append("dry-run 退出码 %d ≠ 0：%s" % (code, (out + err)[:200]))
@@ -439,26 +459,26 @@ def check_17(ch, aveva_before):
     if a1[:3] != b"\xef\xbb\xbf" or c1[:3] != b"\xef\xbb\xbf" or _lone_lf(a1) or _lone_lf(c1):
         errs.append("写回的 XML 未保留 BOM+CRLF")
     idem = (a1 == a2 and c1 == c2)
-    det.append("  [%s] 幂等：第二次 --execute 后两个 XML 与第一次逐字节相同（PKPMJWD 条目 %d 处）"
-               % ("OK" if idem else "FAIL", a2.count(b"PKPMJWD")))
+    det.append("  [%s] 幂等：第二次 --execute 后两个 XML 与第一次逐字节相同（PKPM2PDMS 条目 %d 处）"
+               % ("OK" if idem else "FAIL", a2.count(b"PKPM2PDMS")))
     if not idem:
         errs.append("重复安装不幂等（第二次改动了 XML）")
-    if a2.count(b"<string>PKPMJWD</string>") != 1:
-        errs.append("DesignAddins.xml 的 PKPMJWD 条目数 ≠ 1")
+    if a2.count(b"<string>PKPM2PDMS</string>") != 1:
+        errs.append("DesignAddins.xml 的 PKPM2PDMS 条目数 ≠ 1")
 
     # ---------- ③ 卸载 = 恢复 + 移动（无删除）
     und = [sys.executable, UNDEPLOY_PY, "--pdms-root", SB]
-    und_root = os.path.join(SB, "PKPMJWD")
+    und_root = os.path.join(SB, "PKPM2PDMS")
     pre_dirs = set(os.listdir(und_root)) if os.path.isdir(und_root) else set()
     code3, o3, e3 = _run(und + ["--execute"])
     det.append("undeploy --execute 退出码 %d" % code3)
     if code3:
         errs.append("undeploy 退出码 %d ≠ 0" % code3)
-    bak_a = _read(os.path.join(SB, "DesignAddins.xml.pkpmjwd-bak"))
-    bak_c = _read(os.path.join(SB, "DesignCustomization.xml.pkpmjwd-bak"))
+    bak_a = _read(os.path.join(SB, "DesignAddins.xml.pkpm2pdms-bak"))
+    bak_c = _read(os.path.join(SB, "DesignCustomization.xml.pkpm2pdms-bak"))
     now_a = _read(os.path.join(SB, "DesignAddins.xml"))
     now_c = _read(os.path.join(SB, "DesignCustomization.xml"))
-    det.append("  [%s] 卸载后两个 XML 与 .pkpmjwd-bak 逐字节相等"
+    det.append("  [%s] 卸载后两个 XML 与 .pkpm2pdms-bak 逐字节相等"
                % ("OK" if (now_a == bak_a and now_c == bak_c) else "FAIL"))
     if now_a != bak_a or now_c != bak_c:
         errs.append("卸载未逐字节恢复 XML")
@@ -472,7 +492,7 @@ def check_17(ch, aveva_before):
     det.append("  本次运行移入 %s 的文件：%s（目录名含卸载时刻，不参与判定）"
                % ([re.sub(r"_\d{8}-\d{6}$", "_<stamp>", d) for d in new_dirs] or "(无)",
                   sorted(moved)))
-    need = {"PKPMJWD.dll", "pkpmjwd.uic", "engine_path.txt", "pkpmjwduniquename.pmlfnc"}
+    need = {"PKPM2PDMS.dll", "pkpm2pdms.uic", "engine_path.txt", "pkpm2pdmsuniquename.pmlfnc"}
     got_leaf = {os.path.basename(m) for m in moved}
     if not new_dirs:
         errs.append("undeploy 未新建 _uninstalled_* 目录（§p.6 卸载行：移动而非删除）")
@@ -484,11 +504,11 @@ def check_17(ch, aveva_before):
     real_cust = os.path.join(AVEVA, "DesignCustomization.xml")
     ra = _read(real_addins).decode("utf-8-sig") if os.path.isfile(real_addins) else ""
     rc = _read(real_cust).decode("utf-8-sig") if os.path.isfile(real_cust) else ""
-    cond = [("PKPMJWD" not in ra, "DesignAddins.xml 无 PKPMJWD 条目"),
-            ('Path="pkpmjwd.uic"' not in rc, "DesignCustomization.xml 无 pkpmjwd.uic 挂载"),
-            (not os.path.isfile(os.path.join(AVEVA, "PKPMJWD.dll")), "根目录无 PKPMJWD.dll"),
-            (not os.path.isfile(os.path.join(AVEVA, "pkpmjwd.uic")), "根目录无 pkpmjwd.uic"),
-            (not os.path.isdir(os.path.join(AVEVA, "PKPMJWD")), "根目录无 PKPMJWD\\ 目录")]
+    cond = [("PKPM2PDMS" not in ra, "DesignAddins.xml 无 PKPM2PDMS 条目"),
+            ('Path="pkpm2pdms.uic"' not in rc, "DesignCustomization.xml 无 pkpm2pdms.uic 挂载"),
+            (not os.path.isfile(os.path.join(AVEVA, "PKPM2PDMS.dll")), "根目录无 PKPM2PDMS.dll"),
+            (not os.path.isfile(os.path.join(AVEVA, "pkpm2pdms.uic")), "根目录无 pkpm2pdms.uic"),
+            (not os.path.isdir(os.path.join(AVEVA, "PKPM2PDMS")), "根目录无 PKPM2PDMS\\ 目录")]
     det.append("真实 D:\\AVEVA 未被执行过的证据：" +
                "; ".join(("%s=%s" % (msg, ok)) for ok, msg in cond))
     for ok, msg in cond:
@@ -536,7 +556,7 @@ def check_18(ch):
     rows = []
     for label, path, key in (("tgtext.uic", os.path.join(src_uic, "tgtext.uic")
                               if src_uic else None, "TGTEXT"),
-                             ("pkpmjwd.uic", UIC, "PKPMJWD")):
+                             ("pkpm2pdms.uic", UIC, "PKPM2PDMS")):
         if not path or not os.path.isfile(path):
             rows.append((label, None))
             errs.append("缺 %s" % label)
@@ -551,25 +571,25 @@ def check_18(ch):
         rows.append((label, (t, key, enc_ok, blob[:3] == b"\xef\xbb\xbf", _lone_lf(blob))))
     if len(rows) == 2 and all(r[1] for r in rows):
         (l1, (t1, k1, e1, bom1, lf1)), (l2, (t2, k2, e2, bom2, lf2)) = rows
-        det.append("同构对照表（逐条；左=参照 tgtext.uic，右=本包 pkpmjwd.uic）：")
+        det.append("同构对照表（逐条；左=参照 tgtext.uic，右=本包 pkpm2pdms.uic）：")
         det.append("  %-22s | %-28s | %s" % ("结构项", l1, l2))
         for name, fn in UIC_ITEMS:
             a, bb = fn(t1, k1), fn(t2, k2)
             det.append("  %-22s | %-28s | %s" % (name, a, bb))
             if not bb:
-                errs.append("pkpmjwd.uic 缺结构项：%s" % name)
+                errs.append("pkpm2pdms.uic 缺结构项：%s" % name)
             if not a:
                 errs.append("参照 tgtext.uic 反而缺结构项 %s（对照基准异常）" % name)
         det.append("  %-22s | BOM=%s 孤立LF=%d      | BOM=%s 孤立LF=%d（两者都应为无 BOM+LF）"
                    % ("编码", bom1, lf1, bom2, lf2))
         if bom2 or lf2 == 0:
-            errs.append("pkpmjwd.uic 应为 UTF-8 无 BOM + LF（附录 F.3）")
+            errs.append("pkpm2pdms.uic 应为 UTF-8 无 BOM + LF（附录 F.3）")
         det.append("  命名差异（仅 Name/Caption/Key 不同）：%s → %s" % (k1, k2))
     # 窗体控件
     if os.path.isfile(FORM_CS):
         ft = _read(FORM_CS).decode("utf-8", "replace")
         miss = [c for c in CONTROLS if c not in ft]
-        det.append("PKPMJWDForm.cs：契约 §p.3 的 %d 个控件名，缺 %s"
+        det.append("PKPM2PDMSForm.cs：契约 §p.3 的 %d 个控件名，缺 %s"
                    % (len(CONTROLS), miss or "无"))
         if miss:
             errs.append("窗体缺控件：%s" % miss)
@@ -578,48 +598,78 @@ def check_18(ch):
     # Key 三处一致
     if os.path.isfile(ADDIN_CS):
         at = _read(ADDIN_CS).decode("utf-8", "replace")
-        n_key = at.count("PKPMJWD.OpenTools")
-        n_name = ('public string Name' in at) and ('"PKPMJWD"' in at)
-        det.append("PKPMJWDAddin.cs：Key 出现 %d 次（注册日志 + Command 构造器）；IAddin.Name='PKPMJWD'=%s"
+        n_key = at.count("PKPM2PDMS.OpenTools")
+        n_name = ('public string Name' in at) and ('"PKPM2PDMS"' in at)
+        det.append("PKPM2PDMSAddin.cs：Key 出现 %d 次（注册日志 + Command 构造器）；IAddin.Name='PKPM2PDMS'=%s"
                    % (n_key, n_name))
         if n_key < 2:
-            errs.append("Addin 内 Key 'PKPMJWD.OpenTools' 出现 %d 次（应 ≥2：Start 登记 + Command 构造器）" % n_key)
+            errs.append("Addin 内 Key 'PKPM2PDMS.OpenTools' 出现 %d 次（应 ≥2：Start 登记 + Command 构造器）" % n_key)
         if not n_name:
-            errs.append("IAddin.Name 未返回 'PKPMJWD'")
+            errs.append("IAddin.Name 未返回 'PKPM2PDMS'")
     else:
         errs.append("缺 %s" % ADDIN_CS)
     if os.path.isfile(UIC):
         ut = _read(UIC).decode("utf-8-sig")
         det.append("Key 三处一致（.uic / Addin / Command 构造器）= %s"
-                   % (("PKPMJWD.OpenTools" in ut) and os.path.isfile(ADDIN_CS)
-                      and "PKPMJWD.OpenTools" in _read(ADDIN_CS).decode("utf-8", "replace")))
+                   % (("PKPM2PDMS.OpenTools" in ut) and os.path.isfile(ADDIN_CS)
+                      and "PKPM2PDMS.OpenTools" in _read(ADDIN_CS).decode("utf-8", "replace")))
     ch.add(18, "界面清单完整（.uic 同构对照 + 13 项控件 + Key 三处一致 + 编译）", errs, det)
 
 
 # ==========================================================================
-# 把关项：宏里创建元素之前的唯一化调用计数 == 元素总数
+# 把关项：〔R7〕宏内零运行期函数依赖 + 名字全宏唯一 + 底层 unnamed + 标准头尾
+# （R6 的"唯一化模板/!!pkpm2pdmsUniquename 调用计数"一节在 R7 整体作废：
+#   宏内不再有任何 PML 函数调用，底层元素无名创建）
 # ==========================================================================
-def _macro_uniquify_stats(path):
+#: 〔R7〕宏头/宏尾的标准形态（与用户原件 …\P-TRANS\pkpm_section_DBOutput.txt 同形）
+_R7_SEP = "-- " + "-" * 64
+_R7_ONERROR = "ONERROR CONTINUE"
+_R7_TAIL_ON = "$S+  -- Synonym translation ON"
+_R7_BOTTOM = ("SCTN", "PANE", "STWALL")
+_R7_FORBIDDEN = ("!!pkpm2pdms", "$M ", "FuncPath", "pkpm2pdmsFuncMissing",
+                 "pkpm2pdmsType", "LABEL /PKPM2PDMSERR", "handle ANY",
+                 "RETURN ERROR", "endhandle")
+
+
+def _macro_r7_stats(path):
+    """独立重算一个宏的 R7 关键量（不读 macgen 的中间变量）。"""
     t = _read(path).decode("gbk")
     lines = t.split("\r\n")
-    calls = sum(1 for l in lines if "!!pkpmjwdUniquename('" in l)
-    named = sum(1 for l in lines
-                if re.match(r"\s*NEW (SITE|ZONE|STRU|FRMW|SBFR|SCTN|PANE|STWALL)\b", l))
-    literal_named = sum(1 for l in lines
-                        if re.match(r"\s*NEW (SITE|ZONE|STRU|FRMW|SBFR|SCTN|PANE|STWALL)\s+/", l))
-    guards = sum(1 for l in lines if "var !pkpmjwdFatal EXIST $!n" in l)
-    unnamed = sum(1 for l in lines if re.match(r"\s*NEW (PLOOP|PAVERT|DATA|PLINE)\b", l))
-    has_onerror = any("ONERROR GOLABEL /PKPMJWDERR" in l for l in lines)
-    has_label = any(l.strip() == "LABEL /PKPMJWDERR" for l in lines)
-    has_tail = any(l.strip() == "RETURN ERROR" for l in lines) and \
-        any(l.strip() == "endhandle" for l in lines) and \
-        any(l.strip() == "$S+" for l in lines)
-    has_guard = any("defined(!!pkpmjwdUniquename)" in l for l in lines)
-    has_m = any(l.strip().startswith("$M ") for l in lines)
-    return {"calls": calls, "named_new": named, "literal_named": literal_named,
-            "guards": guards, "unnamed_new": unnamed, "onerror": has_onerror,
-            "label": has_label, "tail": has_tail, "func_guard": has_guard,
-            "m_preload": has_m}
+    if lines and lines[-1] == "":            # 末行 CRLF 之后的空串不算一行
+        lines = lines[:-1]
+    named, dup, bad_site, named_bottom, unnamed_bottom = [], [], [], [], 0
+    for i, l in enumerate(lines, 1):
+        m = re.match(r"\s*NEW\s+(\w+)\s+(/\S+)\s*$", l)
+        if m:
+            ty, nm = m.group(1), m.group(2)
+            if nm in named:
+                dup.append((nm, i))
+            named.append(nm)
+            if ty in _R7_BOTTOM:
+                named_bottom.append((i, l.strip()))
+            elif not nm.startswith(SITE_NAME):
+                bad_site.append(nm)
+            continue
+        s = l.strip()
+        if s in ("NEW SCTN", "NEW PANE", "NEW STWALL"):
+            unnamed_bottom += 1
+    inserted = sorted({bad for bad in _R7_FORBIDDEN for l in lines if bad in l})
+    onerrors = [i for i, l in enumerate(lines) if l.strip() == _R7_ONERROR]
+    first_new = next((i for i, l in enumerate(lines) if l.strip().startswith("NEW ")), None)
+    head_ok = (len(lines) >= 5 and lines[0] == "$S-  -- Synonym translation OFF"
+               and lines[1] == _R7_SEP
+               and bool(re.match(r"^-- .+  Date: .+$", lines[2]))
+               and bool(re.match(r"^-- 元素：.+$", lines[3]))
+               and lines[4] == _R7_ONERROR)
+    tail_ok = (len(lines) >= 3 and bool(re.match(r"^-- End .+  Date: .+$", lines[-3]))
+               and lines[-2] == _R7_TAIL_ON and lines[-1] == _R7_SEP)
+    return {"named": len(named), "unique": len(set(named)), "dup": dup,
+            "bad_site_prefix": bad_site, "named_bottom": named_bottom,
+            "unnamed_bottom": unnamed_bottom, "inserted_code": inserted,
+            "onerror_n": len(onerrors),
+            "onerror_before_body": bool(onerrors) and first_new is not None
+            and onerrors[0] < first_new,
+            "head_std": head_ok, "tail_std": tail_ok}
 
 
 def check_gate(ch):
@@ -628,45 +678,85 @@ def check_gate(ch):
             ("pdt2pdms", SAMPLE_PDT, "r3_pdt2pdms.mac"))
     for tool, src, name in jobs:
         mac = os.path.join(OUT, name)
+        rep_p = os.path.join(OUT, name + ".report.json")
         code, out, err = _run([sys.executable, CLI, tool, src, "--out", mac,
-                               "--report", os.path.join(OUT, name + ".report.json")])
-        det.append("命令：cli.py %s %s --out _acc_r3_out/%s → 退出码 %d"
-                   % (tool, os.path.basename(src), name, code))
+                               "--report", rep_p, "--site-name", SITE_NAME])
+        det.append("命令：cli.py %s %s --out _acc_r3_out/%s --site-name %s → 退出码 %d"
+                   % (tool, os.path.basename(src), name, SITE_NAME, code))
         if code != 0:
             errs.append("%s 退出码 %d：%s" % (tool, code, (out + err)[-200:]))
             continue
-        st = _macro_uniquify_stats(mac)
-        det.append("  %s：%s" % (name, json.dumps(st)))
-        if st["calls"] != st["named_new"]:
-            errs.append("%s：唯一化调用 %d ≠ 命名元素总数 %d（把关项：每个创建元素前必须恰好一次调用）"
-                        % (name, st["calls"], st["named_new"]))
-        if st["guards"] != st["calls"]:
-            errs.append("%s：故障注入守卫 %d ≠ 调用数 %d（§o.4 模板三行必须成套）"
-                        % (name, st["guards"], st["calls"]))
-        if st["literal_named"]:
-            errs.append("%s：有 %d 条命名 NEW 未走 $!n（绕过唯一化）"
-                        % (name, st["literal_named"]))
-        if not (st["onerror"] and st["label"] and st["tail"]):
-            errs.append("%s：缺 ONERROR 尾（§o.5：ONERROR/LABEL/handle/$S+/RETURN ERROR）" % name)
-        if not st["func_guard"]:
-            errs.append("%s：缺唯一化函数可用性检查（defined(!!pkpmjwdUniquename) ⇒ 故障注入）" % name)
-        if not st["m_preload"]:
-            det.append("  （%s 未带 $M 预载：CLI 未传 pml_func_path ⇒ 按契约 §b.6/§o.4 只发注释提醒；"
-                       "运行前须 $M pdms/pkpmjwduniquename.pmlfnc，或由 Add-in/入口宏预载）" % name)
-    # 入口宏与 Add-in 的预载链（保证"函数已加载"在交付路径上成立）
-    run_mac = os.path.join(PKG, "pdms", "pkpmjwdrun.mac")
-    if os.path.isfile(run_mac):
-        ok = "pkpmjwduniquename" in _read(run_mac).decode("gbk", "replace")
-        det.append("入口宏 pdms/pkpmjwdrun.mac 预载唯一化函数：%s" % ok)
-        if not ok:
-            errs.append("入口宏未 $M 预载 pkpmjwduniquename.pmlfnc")
+        st = _macro_r7_stats(mac)
+        det.append("  %s：带名 NEW %d 条 / 唯一名字 %d 个；底层无名 %d 条；禁项 %s；%s"
+                   % (name, st["named"], st["unique"], st["unnamed_bottom"],
+                      st["inserted_code"] or "无",
+                      "头尾标准形态 OK" if (st["head_std"] and st["tail_std"]) else "头尾不合规"))
+        if st["dup"]:
+            errs.append("%s：宏内名字重复 %s（〔R7〕名字 = /<SITE名>_<段>，含层号 ⇒ 必须全宏唯一）"
+                        % (name, st["dup"][:3]))
+        if st["bad_site_prefix"]:
+            errs.append("%s：有带名 NEW 不以 %s 开头：%s（〔R7〕中间层名必须带 SITE 前缀）"
+                        % (name, SITE_NAME, st["bad_site_prefix"][:3]))
+        if st["named_bottom"]:
+            errs.append("%s：底层 SCTN/PANE/STWALL 仍是带名创建 %s"
+                        "（〔R7〕底层必须 unnamed，PDMS 自动分配系统名）"
+                        % (name, st["named_bottom"][:3]))
+        if not st["unnamed_bottom"]:
+            errs.append("%s：宏内没有无名底层元素（〔R7〕NEW SCTN/PANE/STWALL 无名创建）" % name)
+        if st["inserted_code"]:
+            errs.append("%s：宏内仍有运行期函数依赖/已删错误块 %s"
+                        "（〔R7〕宏内零 !!pkpm2pdms 调用、零 $M 预载、无 LABEL/handle）"
+                        % (name, st["inserted_code"]))
+        if st["onerror_n"] != 1 or not st["onerror_before_body"]:
+            errs.append("%s：`%s` 不满足「全文恰 1 处且在首个创建之前」（实际 %d 处）"
+                        % (name, _R7_ONERROR, st["onerror_n"]))
+        if not st["head_std"]:
+            errs.append("%s：宏头不是 〔R7〕标准形态（$S-/分隔线/`-- <用途>  Date: …`/"
+                        "一行 `-- 元素：…`/ONERROR CONTINUE）" % name)
+        if not st["tail_std"]:
+            errs.append("%s：宏尾不是 〔R7〕标准形态（`-- End …  Date: …`/"
+                        "$S+  -- Synonym translation ON/分隔线）" % name)
+        if os.path.isfile(rep_p):
+            rep = json.load(open(rep_p, encoding="utf-8"))
+            opts = rep.get("options") or {}
+            stats = rep.get("stats") or {}
+            ren = rep.get("renames") or []
+            if opts.get("site_name") != SITE_NAME:
+                errs.append("%s：报告 options.site_name=%r ≠ %r"
+                            % (name, opts.get("site_name"), SITE_NAME))
+            if stats.get("used_names_count") != len(set(stats.get("used_names") or [])):
+                errs.append("%s：报告 stats.used_names 与 used_names_count 不对平" % name)
+            if not (len(ren) == 1 and ren[0].get("kind") == "site-name-probe"):
+                errs.append("%s：报告 renames 不是 SITE 名探测记录（〔R7〕语义变更）：%s"
+                            % (name, json.dumps(ren, ensure_ascii=False)[:100]))
+            det.append("  报告：options.site_name=%r；used_names_count=%r；unnamed_count=%r；"
+                       "renames.kind=%r"
+                       % (opts.get("site_name"), stats.get("used_names_count"),
+                          stats.get("unnamed_count"),
+                          (ren[0].get("kind") if ren else None)))
+    # 〔R7〕pdms/ 交付物不得再引用唯一化函数（定义文件本身除外——它保留在工作树但不再部署）
+    pdms_dir = os.path.join(PKG, "pdms")
+    hits = []
+    if os.path.isdir(pdms_dir):
+        for fn in sorted(os.listdir(pdms_dir)):
+            if fn == "pkpm2pdmsuniquename.pmlfnc" or not fn.endswith((".mac", ".pmlfnc", ".pmlfrm")):
+                continue
+            txt = _read(os.path.join(pdms_dir, fn)).decode("gbk", "replace")
+            if "pkpm2pdmsUniquename" in txt or "pkpm2pdmsuniquename" in txt:
+                hits.append(fn)
+    det.append("pdms/ 里仍引用唯一化函数的文件（R7 要求为空）：%s" % (hits or "（无）"))
+    if hits:
+        errs.append("pdms/ 交付物仍引用 pkpm2pdmsuniquename（%s）：〔R7〕该函数不再部署 ⇒ "
+                    "必须去掉引用（pkpm2pdmsrunmac.pmlfnc 只保留 $M 逻辑；Add-in 预载点一并删）"
+                    % (hits,))
     if os.path.isfile(ADDIN_CS):
         at = _read(ADDIN_CS).decode("utf-8", "replace")
-        ok = "pkpmjwduniquename" in at
-        det.append("Add-in Start() 预载唯一化函数：%s" % ok)
+        ok = "pkpm2pdmsuniquename" not in at
+        det.append("Add-in 不再预载唯一化函数：%s" % ok)
         if not ok:
-            errs.append("Add-in 未在 Start() 预载唯一化函数")
-    ch.add(20, "把关：宏里创建元素前的唯一化调用计数 == 元素总数（且全部经 $!n）", errs, det)
+            errs.append("Add-in 仍预载 pkpm2pdmsuniquename（〔R7〕不再部署该函数）")
+    ch.add(20, "把关：〔R7〕宏内零运行期函数依赖 + 名字全宏唯一 + 底层 unnamed + 标准头尾",
+           errs, det)
 
 
 # ==========================================================================
@@ -675,17 +765,17 @@ def check_gate(ch):
 def check_19(ch, g_before, aveva_before, aveva_after_gate):
     det, errs = [], []
     # ① 工作区 R3 交付物
-    want = [("pdms-net/PKPMJWDAddin.cs", ADDIN_CS), ("pdms-net/PKPMJWDForm.cs", FORM_CS),
+    want = [("pdms-net/PKPM2PDMSAddin.cs", ADDIN_CS), ("pdms-net/PKPM2PDMSForm.cs", FORM_CS),
             ("pdms-net/PmlBridge.cs", os.path.join(NET, "PmlBridge.cs")),
             ("pdms-net/EngineRunner.cs", os.path.join(NET, "EngineRunner.cs")),
             ("pdms-net/PKLog.cs", os.path.join(NET, "PKLog.cs")),
-            ("pdms-net/build.cmd", BUILD_CMD), ("pdms-net/pkpmjwd.uic", UIC),
-            ("pdms-net/dist/PKPMJWD.dll", DIST_DLL), ("pdms-net/dist/pkpmjwd.uic", DIST_UIC),
-            ("pdms-net/deploy/deploy_pkpmjwd.py", DEPLOY_PY),
-            ("pdms-net/deploy/undeploy_pkpmjwd.py", UNDEPLOY_PY),
-            ("pdms/pkpmjwduniquename.pmlfnc", PMLFN),
-            ("engine/dist/pkpmjwd_engine.exe", os.path.join(PKG, "engine", "dist",
-                                                            "pkpmjwd_engine.exe")),
+            ("pdms-net/build.cmd", BUILD_CMD), ("pdms-net/pkpm2pdms.uic", UIC),
+            ("pdms-net/dist/PKPM2PDMS.dll", DIST_DLL), ("pdms-net/dist/pkpm2pdms.uic", DIST_UIC),
+            ("pdms-net/deploy/deploy_pkpm2pdms.py", DEPLOY_PY),
+            ("pdms-net/deploy/undeploy_pkpm2pdms.py", UNDEPLOY_PY),
+            ("pdms/pkpm2pdmsuniquename.pmlfnc", PMLFN),
+            ("engine/dist/pkpm2pdms_engine.exe", os.path.join(PKG, "engine", "dist",
+                                                            "pkpm2pdms_engine.exe")),
             ("engine/dist/run_engine.cmd", os.path.join(PKG, "engine", "dist",
                                                         "run_engine.cmd"))]
     det.append("工作区 R3 交付物（契约 §p.1 目录树）：")
@@ -696,7 +786,7 @@ def check_19(ch, g_before, aveva_before, aveva_after_gate):
         if not ok:
             errs.append("工作区缺 R3 交付物：%s" % label)
     # ② 交付目录
-    det.append("交付目录 D:/AI_Work/PKPM数据解析/交付_PKPM-JWD插件/：")
+    det.append("交付目录 D:/AI_Work/PKPM数据解析/交付_PKPM2PDMS插件/：")
     if not os.path.isdir(DELIVERY):
         errs.append("交付目录不存在：%s" % DELIVERY)
     else:
@@ -712,8 +802,8 @@ def check_19(ch, g_before, aveva_before, aveva_after_gate):
             errs.append("交付目录里没有整包副本（含 spec/CONTRACT.md 的目录）")
         else:
             for label, rel in (("pdms-net", "pdms-net"),
-                               ("pdms/pkpmjwduniquename.pmlfnc",
-                                os.path.join("pdms", "pkpmjwduniquename.pmlfnc")),
+                               ("pdms/pkpm2pdmsuniquename.pmlfnc",
+                                os.path.join("pdms", "pkpm2pdmsuniquename.pmlfnc")),
                                ("engine/dist", os.path.join("engine", "dist"))):
                 ok = os.path.isdir(os.path.join(pkg_copy, rel)) or \
                     os.path.isfile(os.path.join(pkg_copy, rel))
@@ -765,7 +855,7 @@ def main(argv=None):
             pass
     os.makedirs(OUT, exist_ok=True)
     print("=" * 78)
-    print(" PKPM-JWD导入导出 验收测试 R3（契约 v3 验收标准 15–19 + 把关项）")
+    print(" PKPM2PDMS导入导出 验收测试 R3（契约 v3 验收标准 15–19 + 把关项）")
     print("=" * 78)
     print("工作区根 : %s" % ROOT)
     print("交付包   : %s" % PKG)
@@ -788,13 +878,15 @@ def main(argv=None):
     print("  G 盘 %d 文件；D:\\AVEVA 顶层 %d 文件" % (len(g_before), len(aveva_before)))
 
     calls = (
-        (15, "重名唯一化（静态+逻辑对照+renames+宏侧不跳过）", lambda: check_15(ch)),
+        (15, "旧唯一化函数（R7 起不部署）静态纪律 + 逻辑对照 + renames 键语义",
+         lambda: check_15(ch)),
         (16, ".NET 插件真编译（build.cmd 退出码 0 + CLR v2.0.50727/x86）",
          lambda: check_16(ch, aveva_before)),
         (17, "注册脚本静态检查（dry-run/幂等/可回滚/只加不删/未执行过）",
          lambda: check_17(ch, aveva_before)),
         (18, "界面清单完整（.uic 同构对照 + 13 项控件 + Key 三处一致 + 编译）", lambda: check_18(ch)),
-        (20, "把关：宏里创建元素前的唯一化调用计数 == 元素总数（且全部经 $!n）", lambda: check_gate(ch)),
+        (20, "把关：〔R7〕宏内零运行期函数依赖 + 名字全宏唯一 + 底层 unnamed + 标准头尾",
+         lambda: check_gate(ch)),
         (19, "交付落点与\"没动过\"（G 盘/D:\\AVEVA 清单+哈希零变化 + 未部署声明）",
          lambda: check_19(ch, g_before, aveva_before, _manifest(AVEVA, False))),
     )

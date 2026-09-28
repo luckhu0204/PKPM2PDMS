@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """S3 自检：三个子命令 × 退出码 0/2/3 + pdms2jwd 端到端 + ``--report`` / ``--dump-unit``。
 
-跑法（工作区根目录）：``python PKPM-JWD导入导出\\test\\_s3_cli\\check_cli.py``
+跑法（工作区根目录）：``python PKPM2PDMS导入导出\\test\\_s3_cli\\check_cli.py``
 
 输入全部是**本脚本自己生成**的（§c.4 夹具转 GBK+CRLF、故意损坏的 .jwd）；
-G: 下的样本原件只读。产物写在 ``PKPM-JWD导入导出/test/out/``（本包的输出目录）。
+G: 下的样本原件只读。产物写在 ``PKPM2PDMS导入导出/test/out/``（本包的输出目录）。
 """
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ def check(cond, label, detail=""):
 def run(args, cwd=WS):
     """真实跑 cli.py 子进程，返回 (returncode, stdout, stderr)。"""
     cmd = [sys.executable, CLI] + [str(a) for a in args]
-    print("  $ python PKPM-JWD导入导出/engine/cli.py %s" % " ".join(
+    print("  $ python PKPM2PDMS导入导出/engine/cli.py %s" % " ".join(
         ('"%s"' % a if " " in a else a) for a in args))
     p = subprocess.run(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return (p.returncode, p.stdout.decode("utf-8", "replace"),
@@ -167,7 +167,7 @@ def main():
     txt = open(mac, "rb").read().decode("gbk")
     # R3 起（契约 §o.4，MacOptions.uniquify 缺省 True）宏内不再直写 "NEW ZONE /名"，
     # 而是先经唯一化函数探测再 "NEW ZONE $!n" ⇒ 断言改为 R3 形态。
-    check("!!pkpmjwdUniquename('/JLCJ2')" in txt and "NEW ZONE $!n" in txt,
+    check("!!pkpm2pdmsUniquename('/JLCJ2')" in txt and "NEW ZONE $!n" in txt,
           "ZONE 名 = --project（R3 形态：先唯一化再 NEW ZONE $!n）")
     model = jwd_read.read_jwd(JWD)
     col = sorted([x for x in model.members if x.type == "column"],
@@ -196,7 +196,7 @@ def main():
     rc, out, err = run(["pdms2jwd", dump, "--out", os.path.join(OUT, "never6.jwd")])
     check(rc == 2, "dump 同目录没有匹配文件且未给 --secmap ⇒ 2（§f.1 缺省规则）", "rc=%d" % rc)
     bad = gbk_write(os.path.join(OUT, "cli_bad_dump.txt"),
-                    "#PKPM-JWD-PDMSDUMP 1.0\nUNITS mm\n#SITE /S\n#END\n#FOO x\n")
+                    "#PKPM2PDMS-PDMSDUMP 1.0\nUNITS mm\n#SITE /S\n#END\n#FOO x\n")
     rc, out, err = run(["pdms2jwd", bad, "--out", os.path.join(OUT, "never3.jwd")])
     check(rc == 2, "dump 文法错误（#END 之后有内容）⇒ 2", "rc=%d" % rc)
     check(not os.path.isfile(os.path.join(OUT, "never3.jwd")), "码 2 时不留产物")

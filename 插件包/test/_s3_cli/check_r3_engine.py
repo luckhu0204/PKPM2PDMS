@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """R3 引擎侧自检：``--request`` 协议（§p.5/§m R3）+ ``renames`` 键（§h v3）+ 引擎入口三形态。
 
-跑法：``python PKPM-JWD导入导出\\test\\_s3_cli\\check_r3_engine.py``
+跑法：``python PKPM2PDMS导入导出\\test\\_s3_cli\\check_r3_engine.py``
 
 覆盖：
   A. ``_request_to_argv`` 的键还原（连字符选项、位置参数、bool/列表/省略、未知键、缺参、未知 tool）
   B. ``main(["--request", …])`` 端到端（dbsections 内置表 ⇒ 0；缺文件/坏 JSON/未知 tool ⇒ 2）
   C. ``report.renames`` 键存在（生成方向恒 []）
-  D. 引擎入口三形态：python cli.py / dist\\run_engine.cmd / dist\\pkpmjwd_engine.exe（--request）
+  D. 引擎入口三形态：python cli.py / dist\\run_engine.cmd / dist\\pkpm2pdms_engine.exe（--request）
   E. pdms-net/ENGINE_IO.md 存在且含冻结锚点
 """
 from __future__ import annotations
@@ -72,9 +72,9 @@ def main():
         check(True, "db2pdt 没有 --dump-unit，传了 ⇒ InputError（不发明选项）", str(exc)[:70])
     a4 = cli_mod._request_to_argv(parser, "jwd2db",
                                   {"jwd": "a.jwd", "out": "o.mac", "clean": True,
-                                   "catalogue_user": "/PKPM_JWD_USER_X"})
+                                   "catalogue_user": "/PKPM2PDMS_USER_X"})
     check(a4 == ["jwd2db", "a.jwd", "--out", "o.mac", "--clean",
-                 "--catalogue-user", "/PKPM_JWD_USER_X"],
+                 "--catalogue-user", "/PKPM2PDMS_USER_X"],
           "jwd2db：store_true 与连字符长选项", str(a4))
     for tool, bad in (("jwd2pdms", {"jwd": "a", "out": "b", "nope": 1}),
                       ("pdms2pdt", {"out": "b", "skeleton": "full"}),
@@ -120,9 +120,9 @@ def main():
           "_new_report 恒含 renames 键")
 
     print("\n=== D. 引擎入口三形态 ===")
-    exe = os.path.join(ENGINE, "dist", "pkpmjwd_engine.exe")
+    exe = os.path.join(ENGINE, "dist", "pkpm2pdms_engine.exe")
     wrap = os.path.join(ENGINE, "dist", "run_engine.cmd")
-    check(os.path.isfile(exe), "dist\\pkpmjwd_engine.exe 存在（PyInstaller --onefile）",
+    check(os.path.isfile(exe), "dist\\pkpm2pdms_engine.exe 存在（PyInstaller --onefile）",
           "%d B" % (os.path.getsize(exe) if os.path.isfile(exe) else -1))
     check(os.path.isfile(wrap), "dist\\run_engine.cmd 存在（§p.1 回退）")
     wb = open(wrap, "rb").read()
@@ -144,7 +144,7 @@ def main():
     doc = os.path.join(PKG, "pdms-net", "ENGINE_IO.md")
     check(os.path.isfile(doc), "pdms-net/ENGINE_IO.md 存在")
     t = io.open(doc, encoding="utf-8").read() if os.path.isfile(doc) else ""
-    for anchor in ("--request", "engine_path.txt", "PKPMJWD_ENGINE", "pkpmjwd_engine.exe",
+    for anchor in ("--request", "engine_path.txt", "PKPM2PDMS_ENGINE", "pkpm2pdms_engine.exe",
                    "run_engine.cmd", "renames", "退出码", "30 分钟", "UTF-8"):
         check(anchor in t, "ENGINE_IO.md 含锚点 %r" % anchor)
 

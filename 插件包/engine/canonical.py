@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
-"""PKPM-JWD导入导出 —— 规范模型（唯一契约的数据结构）。
+"""PKPM2PDMS导入导出 —— 规范模型（唯一契约的数据结构）。
 
 契约版本：CONTRACT_VERSION = "1.0"；条文见 ``spec/CONTRACT.md`` §a。
+
+**注意区分两个版本号**：``CONTRACT_VERSION`` 是**规范模型 schema 版本**（出现在
+``.jwd``/``report.json`` 的 ``contract_version`` 字段里，被契约与多个测试引用），
+本版（插件 v2.1.0）**不动它，恒为 "1.0"**；插件的发行版本是 **v2.1.0**（见
+``docs/使用说明.md`` §0 与 ``engine/README.txt``）。两者是两回事，不要互相推导。
 
 单位与坐标系（全项目统一，模块之间**不得**再做换算）::
 
@@ -30,6 +35,8 @@ import math
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
+#: 规范模型 **schema** 版本（**不是**插件版本；插件版本见 docs/使用说明.md §0）。
+#: 本常量被 spec/CONTRACT.md 与多个测试引用，插件 v2.1.0 里**保持 "1.0" 不变**。
 CONTRACT_VERSION = "1.0"
 
 # --------------------------------------------------------------------------

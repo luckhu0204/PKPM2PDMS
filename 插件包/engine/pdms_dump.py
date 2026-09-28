@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""PKPM-JWD导入导出 —— PDMS 中性导出文本 ``#PKPM-JWD-PDMSDUMP 1.0`` → 规范模型。实施包④。
+"""PKPM2PDMS导入导出 —— PDMS 中性导出文本 ``#PKPM2PDMS-PDMSDUMP 1.0`` → 规范模型。实施包④。
 
 契约条款（``spec/CONTRACT.md``）：§c（格式与解析规则，逐条对应）、§a.3（平面型 Level）、
 §a.4（ShapeVal 编码，本模块只解出 kind/dims，编码由 ``jwd_write.shapeval_for`` 统一完成）、
@@ -43,7 +43,15 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 from canonical import (TOL, Joint, Level, Member, Model, Section, Slab, Wall)
 
 #: 契约 §c.2 的文件头与版本
-HEADER = '#PKPM-JWD-PDMSDUMP'
+#:
+#: **兼容性提示（改名带来的唯一代价）**：首行 magic 里的插件标识随 v2.1.0 改名，
+#: ``#PKPM-JWD-PDMSDUMP`` → ``#PKPM2PDMS-PDMSDUMP``；``FORMAT_VERSION`` 仍是 ``'1.0'``
+#: **未动**（那是格式版本，不是插件版本）。解析侧是**硬校验**（本文件 :410、``cli.py``
+#: 的 ``pdms2jwd``/``pdms2pdt`` 入口）：**v2.0 时代生成的旧 dump 文本新引擎一律拒绝**。
+#: 迁移办法：用 v2.0 的旧引擎，或把首行 ``#PKPM-JWD-PDMSDUMP`` 手工替换为
+#: ``#PKPM2PDMS-PDMSDUMP``（其余行不动）。**不为旧 magic 加兼容分支**——那属行为增量，
+#: 超出"只改名"的范围（见计划/RENAME_MAP.md §8 待决项 ②）。
+HEADER = '#PKPM2PDMS-PDMSDUMP'
 FORMAT_VERSION = '1.0'
 
 #: 契约 §c.1：单位换算（只有长度量）
@@ -97,9 +105,23 @@ def set_default_section_map(section_map: Any) -> None:
 
 
 def load_dump(path: str) -> str:
-    """按契约 §c.1 读 dump 文本：**GBK、不吞解码错误**（失败即 ``UnicodeDecodeError``）。"""
-    with open(path, 'r', encoding='gbk', newline='') as f:
-        return f.read()
+    """按契约 §c.1 读 dump 文本：**GBK、不吞解码错误**（失败即 ``UnicodeDecodeError``）。
+
+    〔R6 实机修复 2026-09-28 17:24〕**本机 PDMS 12.1 SP4 的 PML FILE 对象写出的 dump
+    是 UTF-8 with BOM**（实机 dump 头三字节 = EF BB BF，紧跟 ``#PKPM2PDMS-PDMSDUMP``；
+    见 验收/R6导出/export_test.dump.txt 与 验收/R6日志/P8_export_fail.txt 的引擎报错
+    「不是 GBK 编码：'gbk' codec can't decode byte 0xbf in position 2」）。
+    也就是说：只按 GBK 读 = 本机永远读不了 PDMS 自己写的 dump ⇒ 导出功能整条不通。
+    故改为**按实际字节自适应**：UTF-8 BOM / UTF-8 无 BOM 都能读；否则按 GBK 严格读
+    （仍不吞解码错误）。写方契约不变（引擎自己产出的文本仍是 UTF-8 无 BOM / 宏是 GBK）。
+    """
+    raw = open(path, 'rb').read()
+    if raw.startswith(b'\xef\xbb\xbf'):
+        return raw.decode('utf-8-sig')
+    try:
+        return raw.decode('utf-8')
+    except UnicodeDecodeError:
+        return raw.decode('gbk')
 
 
 # ---------------------------------------------------------------------------

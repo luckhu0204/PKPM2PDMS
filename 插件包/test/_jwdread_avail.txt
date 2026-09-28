@@ -1,3 +1,0 @@
-jwd_read 可 import；公开名字： ['Any', 'CONSUMED_TABLES', 'CONTRACT_VERSION', 'Dict', 'Joint', 'Level', 'List', 'Load', 'Member', 'Model', 'NO_MODEL_FIELD_TABLES', 'Optional', 'PANE_ORI', 'PANE_SJUS', 'SECTION_KIND_KNOWN', 'Section', 'Sequence', 'Slab', 'TOL', 'Tuple']
-counts = {'levels': 5, 'joints': 382, 'sections': 28, 'members': {'beam': 598, 'column': 200, 'brace': 13}, 'members_total': 811, 'slabs': 222, 'slabs_holes': 29, 'slabs_with_thickness': 80, 'walls': 0, 'loads': {'beam-line': 77, 'joint-point': 44}, 'loads_total': 121}
-sections: 28 notes: 17

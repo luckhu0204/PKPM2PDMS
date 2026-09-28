@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """S3-v2 产物字节纪律自检（契约 §g / §j.2 / §l.1-5 / §l.4）。
 
-跑法：``python PKPM-JWD导入导出\\test\\_s3_cli\\check_v2_artifacts.py``
+跑法：``python PKPM2PDMS导入导出\\test\\_s3_cli\\check_v2_artifacts.py``
 
 只读 ``test/out/`` 下的产物；不写任何文件。检查项：
   * PDMS 侧（.mac 建模型宏 / 目录宏）：GBK 可解码、无 BOM、只有 CRLF；目录宏另外要求纯 ASCII。
@@ -106,7 +106,7 @@ def main():
     forbidden = ["/AVEVA", "/CATALOGUE", "/SPWLD", "/SPECIFICATION", "OVERRIDE"]
     for f in forbidden:
         check(f not in txt, "sample_db.mac 内不出现 %r" % f)
-    for f in ("/PKPM_JWD_USER", "/PKPM_JWD_STSS", "/PKPM_JWD_USER_SECTION", "/PKPM_JWD_LIB"):
+    for f in ("/PKPM2PDMS_USER", "/PKPM2PDMS_STSS", "/PKPM2PDMS_USER_SECTION", "/PKPM2PDMS_LIB"):
         check(f in txt, "sample_db.mac 只建本包容器 %s" % f)
     news = sum(1 for l in txt.splitlines() if l.strip().startswith("NEW "))
     ends = sum(1 for l in txt.splitlines() if l.strip() == "END")

@@ -6,7 +6,7 @@ import sys
 import time
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-SCRIPT = r"PKPM-JWD导入导出\test\acceptance_r3.py"
+SCRIPT = r"PKPM2PDMS导入导出\test\acceptance_r3.py"
 outs = []
 for i in range(3):
     t = time.time()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""PKPM-JWD导入导出 —— ``.pdt`` 写出器（契约 §(j)，v2.0 / 变更记录 §0.4-4/5/6）。
+"""PKPM2PDMS导入导出 —— ``.pdt`` 写出器（契约 §(j)，v2.0 / 变更记录 §0.4-4/5/6）。
 
 把 :class:`canonical.Model` 写成 PKPM 的文本中间模型 ``.pdt``——**逐字**照
 ``1_PM.pdt`` 的行式（契约 §j.4 的模板表）与 ``PDMSxCA_Addin121.dll`` 里的格式串

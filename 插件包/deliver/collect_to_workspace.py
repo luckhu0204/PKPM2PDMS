@@ -816,7 +816,7 @@ def build_hash_list(dst: Path, started: str, refresh_mode: bool,
     rows.sort(key=lambda r: r[2])
     lines: list[str] = []
     lines.append("=" * 74)
-    lines.append(" SHA256 哈希清单 —— PKPM-JWD 导入导出（交付目录整棵树，§q-19①）")
+    lines.append(" SHA256 哈希清单 —— PKPM2PDMS 导入导出（交付目录整棵树，§q-19①）")
     lines.append("=" * 74)
     lines.append(f"生成时间   : {started}（由 插件包\\deliver\\collect_to_workspace.py 自动生成"
                  f"{'，刷新模式' if refresh_mode else ''}）")
@@ -850,18 +850,18 @@ def build_start_here(pkg_ver: str, contract_ver: str) -> list[str]:
         "1. 先读什么：插件包\\docs\\使用说明.md —— 安装/导入/导出/参数/界面/卸载/已知限制全在里面。",
         "",
         "2. 在哪装（R3 路线，先预览再执行；需要 Python 3.12）：",
-        '   python pdms-net\\deploy\\deploy_pkpmjwd.py                （缺省 dry-run：只打印清单）',
-        '   python pdms-net\\deploy\\deploy_pkpmjwd.py --execute      （真做：备份+复制+注册，幂等）',
-        '   python pdms-net\\deploy\\undeploy_pkpmjwd.py --execute    （卸载/回滚，恢复 .pkpmjwd-bak）',
-        "   装完【完全退出并重启 PDMS】，进 DESIGN 模块，菜单栏出现「PKPM-JWD」即成。",
+        '   python pdms-net\\deploy\\deploy_pkpm2pdms.py                （缺省 dry-run：只打印清单）',
+        '   python pdms-net\\deploy\\deploy_pkpm2pdms.py --execute      （真做：备份+复制+注册，幂等）',
+        '   python pdms-net\\deploy\\undeploy_pkpm2pdms.py --execute    （卸载/回滚，恢复 .pkpm2pdms-bak）',
+        "   装完【完全退出并重启 PDMS】，进 DESIGN 模块，菜单栏出现「PKPM2PDMS」即成。",
         "   安装程序\\ 里的两个 v1 exe 是旧方案（v1 遗留，§p.8；只装 PML 菜单，不含 R3 的 .NET 插件），",
         "   要装 R3 的 .NET 插件请走上面的 deploy 脚本。",
         "",
-        "3. 装完怎么用（转换）：双击 安装程序\\PKPM-JWD_引擎_v1.exe 出转换界面（v1 版），或",
-        "   engine\\dist\\pkpmjwd_engine.exe（R3 独立引擎，功能与源码版一致）；不用 exe 也可以：",
+        "3. 装完怎么用（转换）：双击 安装程序\\PKPM2PDMS_引擎_v2.1.0.exe 出转换界面，或",
+        "   engine\\dist\\pkpm2pdms_engine.exe（独立引擎，功能与源码版一致）；不用 exe 也可以：",
         "   python engine\\cli.py --help（12 个子命令）；python engine\\gui.py（图形界面）。",
         "",
-        "4. 怎么卸载：python pdms-net\\deploy\\undeploy_pkpmjwd.py --execute（恢复 .pkpmjwd-bak，",
+        "4. 怎么卸载：python pdms-net\\deploy\\undeploy_pkpm2pdms.py --execute（恢复 .pkpm2pdms-bak，",
         "   4 个安装文件移入 _uninstalled_<时刻>\\，不删除）；或 v1 方式（同上）。",
         "",
         "5. 版本注意：宏/PML/.NET 插件均未在 PDMS 实机验证（acceptance_r3.py 各检查的",
@@ -888,7 +888,7 @@ def build_manifest(
     counters = counters or {"added": 0, "updated": 0, "same": 0, "stale": []}
     lines: list[str] = []
     lines.append("=" * 74)
-    lines.append(" 交付清单 —— PKPM-JWD 导入导出（工作区归集版）")
+    lines.append(" 交付清单 —— PKPM2PDMS 导入导出（工作区归集版）")
     lines.append("=" * 74)
     lines.append(f"生成时间   : {started}（由 插件包\\deliver\\collect_to_workspace.py 自动生成"
                  f"{'，--refresh 刷新' if refresh_mode else ''}）")

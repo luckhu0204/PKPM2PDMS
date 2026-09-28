@@ -9,7 +9,7 @@
    覆盖 = 先把旧文件**移动**到 ``交付_PKPM-JWD插件\\_备份_被覆盖_<时间>\\``（内容保留，
    不是删除），再从源**独占新建**；目标里多出来的旧文件原样保留并列出。
 2. **新增 PDMS原生插件\\**：``PKPM-JWD导入导出\\pdms-net\\`` 整树（源码 5 个 .cs +
-   build.cmd + pkpmjwd.uic + dist\\PKPMJWD.dll + deploy 两脚本 + _selftest 沙箱证据）。
+   build.cmd + pkpm2pdms.uic + dist\\PKPM2PDMS.dll + deploy 两脚本 + _selftest 沙箱证据）。
    **只放文件，不执行任何脚本**（本脚本没有任何执行外部命令的代码）。
 3. **重新生成交付清单.txt / 从这里开始.txt**：写清 R3 新内容、装在哪一步（PDMS 停机时）、
    主用法 = PDMS 内菜单、以及【未部署】声明。
@@ -169,7 +169,7 @@ def file_skip_reason(name: str) -> str | None:
 def is_reparse(path: Path) -> bool:
     """目录是符号链接或 junction（联接点）——一律不跟随，防无限循环。
 
-    pdms-net\\_selftest\\_rootsim\\ 下的 PKPM-JWD-sim / pdms-net 是指向真实目录的
+    pdms-net\\_selftest\\_rootsim\\ 下的 PKPM2PDMS-sim / pdms-net 是指向真实目录的
     联接（pdms-net\\README.txt §2 有说明）；os.walk 会跟随 junction 导致路径无限
     增长（实测已在真实运行中触发 FileNotFoundError）。"""
     if os.path.islink(path):
@@ -488,7 +488,7 @@ def build_manifest(
 ) -> list[str]:
     L: list[str] = []
     L.append("=" * 74)
-    L.append(" 交付清单 —— PKPM-JWD 导入导出（工作区归集版 · R3 更新）")
+    L.append(" 交付清单 —— PKPM2PDMS 导入导出（工作区归集版 · R3 更新）")
     L.append("=" * 74)
     L.append(f"更新时间   : {started}（由 插件包\\deliver\\collect_r3.py 重新生成）")
     L.append(f"插件包版本 : {pkg_ver}（契约 {rev_line}；CONTRACT_VERSION 常量 = \"{contract_const}\"）")

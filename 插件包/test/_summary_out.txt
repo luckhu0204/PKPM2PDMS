@@ -1,5 +1,0 @@
-test/_rt_out.txt           [OK]=34   [FAIL]=0  
-    FAIL 项: 0  
-test/_dump_chain_out.txt   [OK]=81   [FAIL]=0  
-    FAIL 项: 0  
-test/_wr_sample.txt        [OK]=0    [FAIL]=0  

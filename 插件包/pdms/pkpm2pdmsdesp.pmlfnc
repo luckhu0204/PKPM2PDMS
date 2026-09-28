@@ -1,0 +1,32 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: !!pkpm2pdmsRenamesCount -> "PML: Function not found"；
+--    P7_export_1: "(46,85) PML: Wrong Function found"）。故一函数一文件。
+-- 源     : pkpm2pdmsexport.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmsdesp
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- DESP 参数串：返回 ' v1 v2 …'（无参数返回空串）。
+-- 上界 13 与 MYTOOLS\...\sdnfinver3.pmlfnc:117-198 的 despar[1..13] 一致。
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsdesp(!element is DBREF, !toMm is BOOLEAN) is STRING
+
+   !out = ''
+   do !i from 1 to 13
+   -- 〔R6 实机修复·handle 语义〕块体只在报错时执行 -> 语句移出，块只兜错。
+      !okD = TRUE
+      !v = !element.desp[!i]
+      handle any
+         !okD = FALSE
+      endhandle
+      if (!okD.eq(TRUE)) then
+         if (!v.unset().not()) then
+            !out = !out & ' ' & !!pkpm2pdmsnum(!v, !toMm)
+         endif
+      endif
+   enddo
+   return !out
+
+endfunction
+-- End of function !!pkpm2pdmsdesp

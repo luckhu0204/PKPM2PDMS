@@ -5,7 +5,7 @@ import json
 import os
 
 REC = r"D:\AI_Work\PKPM数据解析\_recon\dbsect"
-OUT = open(r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\_r2_probe_dllpairs.txt", "w",
+OUT = open(r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\test\_r2_probe_dllpairs.txt", "w",
            encoding="utf-8")
 
 pairs = json.load(open(os.path.join(REC, "_dll_pairs_full.json"), encoding="utf-8"))

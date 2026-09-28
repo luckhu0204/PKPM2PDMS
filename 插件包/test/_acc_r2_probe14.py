@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-SCRIPT = r"PKPM-JWD导入导出\test\acceptance_r2.py"
+SCRIPT = r"PKPM2PDMS导入导出\test\acceptance_r2.py"
 outs = []
 for i in range(4):
     p = subprocess.run([sys.executable, SCRIPT], capture_output=True)

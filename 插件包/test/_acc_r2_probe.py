@@ -8,8 +8,8 @@ import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 ROOT = r"D:\AI_Work\PKPM数据解析"
-CLI = os.path.join(ROOT, "PKPM-JWD导入导出", "engine", "cli.py")
-OUT = os.path.join(ROOT, "PKPM-JWD导入导出", "test", "_acc_r2_out")
+CLI = os.path.join(ROOT, "PKPM2PDMS导入导出", "engine", "cli.py")
+OUT = os.path.join(ROOT, "PKPM2PDMS导入导出", "test", "_acc_r2_out")
 S = r"G:\工作\PDMS相关\00 PDMS插件\02 实用插件\PKPM导入导出插件"
 JWD = os.path.join(S, "JLCJ2.jwd")
 PDT = os.path.join(S, "1_PM.pdt")

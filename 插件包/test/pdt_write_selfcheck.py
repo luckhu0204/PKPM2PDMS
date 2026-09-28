@@ -3,7 +3,7 @@
 
 跑法::
 
-    cd /d "D:\\AI_Work\\PKPM数据解析\\PKPM-JWD导入导出"
+    cd /d "D:\\AI_Work\\PKPM数据解析\\PKPM2PDMS导入导出"
     python test\\pdt_write_selfcheck.py
 
 覆盖（任务验收 ①–④ + §j.10 的行式/计数自洽）::

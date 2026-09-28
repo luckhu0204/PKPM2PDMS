@@ -4,13 +4,13 @@ import os
 import re
 import sys
 
-sys.path.insert(0, r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\engine")
+sys.path.insert(0, r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\engine")
 import jwd_read  # noqa: E402
 import pdt_read  # noqa: E402
 import pdt_write  # noqa: E402
 
 JWD = r"G:\工作\PDMS相关\00 PDMS插件\02 实用插件\PKPM导入导出插件\JLCJ2.jwd"
-P = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\_acc_tmp\r3_probe_secs.pdt"
+P = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\test\_acc_tmp\r3_probe_secs.pdt"
 m0 = jwd_read.read_jwd(JWD)
 pdt_write.write_pdt(m0, P, pdt_write.PdtOptions(skeleton="full"))
 m1 = pdt_read.read_pdt(P)

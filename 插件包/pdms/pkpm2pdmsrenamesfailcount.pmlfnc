@@ -1,0 +1,28 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: !!pkpm2pdmsRenamesCount -> "PML: Function not found"；
+--    P7_export_1: "(46,85) PML: Wrong Function found"）。故一函数一文件。
+-- 源     : pkpm2pdmsuniquename.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmsRenamesFailCount
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- FAIL 条数（'FAIL|' 开头的记录；数组未建 => 0）
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsRenamesFailCount() is REAL
+
+   if (undefined(!!pkpm2pdmsRenames)) then
+      return 0
+   endif
+   !n = 0
+   -- 〔R6 实机修复〕.size() -> arraySize()（本机实测 .size() 报 (2,759)）。
+   !nAll = arraySize(!!pkpm2pdmsRenames)
+   do !i from 1 to !nAll
+      if (!!pkpm2pdmsRenames[!i].before('|').eq('FAIL')) then
+         !n = !n + 1
+      endif
+   enddo
+   return !n
+
+endfunction
+-- End of function !!pkpm2pdmsRenamesFailCount

@@ -1,0 +1,42 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: "PML: Function not found"；P7_export_1: "(46,85) PML: Wrong
+--    Function found"；本工程 lint-pml.ps1 的 PKG-04 同指此文件）。故一函数一文件。
+-- 源     : pkpm2pdmsdbexport.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmsdbcounts
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- 容器直接子元素按类型计数：返回 'TYPE=n TYPE=n …'（按首次出现顺序）
+-- 只用 .mCount() / .members[i] / .type —— 不需要预知任何类型码
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsdbcounts(!container is DBREF) is STRING
+
+   !names = object ARRAY()
+   !counts = object ARRAY()
+   !n = 0
+   do !i from 1 to !container.mCount()
+      !t = !container.members[!i].type
+      !k = 0
+      do !j from 1 to !n
+         if (!k eq 0 and !names[!j] eq !t) then
+            !k = !j
+         endif
+      enddo
+      if (!k eq 0) then
+         !counts[!k] = !counts[!k] + 1
+      else
+         !n = !n + 1
+         !names[!n] = !t
+         !counts[!n] = 1
+      endif
+   enddo
+
+   !out = ''
+   do !j from 1 to !n
+      !out = !out & !names[!j] & '=' & !counts[!j].string() & ' '
+   enddo
+   return !out
+
+endfunction
+-- End of function !!pkpm2pdmsdbcounts

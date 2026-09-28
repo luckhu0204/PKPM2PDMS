@@ -1,5 +1,5 @@
 <#
-  PKPM-JWD导入导出 —— PDMS 侧安装脚本（PDMS 12.1 SP4）
+  PKPM2PDMS导入导出 v2.1.0 —— PDMS 侧安装脚本（PDMS 12.1 SP4）
 
   用法（先跑 -DryRun 看完整变更清单，确认后再真装）：
       powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -DryRun
@@ -8,25 +8,31 @@
   参数：
     -PdmsRoot    PDMS 安装根目录，缺省 D:\AVEVA\Plant\PDMS12.1.SP4
     -SourceDir   要安装的 PML 包目录，缺省 <本脚本所在目录>\..\pdms
-    -PackageName 装到 PMLLIB 下的子目录名，缺省 pkpmjwd
+    -PackageName 装到 PMLLIB 下的子目录名，缺省 pkpm2pdms
     -DryRun      只打印将要发生的全部改动（含内存中做完的 XML 变换与校验），不落盘
     -Force       跳过“PDMS 正在运行”检查（不推荐；PDMS 在跑时覆盖 PML 会读不到新代码）
     -SkipEncodingCheck  跳过源文件的 GBK/CRLF 校验（不推荐）
 
   本脚本做什么（契约 §i.4 / §g）：
-    1) 把 pdms 包复制到 <PDMS根>\PMLLIB\pkpmjwd\        —— 只新增/覆盖本包这几个文件
-    2) 改前把 <PDMS根>\design.uic 备份为 design.uic.bak_pkpmjwd_<yyyyMMdd_HHmmss>
+    1) 把 pdms 包复制到 <PDMS根>\PMLLIB\pkpm2pdms\        —— 只新增/覆盖本包这几个文件
+    2) 改前把 <PDMS根>\design.uic 备份为 design.uic.bak_pkpm2pdms_<yyyyMMdd_HHmmss>
     3) 往 design.uic「追加」一个菜单项后写回：
-         <Tools> 段内追加 <MenuTool Name="PKPMJWD.Menu"> + <ButtonTool Name="PKPMJWD.Open">
-         <MenuBar> 段内追加 <Tool Name="PKPMJWD.Menu" />
-       按钮命令用 <Command><Type>Macro</Type><Macro>show !!pkpmjwd</Macro></Command>
+         <Tools> 段内追加 <MenuTool Name="PKPM2PDMS.PML.Menu"> + <ButtonTool Name="PKPM2PDMS.PML.Open">
+         <MenuBar> 段内追加 <Tool Name="PKPM2PDMS.PML.Menu" />
+         ---- Tool Key 必须全局唯一：PDMS 的 RootTools 集合是**跨 uic 文件**的，
+              同名会让后加载的整份 uic 被拒载（2026-09-28 实机 P3：原生路线的
+              pkpm2pdms.uic 因与本文件注入的 PKPM2PDMS.Menu/PKPM2PDMS.Open 重名，
+              被 PDMS 报 "Key ... already exists in the RootTools collection" 整份放弃）。
+              原生路线已占用 PKPM2PDMS.Menu / PKPM2PDMS.Open，故本（legacy PML）路线
+              一律加 .PML. 前缀；菜单标题仍是「PKPM2PDMS PML」（P3 判据看标题，不看 Key）。
+       按钮命令用 <Command><Type>Macro</Type><Macro>show !!pkpm2pdms</Macro></Command>
        —— 这是本机 AVEVA 自带文件里真实存在的写法（PDMS 根目录 HistoryToolbar.uic /
        Schematic Model Manager\Resources\SmmToolsMenu.uic 的 <Type>Macro</Type>），
        不需要任何 .NET add-in，因此**不动 DesignAddins.xml**
        （DesignAddins.xml 只登记 .NET 程序集，写进去会让 Design 启动时找不存在的 DLL）。
     4) 保持 UTF-8 带 BOM + 原换行风格写回；写前/写后都用 [xml] 解析校验；
        写失败或写后校验失败 → 用备份回滚，并报告回滚结果。
-    5) 幂等：design.uic 里已有 PKPMJWD.Menu 时跳过注入（不动该文件）。
+    5) 幂等：design.uic 里已有 PKPM2PDMS.PML.Menu 时跳过注入（不动该文件）。
 
   禁止事项：不删除任何既有文件；不重排/改写既有 XML 条目；不动 P-TRANS 目录。
 #>
@@ -34,7 +40,7 @@
 param(
     [string]$PdmsRoot = 'D:\AVEVA\Plant\PDMS12.1.SP4',
     [string]$SourceDir = '',
-    [string]$PackageName = 'pkpmjwd',
+    [string]$PackageName = 'pkpm2pdms',
     [switch]$DryRun,
     [switch]$Force,
     [switch]$SkipEncodingCheck
@@ -64,7 +70,26 @@ if (-not (Test-Path -LiteralPath $SourceDir -PathType Container)) {
     Fail ("源包目录不存在：" + $SourceDir) $ExitArgs
 }
 
-$required = @('pkpmjwd.pmlfrm', 'pkpmjwdexport.pmlfnc', 'pkpmjwddbexport.pmlfnc', 'pkpmjwdrun.mac')
+# R6：PML 包一函数一文件（PMLLIB 自动加载规则 = 文件名 = 函数名，见 pdms\README.txt），
+#     所以按目录枚举源包里全部 PML/文本文件（逐条印在【1】清单里），而不是写死 4 个名字。
+# 〔R7 实机修复·部署清单〕退役族**不部署**：改名责任已整体移交 .NET 侧 SITE 名探测
+#   （SiteProber）+ 引擎生成期查重，宏里零 PML 函数调用
+#   （证据 验收/R7日志/addin_log_full_r7.txt 的 "no PML preload at addin start
+#    (retired family; site name probed on run)"）。
+#   与原生 deploy 路线同一份口径 = 插件包\pdms-net\deploy\deploy_pkpm2pdms.py 的
+#   RETIRED_PML。工作树里这 5 个文件**保留不删**，只是不进本清单、不复制到 PMLLIB。
+$retired = @('pkpm2pdmsuniquename.pmlfnc', 'pkpm2pdmsrenamescount.pmlfnc',
+             'pkpm2pdmsrenamesfailcount.pmlfnc', 'pkpm2pdmsrenamesshow.pmlfnc',
+             'pkpm2pdmsrunmac.pmlfnc')
+$required = @(Get-ChildItem -LiteralPath $SourceDir -File |
+              Where-Object { $_.Extension -in '.pmlfnc', '.pmlfrm', '.mac', '.txt' } |
+              Where-Object { $retired -notcontains $_.Name } |
+              Sort-Object Name | ForEach-Object { $_.Name })
+if ($required.Count -eq 0) { Fail ('源包目录里没有 PML 文件：' + $SourceDir) $ExitArgs }
+foreach ($must in @('pkpm2pdms.pmlfrm', 'pkpm2pdmsexport.pmlfnc',
+                    'pkpm2pdmsdbexport.pmlfnc', 'pkpm2pdmsrun.mac')) {
+    if ($required -notcontains $must) { Fail ('源包缺少 ' + $must) $ExitArgs }
+}
 $sources = @()
 foreach ($n in $required) {
     $p = Join-Path $SourceDir $n
@@ -74,9 +99,21 @@ foreach ($n in $required) {
 $targetDir = Join-Path $PdmsRoot ('PMLLIB\' + $PackageName)
 
 # ---------------------------------------------------------------- 源文件编码校验
+# 范围：只校验 **PDMS 会解析的** PML 源（.pmlfnc/.pmlfrm/.mac）——契约要求
+#       「PDMS 侧产物 GBK 无 BOM + CRLF」只针对这几种文件。
+#       .txt 是给人看的说明（README.txt，UTF-8 无 BOM + LF，见静态回归规则 B），
+#       PDMS 从不解析它，按原形态复制即可；把它纳入 GBK 校验会让安装被自己的
+#       文档文件卡死（R6 实机 P1 首跑即命中：README.txt 报「非 CRLF 242 处」）。
 $encFails = @()
+# 〔R7 实机修复·编码预检空转〕$sources 里装的是**路径字符串**，字符串没有 .Extension
+#   属性（取到 $null）-> 这里恒匹配 0 条 -> 预检形同虚设却仍打印"已校验 N 个 = GBK 无 BOM
+#   + CRLF"这种结论性措辞（R7 实机 P1_install_dryrun_r7.txt 首行：'已校验 0 个'，
+#   根因与实测见 验收/R7日志/P1_install_enc_precheck_defect.txt）。
+#   修法：过滤前先 Get-Item 转成 FileInfo（$sources 本身保持字符串，供【1】/【4】沿用）。
+$encChecked = @($sources | ForEach-Object { Get-Item -LiteralPath $_ } |
+                Where-Object { $_.Extension -in '.pmlfnc', '.pmlfrm', '.mac' })
 if (-not $SkipEncodingCheck) {
-    foreach ($p in $sources) {
+    foreach ($p in $encChecked) {
         $b = [System.IO.File]::ReadAllBytes($p)
         if ($b.Length -ge 3 -and $b[0] -eq 0xEF -and $b[1] -eq 0xBB -and $b[2] -eq 0xBF) {
             $encFails += ("UTF-8 BOM：" + (Split-Path $p -Leaf))
@@ -102,6 +139,12 @@ if (-not $SkipEncodingCheck) {
         Say '提示：先跑  python test\make_gbk.py  转换后再安装；确要跳过请加 -SkipEncodingCheck'
         exit $ExitCheck
     }
+    # 注意（本机 PS 5.1 实测）："行尾是完整操作数、下一行以 + 开头" 的续行写法会报
+    # MissingEndParenthesisInExpression（C:\TEMP\r6\cases\e1.ps1 最小复现：2026-09-28）。
+    # 所以续行一律把 + 放在行尾。
+    Say ('编码检查：已校验 ' + $encChecked.Count + ' 个 PDMS 解析源（.pmlfnc/.pmlfrm/.mac）' +
+         ' = GBK 无 BOM + CRLF；另有 ' + ($sources.Count - $encChecked.Count) +
+         ' 个非解析文件（.txt，按原形态复制，PDMS 不解析）未纳入该校验')
 }
 
 # ---------------------------------------------------------------- PDMS 进程检查
@@ -127,29 +170,29 @@ try { $null = [xml]$uicText; $origParses = $true }
 catch { $origParses = $false; $origErr = $_.Exception.Message }
 
 $menuInner = @(
-    '<MenuTool Name="PKPMJWD.Menu">',
+    '<MenuTool Name="PKPM2PDMS.PML.Menu">',
     '  <Image />',
-    '  <Caption>PKPM-JWD</Caption>',
+    '  <Caption>PKPM2PDMS PML</Caption>',
     '  <DisplayStyle>Default</DisplayStyle>',
     '  <Tools>',
-    '    <Tool Name="PKPMJWD.Open" />',
+    '    <Tool Name="PKPM2PDMS.PML.Open" />',
     '  </Tools>',
     '  <IsContextMenu>false</IsContextMenu>',
     '</MenuTool>',
-    '<ButtonTool Name="PKPMJWD.Open">',
+    '<ButtonTool Name="PKPM2PDMS.PML.Open">',
     '  <Command>',
     '    <Type>Macro</Type>',
-    '    <Macro>show !!pkpmjwd</Macro>',
+    '    <Macro>show !!pkpm2pdms</Macro>',
     '    <Arguments />',
     '  </Command>',
     '  <Image />',
-    '  <Caption>PKPM-JWD 导入导出</Caption>',
+    '  <Caption>PKPM2PDMS PML 导入导出</Caption>',
     '  <DisplayStyle>Default</DisplayStyle>',
     '</ButtonTool>')
 $menuBlock = ($menuInner | ForEach-Object { '    ' + $_ }) -join $nl
-$barLine = '    <Tool Name="PKPMJWD.Menu" />'
+$barLine = '    <Tool Name="PKPM2PDMS.PML.Menu" />'
 
-$already = $uicText -match 'PKPMJWD\.Menu'
+$already = $uicText -match 'PKPM2PDMS\.PML\.Menu'
 $newText = $uicText
 $insToolsLine = -1
 $insBarLine = -1
@@ -198,7 +241,7 @@ if (-not $already) {
 
 # ---------------------------------------------------------------- 变更清单
 $ts = Get-Date -Format 'yyyyMMdd_HHmmss'
-$bakCandidate = $uicPath + '.bak_pkpmjwd_' + $ts
+$bakCandidate = $uicPath + '.bak_pkpm2pdms_' + $ts
 $bakPath = $bakCandidate
 $k = 1
 while ((Test-Path -LiteralPath $bakPath) -and (-not $DryRun)) {
@@ -207,7 +250,7 @@ while ((Test-Path -LiteralPath $bakPath) -and (-not $DryRun)) {
 }
 
 Say '=============================================================='
-Say (' PKPM-JWD导入导出 安装' + $(if ($DryRun) { '（-DryRun 只打印，不落盘）' } else { '' }))
+Say (' PKPM2PDMS导入导出 v2.1.0 安装' + $(if ($DryRun) { '（-DryRun 只打印，不落盘）' } else { '' }))
 Say '=============================================================='
 Say ('PDMS 根      : ' + $PdmsRoot)
 Say ('源包目录     : ' + $SourceDir)
@@ -221,10 +264,12 @@ foreach ($p in $sources) {
     Say ('   ' + $action + '  ' + $dst)
     Say ('         ← ' + $p + '   (' + (Get-Item -LiteralPath $p).Length + ' 字节)')
 }
+Say ('   —— 另有 ' + $retired.Count + ' 个退役族文件**不部署**（工作树保留不删）：' +
+     ($retired -join '、'))
 Say ''
 Say '【2】design.uic 追加菜单项：'
 Say ('   文件       : ' + $uicPath)
-Say ('   当前状态   : ' + $(if ($already) { '已含 PKPMJWD.Menu —— 本次跳过注入（幂等）' } else { '未含 PKPMJWD.Menu，将追加' }))
+Say ('   当前状态   : ' + $(if ($already) { '已含 PKPM2PDMS.PML.Menu —— 本次跳过注入（幂等）' } else { '未含 PKPM2PDMS.PML.Menu，将追加' }))
 Say ('   原文件    : ' + $uicBytes.Length + ' 字节，' + ($uicText -split "`n").Count + ' 行，BOM=' + $hasBom + '，换行=' + $(if ($nl -eq "`r`n") { 'CRLF' } else { 'LF' }))
 Say ('   现在即可解析 XML : ' + $origParses)
 if (-not $already) {
@@ -290,7 +335,7 @@ if (-not $already) {
         try {
             $verify = [System.IO.File]::ReadAllText($uicPath, $strictUtf8)
             $null = [xml]$verify
-            if ($verify -notmatch 'PKPMJWD\.Menu') { throw '回读内容里没有 PKPMJWD.Menu' }
+            if ($verify -notmatch 'PKPM2PDMS\.PML\.Menu') { throw '回读内容里没有 PKPM2PDMS.PML.Menu' }
             Say '   写后校验通过（XML 可解析，菜单项存在）'
         } catch {
             Say ('   写后校验失败：' + $_.Exception.Message + ' —— 用备份回滚')
@@ -308,7 +353,7 @@ if (-not $already) {
         exit $ExitWrite
     }
 } else {
-    Say '   design.uic 已含 PKPMJWD.Menu，跳过注入与备份（幂等）'
+    Say '   design.uic 已含 PKPM2PDMS.PML.Menu，跳过注入与备份（幂等）'
 }
 
 Say ''
@@ -321,11 +366,11 @@ foreach ($p in $sources) {
     Say ('     ' + $leaf + '  ' + $fi.Length + ' 字节  ' + $fi.LastWriteTime.ToString('yyyy-MM-dd HH:mm:ss'))
 }
 $finalOk = $false
-try { $final = [System.IO.File]::ReadAllText($uicPath, $strictUtf8); $null = [xml]$final; $finalOk = ($final -match 'PKPMJWD\.Menu') } catch { }
+try { $final = [System.IO.File]::ReadAllText($uicPath, $strictUtf8); $null = [xml]$final; $finalOk = ($final -match 'PKPM2PDMS\.PML\.Menu') } catch { }
 Say ('   design.uic : 可解析且含菜单项 = ' + $finalOk)
 Say ''
 Say '接下来：完全退出并重启 PDMS（新 PML 文件需要重启后才会被索引；'
 Say '        不要手工运行 pmlscan.exe，也不要改 PMLLIB\pml.index）。'
-Say '        进入 DESIGN 后菜单栏应出现「PKPM-JWD」，或命令行执行'
-Say '        $m "%PMLLIB%/pkpmjwd/pkpmjwdrun.mac" 打开窗体。'
+Say '        进入 DESIGN 后菜单栏应出现「PKPM2PDMS PML」，或命令行执行'
+Say '        $m "%PMLLIB%/pkpm2pdms/pkpm2pdmsrun.mac" 打开窗体。'
 exit $ExitOk

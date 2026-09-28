@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""PKPM-JWD导入导出 —— ``.pdt`` 读取器（契约 §b.4；格式规范 ``_recon/pdt_format.md``）。
+"""PKPM2PDMS导入导出 —— ``.pdt`` 读取器（契约 §b.4；格式规范 ``_recon/pdt_format.md``）。
 
 ``.pdt`` 是 PKPM 的**文本中间模型**（PKPM 插件 CA→PDMS 方向读的就是它，
 见 ``pdms_target.md`` §3.2 的格式串直证）。本模块把它读成与 ``.jwd`` 完全相同的

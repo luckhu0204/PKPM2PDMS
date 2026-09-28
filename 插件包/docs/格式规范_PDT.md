@@ -234,10 +234,10 @@ $DEFWASLABSECTION → $DEFMATERIAL → $SETELEMENT → $SETWALL → $SETSLAB →
 cd /d D:\AI_Work\PKPM数据解析
 
 :: 读侧：.pdt → 规范模型（617 节点 / 1046 构件 / 11 层 / 331 板 / 4 墙）
-python PKPM-JWD导入导出\engine\cli.py pdt2model "G:\...\1_PM.pdt" --out "%TEMP%\pdt_model.json"
+python PKPM2PDMS导入导出\engine\cli.py pdt2model "G:\...\1_PM.pdt" --out "%TEMP%\pdt_model.json"
 
 :: 写侧 + 往返（检查 9）
-python PKPM-JWD导入导出\test\acceptance_r2.py
+python PKPM2PDMS导入导出\test\acceptance_r2.py
 
 :: 只读解析对照（侦察器，双解析器交叉）
 python _recon\parse_pdt.py "G:\...\1_PM.pdt"

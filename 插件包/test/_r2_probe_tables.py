@@ -8,8 +8,8 @@ import re
 
 ROOT = r"D:\AI_Work\PKPM数据解析"
 SRC = os.path.join(ROOT, r"_recon\dbsect\pkpm_pdms_section_table.csv")
-BUILT = os.path.join(ROOT, r"PKPM-JWD导入导出\engine\section_table.csv")
-META = os.path.join(ROOT, r"PKPM-JWD导入导出\engine\section_table.meta.json")
+BUILT = os.path.join(ROOT, r"PKPM2PDMS导入导出\engine\section_table.csv")
+META = os.path.join(ROOT, r"PKPM2PDMS导入导出\engine\section_table.meta.json")
 MAP = (r"G:\工作\PDMS相关\00 PDMS插件\02 实用插件\PKPM导入导出插件"
        r"\PKPM转PDMS截面匹配文件.txt")
 DLLTOK = os.path.join(ROOT, r"_recon\dbsect\_dll_tokens.json")

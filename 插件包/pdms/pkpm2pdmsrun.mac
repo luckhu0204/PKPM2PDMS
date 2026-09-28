@@ -1,0 +1,62 @@
+-- ===========================================================================
+-- PKPM2PDMS导入导出 —— PDMS 侧运行入口宏（命令行 / 菜单 / 窗体共用的门面）
+-- 文件   : pkpm2pdmsrun.mac             落盘: GBK 无 BOM + CRLF，注释用 --
+-- 用法 1 : 只打开 PML 窗体（无参数；命令行与菜单兜底入口，行为同 v2.1.0 以前）
+--              $m "%PMLLIB%/pkpm2pdms/pkpm2pdmsrun.mac"
+-- 用法 2 : 运行一个导入宏（.NET 窗体「PKPM导入PDMS」一键导入；宏由引擎现生成）
+--              $m "%PMLLIB%/pkpm2pdms/pkpm2pdmsrun.mac" "<宏全路径>"
+--          宏路径也可以由调用方先写进全局量 !!pkpm2pdmsRunMacPath
+--          （变量形态；本宏读完即清空 —— 一次性，避免下次无参调用误跑旧宏）。
+--          宏取参写法出处：PMLLIB\Building_Design\...\ANCHOR\nucdesmanchor.mac:23-25
+--              （!nomMdb = |$1| …；该文件 :9-11 是 $m/<宏> arg1 arg2 的调用示例）
+-- 回传   : 全局量 !!pkpm2pdmsRunStatus（同串也是 !!pkpm2pdmsRunMac 的返回值）
+--              'FORM|'                                     无参数：只开了窗体
+--              'OK|<宏路径>|renames=<累计改名条数>'          宏跑完
+--              'ERR|<宏路径>|<原因>|renames=<n>'            中止/报错
+--          改名条数 = !!pkpm2pdmsRenames 的条数（ENGINE_IO.md §6 同一真相来源）。
+-- 唯一化 : 预载已从"宏里 $M 预载"搬进本入口调用的 !!pkpm2pdmsRunMac
+--          （见 pdms\pkpm2pdmsrunmac.pmlfnc 文件头：本机实测 $M .pmlfnc 无效，
+--            .pmlfnc 只按「文件名 = 函数名」被 PMLLIB 自动加载）。
+-- 菜单   : 装完菜单后 design.uic 的 <Macro>show !!pkpm2pdms</Macro> 直接开窗体；
+--          本宏是命令行/脚本入口。
+-- 依赖   : pkpm2pdmsrunmac.pmlfnc（必须在 <PDMS根>\PMLLIB\pkpm2pdms\ 内，
+--          且安装后重启过 PDMS）。
+-- ===========================================================================
+
+-- 0) 目标宏路径：宏参数 $1 优先取，其次全局量 !!pkpm2pdmsRunMacPath
+--    （$1 未被替换时（无参数调用）pdms 原样留下 '$1' 文本，按未给参数处理）
+!p2pArg = |$1|
+if (!p2pArg.eq('$1')) then
+   !p2pArg = ''
+endif
+!p2pMac = ''
+if (defined(!!pkpm2pdmsRunMacPath)) then
+   !p2pMac = !!pkpm2pdmsRunMacPath
+   !!pkpm2pdmsRunMacPath = ''
+endif
+if (!p2pMac.length() le 0) then
+   !p2pMac = !p2pArg
+endif
+
+-- 1) 无宏路径 = 只打开窗体（原有命令行/菜单行为，不变）
+if (!p2pMac.length() le 0) then
+   !!pkpm2pdmsRunStatus = 'FORM|'
+   $P PKPM2PDMS导入导出：加载操作窗体 …
+   show !!pkpm2pdms
+   return
+endif
+
+-- 2) 有宏路径 = 交给入口函数跑（预载唯一化函数 → $M 宏 → 回传状态）
+-- 〔R6 实机修复·handle 语义〕handle 块 = 错误路径，调用语句必须放在块外（紧跟 handle 之前）。
+!p2pRes = !!pkpm2pdmsRunMac(!p2pMac)
+handle any
+   !p2pRes = ''
+endhandle
+if (!p2pRes.length() le 0) then
+   !!pkpm2pdmsRunStatus = 'ERR|' & !p2pMac & '|运行入口函数 pkpm2pdmsRunMac 未就绪（需 <PDMS根>\PMLLIB\pkpm2pdms\pkpm2pdmsrunmac.pmlfnc 已部署且 PDMS 已重启）'
+   $P PKPM2PDMS：$!!pkpm2pdmsRunStatus
+   return
+endif
+$P PKPM2PDMS：$!!pkpm2pdmsRunStatus
+
+-- End of file pkpm2pdmsrun.mac

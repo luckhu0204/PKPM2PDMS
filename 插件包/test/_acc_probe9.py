@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-PKG = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出"
+PKG = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出"
 for name in sorted(os.listdir(os.path.join(PKG, 'pdms'))):
     p = os.path.join(PKG, 'pdms', name)
     if not os.path.isfile(p):

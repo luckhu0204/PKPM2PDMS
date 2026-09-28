@@ -6,7 +6,7 @@ import sys
 from collections import Counter
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-p = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\_acc_tmp\JLCJ2.mac"
+p = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\test\_acc_tmp\JLCJ2.mac"
 raw = open(p, 'rb').read()
 print('bytes', len(raw), 'bom?', raw[:3] == b'\xef\xbb\xbf')
 t = raw.decode('gbk')

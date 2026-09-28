@@ -4,7 +4,7 @@ import collections
 import os
 import sys
 
-sys.path.insert(0, r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\engine")
+sys.path.insert(0, r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\engine")
 import sectionlib  # noqa: E402
 
 secs = sectionlib.load_builtin_table().to_jwd_sections()

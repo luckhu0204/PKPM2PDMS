@@ -21,3 +21,16 @@ PDMS原生插件/_selftest/_rootsim/
 # 编辑器/系统
 Thumbs.db
 .DS_Store
+
+# v2.1.0 追加（与本次入库扫描口径一致；规则只为"查找/兜底"用，不用于删除）
+*.png
+*.备份_*
+*_运行中被占用_*
+验收/
+安装程序构建/build/
+插件包/test/_acceptance_out/
+插件包/test/_acceptance_r2_out/
+插件包/test/_acc_r3_out/
+插件包/test/_db_out/
+插件包/test/_r6_out/
+插件包/test/_*.txt

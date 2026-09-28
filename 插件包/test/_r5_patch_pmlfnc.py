@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""R3 修复脚本（本会话自建）：pkpmjwduniquename.pmlfnc 的探测行与头注释（GBK+CRLF 写回）。
+"""R3 修复脚本（本会话自建）：pkpm2pdmsuniquename.pmlfnc 的探测行与头注释（GBK+CRLF 写回）。
 
-只改本包自己的 pdms/pkpmjwduniquename.pmlfnc。
+只改本包自己的 pdms/pkpm2pdmsuniquename.pmlfnc。
 """
 import os
 
-P = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\pdms\pkpmjwduniquename.pmlfnc"
+P = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\pdms\pkpm2pdmsuniquename.pmlfnc"
 
 raw = open(P, "rb").read()
 t = raw.decode("gbk")
@@ -32,18 +32,18 @@ t = t.replace(old_probe, new_probe, 1)
 # ② 头注释：TYPE 通道说明补记 R3 修正（保留 'TYPE 通道' 字样供验收检查）
 old_type = (
     "-- == TYPE 通道（与 F.1 的一处必要偏差，如实说明）==\r\n"
-    "--   F.1/§o.4 写 `!pkpmjwdType = 'SCTN'`（单 !）。PML 里单 ! 变量只在定义它的\r\n"
+    "--   F.1/§o.4 写 `!pkpm2pdmsType = 'SCTN'`（单 !）。PML 里单 ! 变量只在定义它的\r\n"
     "--   宏/函数作用域内可见，跨作用域传递须用双 ! 全局（!!CE 等同理）。\r\n"
-    "--   本函数读取双 ! 全局 !!pkpmjwdType（undefined 时记 '?'）；调用方（宏/窗体）\r\n"
+    "--   本函数读取双 ! 全局 !!pkpm2pdmsType（undefined 时记 '?'）；调用方（宏/窗体）\r\n"
     "--   两个名字都赋值，兼容两种作用域模型。defined()/undefined() 的出处：\r\n"
 )
 new_type = (
     "-- == TYPE 通道（与 F.1 的一处必要偏差，如实说明）==\r\n"
-    "--   F.1/§o.4 原文写 `!pkpmjwdType = 'SCTN'`（单 !）。PML 里单 ! 变量只在定义它的\r\n"
+    "--   F.1/§o.4 原文写 `!pkpm2pdmsType = 'SCTN'`（单 !）。PML 里单 ! 变量只在定义它的\r\n"
     "--   宏/函数作用域内可见，跨作用域传递须用双 ! 全局（!!CE 等同理）。\r\n"
-    "--   本函数读取双 ! 全局 !!pkpmjwdType（undefined 时记 '?'）；调用方（宏/窗体）\r\n"
+    "--   本函数读取双 ! 全局 !!pkpm2pdmsType（undefined 时记 '?'）；调用方（宏/窗体）\r\n"
     "--   两个名字都赋值，兼容两种作用域模型。R3 复核修正（§0.4-12）：生成器\r\n"
-    "--   （engine/macgen.py）此前误赋单 ! ， defined(!!pkpmjwdType) 恒假、改名记录\r\n"
+    "--   （engine/macgen.py）此前误赋单 ! ， defined(!!pkpm2pdmsType) 恒假、改名记录\r\n"
     "--   TYPE 恒 '?'；已改为赋双 ! 全局，与本函数一致。defined()/undefined() 的出处：\r\n"
 )
 assert old_type in t, "TYPE 注释锚点缺失"

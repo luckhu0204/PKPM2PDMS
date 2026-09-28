@@ -5,7 +5,7 @@ import json
 import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-rep = json.load(open(r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\test\_acc_tmp\JLCJ2.report.json", encoding='utf-8'))
+rep = json.load(open(r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\test\_acc_tmp\JLCJ2.report.json", encoding='utf-8'))
 print("keys:", sorted(rep.keys()))
 print("counts:", rep["counts"])
 print("stats.commands:", rep.get("stats", {}).get("commands"))

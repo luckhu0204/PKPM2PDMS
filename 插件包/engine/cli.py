@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""PKPM-JWD导入导出 —— 命令行入口（契约 ``spec/CONTRACT.md`` v2.0 的 §(f)/§(h)/§(m)）。
+"""PKPM2PDMS导入导出 —— 命令行入口（契约 ``spec/CONTRACT.md`` v2.0 的 §(f)/§(h)/§(m)）。
 
 v1 的三条（§f.1，**签名不变**）::
 
-    python PKPM-JWD导入导出/engine/cli.py jwd2pdms <jwd> --out <macro.mac>
+    python PKPM2PDMS导入导出/engine/cli.py jwd2pdms <jwd> --out <macro.mac>
             [--secmap F] [--extra F] [--project N] [--base E N U] [--angle D] [--unit mm] [--report R.json]
-    python PKPM-JWD导入导出/engine/cli.py pdms2jwd <dump.txt> --out <out.jwd>
+    python PKPM2PDMS导入导出/engine/cli.py pdms2jwd <dump.txt> --out <out.jwd>
             [--secmap F] [--dump-unit mm] [--report R.json]
-    python PKPM-JWD导入导出/engine/cli.py pdt2model <pdt> --out <model.json> [--report R.json]
+    python PKPM2PDMS导入导出/engine/cli.py pdt2model <pdt> --out <model.json> [--report R.json]
 
 R2 追加的九条（§m.1 的命令矩阵，参数名与缺省逐字对应）::
 
@@ -22,6 +22,30 @@ R2 追加的九条（§m.1 的命令矩阵，参数名与缺省逐字对应）::
     pdt2jwd   <pdt>  --out <out.jwd>     [--secmap F] [--report R.json]
     dbsections <db.macro|--from-builtin> --out <F.csv|F.json>
                                          [--format csv|json] [--report R.json] [--secmap F]
+
+R6 追加的一条（用户实机反馈问题③：窗体下拉收敛为三项，第一项要"自动识别"）::
+
+    auto2pdms <src>  --out <macro.mac>   [与 jwd2pdms **逐项相同**的选项]
+
+R7〔2026-09-28 用户确认的命名方案〕：三个建模型命令（``jwd2pdms``/``pdt2pdms``/``auto2pdms``）
+各增一个选项 ``--site-name N``（= ``--request`` 协议里的 ``site_name`` 键）：
+
+* **SITE 名由 .NET 侧探测**：执行前用 ``DbElement.GetElement("/候选名")`` 逐个试
+  ``/PKPM2PDMS`` → ``/PKPM2PDMSre`` → ``/PKPM2PDMSre2`` …（上限 re99），试出第一个可用的
+  再传给引擎；**静默、零弹窗**；
+* 引擎**只按传入值创建 SITE**：不生成候选名、不做 re 逻辑、缺失即码 2（不自行默认）；
+* 中间层名（ZONE/STRU/FRMW/SBFR）= ``<SITE名>_<段>``，含层号 ⇒ **全宏唯一**（生成期查重，
+  重复即生成失败）；底层 SCTN/PANE/STWALL 一律 **unnamed** 创建（PDMS 自动分配系统名）；
+* 宏头 ``ONERROR CONTINUE``、宏尾 ``$S+  -- Synonym translation ON`` + 分隔线，
+  **没有** LABEL/handle 错误块；宏内**零** ``!!pkpm2pdms*`` 调用、**零** ``$M`` 预载
+  （``pkpm2pdmsuniquename*.pmlfnc`` 系列不再部署、不再被引用）；
+* 报告：``renames`` 语义变为 **SITE 名探测结果**（.NET 传入什么就记什么），
+  另加 ``options.site_name``、``stats.used_names``/``used_names_count``、``stats.unnamed_count``。
+
+``auto2pdms`` 按**文件头**判定走 ``jwd2pdms`` 还是 ``pdt2pdms``（前 16 字节
+``SQLite format 3`` ⇒ jwd；否则按文本解码 GBK/UTF-8 后命中 ``$VERSION``/``$NODECOOR``
+或首个非空行以 ``;File`` 开头 ⇒ pdt；两者都不像 ⇒ 码 2 报错，**不猜**），
+判定后内部调用那两个 **同一个执行函数**（不复制逻辑，§f.3 的纪律）。
 
 退出码（§f.2 冻结，v2 不新增码）：``0`` 成功 / ``1`` 未捕获异常（打印 traceback）/
 ``2`` 参数或输入文件错误 / ``3`` ``Model.validate()`` 出现 ``E-``（**不写产物**）。
@@ -70,6 +94,7 @@ R2 追加的九条（§m.1 的命令矩阵，参数名与缺省逐字对应）::
 from __future__ import annotations
 
 import argparse
+import codecs
 import json
 import os
 import re
@@ -101,6 +126,7 @@ __all__ = ["RunResult", "InputError", "ModelError", "main", "build_parser",
            "run_jwd2pdms", "run_pdms2jwd", "run_pdt2model",
            "run_pdt2pdms", "run_pdms2pdt", "run_jwd2pdt", "run_pdt2jwd",
            "run_jwd2db", "run_pdt2db", "run_db2jwd", "run_db2pdt", "run_dbsections",
+           "run_auto2pdms", "detect_source_format",
            "build_section_report",
            "EXIT_OK", "EXIT_EXCEPTION", "EXIT_INPUT", "EXIT_MODEL",
            "CATEGORIES", "CATEGORY_CN", "DEFAULT_SECMAP_NAME", "TOOLS"]
@@ -115,9 +141,12 @@ EXIT_INPUT = 2
 EXIT_MODEL = 3
 
 #: §m.1 的子命令全集（v1 三条 + R2 九条；顺序与 §m.1 的表一致）
+#: 〔R6〕末尾追加 ``auto2pdms``（自动识别 .jwd/.pdt；参数与 jwd2pdms 逐项相同），
+#: 追加在**末尾**以免改动 §m.1 既有的顺序（`metavar` 与错误提示都用这个元组）。
 TOOLS = ("jwd2pdms", "pdt2pdms", "pdms2jwd", "pdms2pdt",
          "jwd2db", "pdt2db", "db2jwd", "db2pdt",
-         "jwd2pdt", "pdt2jwd", "dbsections", "pdt2model")
+         "jwd2pdt", "pdt2jwd", "dbsections", "pdt2model",
+         "auto2pdms")
 
 #: 走"规范模型 → PDMS 建模型宏"的命令（macgen）
 PDMS_MACRO_TOOLS = ("jwd2pdms", "pdt2pdms")
@@ -581,8 +610,10 @@ def _new_report(tool: str, source: str, fmt: str, output: str,
                 options: Dict[str, Any]) -> Dict[str, Any]:
     """§h + §m.3 的报告骨架（v1 键位不变，追加 ``db`` 块与 §h v3 的 ``renames`` 键）。
 
-    ``renames``（§o.7）：改名只发生在 PDMS 运行期 —— 纯生成方向（引擎单独跑、未经 PDMS）
-    恒为 ``[]``（键仍必须存在）；PDMS 内执行宏后由 .NET 侧把 ``!!pkpmjwdRenames`` 取回并入。
+    ``renames``〔R7 语义变更〕：不再是"运行期被迫改名清单"（唯一化函数与宏内唯一化模板已
+    整体作废），而是 **SITE 名探测结果** —— .NET 侧直查试出的可用名经 ``site_name`` 传入，
+    引擎按传入值原样创建、不改名；三个宏子命令由 :func:`_record_macro_names` 填这一项，
+    其余方向恒为 ``[]``（键仍必须存在，§h 纪律）。
     """
     return {
         "contract_version": C.CONTRACT_VERSION,
@@ -732,6 +763,29 @@ def _check_plan_sections(plan_sections: Sequence[Dict[str, Any]],
             "：宏侧独有的 %s；报告侧独有的 %s" % (only_plan, only_cli))
 
 
+def _record_macro_names(rep: Dict[str, Any], plan: Any, site_name: str) -> None:
+    """〔R7〕把命名/探测结果填进报告（只对生成 PDMS 建模型宏的三个子命令）。
+
+    * ``options.site_name`` —— .NET 侧直查试出的可用 SITE 名（引擎原样使用）；
+    * ``renames`` —— **语义变更**：不再表示"运行期被迫改名清单"（那套唯一化函数已不再部署），
+      而是 **SITE 名探测结果**：.NET 传入什么就记什么，引擎不改名、不做 re 逻辑；
+    * ``stats.used_names``/``used_names_count`` —— 宏内**带名**创建用掉的全部名字（已查重）；
+    * ``stats.unnamed_count`` —— 无名创建（``NEW SCTN``/``NEW PANE``/``NEW STWALL``）的条数。
+    """
+    rep["options"]["site_name"] = site_name
+    rep["renames"] = [{
+        "kind": "site-name-probe",
+        "site_name": site_name,
+        "provider": ".NET（DbElement 直查逐个试名：/PKPM2PDMS → /PKPM2PDMSre → … re99）",
+        "renamed": False,
+        "why": "〔R7〕改名责任全在 .NET 探测侧：引擎按传入的 site_name 原样创建 SITE，"
+               "不生成候选名、不做 re 逻辑；中间层名含层号 ⇒ 全宏唯一（生成期查重）",
+    }]
+    rep["stats"]["used_names"] = list(getattr(plan, "used_names", []) or [])
+    rep["stats"]["used_names_count"] = len(rep["stats"]["used_names"])
+    rep["stats"]["unnamed_count"] = int(getattr(plan, "unnamed_count", 0))
+
+
 def _section_block_and_warnings(model: C.Model, smap, rep: Dict[str, Any],
                                 tool: str) -> Dict[str, Any]:
     """填 ``rep.sections`` 并把 ``SectionMap`` 的加载期问题并入 ``warnings``。"""
@@ -783,10 +837,13 @@ def run_jwd2pdms(jwd: str, out: str, secmap: Optional[str] = None,
                  extra: Optional[str] = None, project: Optional[str] = None,
                  base: Sequence[float] = (0.0, 0.0, 0.0), angle: float = 0.0,
                  unit: str = "mm", report: Optional[str] = None,
-                 categories: Optional[Sequence[str]] = None) -> RunResult:
+                 categories: Optional[Sequence[str]] = None,
+                 site_name: Optional[str] = None) -> RunResult:
     """``jwd2pdms``：``.jwd``（SQLite3）→ PDMS 宏 ``.mac``（GBK+CRLF）+ ``report.json``。
 
     ``categories``：GUI 的构件类别勾选（§f.3）；``None`` = 不过滤（与命令行逐项等价）。
+    ``site_name``：〔R7〕SITE 名（.NET 侧直查试出的可用名，经 ``--request`` 的 ``site_name``
+    传入；命令行用 ``--site-name``）。**必填**：引擎不生成、不默认、不做 re 逻辑（缺 ⇒ 码 2）。
     """
     t0 = time.time()
     src = os.path.abspath(jwd)
@@ -795,6 +852,7 @@ def run_jwd2pdms(jwd: str, out: str, secmap: Optional[str] = None,
     res = RunResult(tool="jwd2pdms", source=src, output=out_abs, report_path=rep_path)
     rep = _new_report("jwd2pdms", src, "jwd", out_abs,
                       {"secmap": "", "extra": "", "project": project or "",
+                       "site_name": site_name or "",
                        "base": [float(x) for x in base], "angle": float(angle),
                        "unit": unit})
     rep["_report_path"] = rep_path
@@ -838,12 +896,13 @@ def run_jwd2pdms(jwd: str, out: str, secmap: Optional[str] = None,
         if errors:
             raise ModelError(errors)                             # §f.2 码 3：不写产物
 
-        opts = macgen.MacOptions(project=proj, base_e=float(base[0]), base_n=float(base[1]),
+        opts = macgen.MacOptions(project=proj, site_name=site_name or "",
+                                 base_e=float(base[0]), base_n=float(base[1]),
                                  base_u=float(base[2]), angle_deg=float(angle), unit=unit,
                                  secmap=smap)
         try:
             plan = macgen.build_plan(model, opts)
-        except ValueError as exc:                    # 名字/单位非法 ⇒ 输入错误（码 2）
+        except ValueError as exc:                    # 名字/单位/site_name 非法 ⇒ 输入错误（码 2）
             raise InputError(str(exc))
         block = _section_block_and_warnings(model, smap, rep, "jwd2pdms")
         mismatch = _check_plan_sections(plan.sections, block["detail"])
@@ -852,6 +911,7 @@ def run_jwd2pdms(jwd: str, out: str, secmap: Optional[str] = None,
         rep["assumptions"].extend(plan.assumptions)
         rep["warnings"].extend(plan.warnings)
         rep["stats"]["commands"] = dict(plan.stats)
+        _record_macro_names(rep, plan, opts.site_name)
 
         try:
             macgen.write_macro(out_abs, plan.text())             # GBK+CRLF + 回读校验（§g）
@@ -882,7 +942,7 @@ def run_jwd2pdms(jwd: str, out: str, secmap: Optional[str] = None,
 def run_pdms2jwd(dump: str, out: str, secmap: Optional[str] = None,
                  dump_unit: str = "mm", report: Optional[str] = None,
                  categories: Optional[Sequence[str]] = None) -> RunResult:
-    """``pdms2jwd``：``#PKPM-JWD-PDMSDUMP 1.0`` 文本（GBK）→ ``.jwd``（SQLite）+ 报告。
+    """``pdms2jwd``：``#PKPM2PDMS-PDMSDUMP 1.0`` 文本（GBK）→ ``.jwd``（SQLite）+ 报告。
 
     ``--dump-unit``（§f.1）：**仅当 dump 没有 ``UNITS`` 行时**生效；有 ``UNITS`` 行时以该行
     为准并记 ``warnings``。``parse_dump(text)`` 的冻结签名没有"缺省单位"入口，故这里在
@@ -1098,17 +1158,19 @@ def _validate_or_raise(model: C.Model, rep: Dict[str, Any]) -> None:
 def _emit_pdms_macro(tool: str, model: C.Model, out_abs: str,
                      smap: Optional[secmap_mod.SectionMap], project: str,
                      base: Sequence[float], angle: float, unit: str,
-                     rep: Dict[str, Any]) -> None:
+                     rep: Dict[str, Any], site_name: str = "") -> None:
     """``jwd2pdms``/``pdt2pdms`` 的宏生成（§d.4 的骨架由 macgen 负责）。
 
     ``plan.sections``（宏侧实际用到的截面）与 CLI 的 ``sections`` 块交叉核对（§b.1 纪律 1）。
+    ``site_name``：〔R7〕SITE 名（必填；.NET 直查试出后传入，引擎不改名）。
     """
-    opts = macgen.MacOptions(project=project, base_e=float(base[0]), base_n=float(base[1]),
+    opts = macgen.MacOptions(project=project, site_name=site_name or "",
+                             base_e=float(base[0]), base_n=float(base[1]),
                              base_u=float(base[2]), angle_deg=float(angle), unit=unit,
                              secmap=smap)
     try:
         plan = macgen.build_plan(model, opts)
-    except ValueError as exc:                    # 名字/单位非法 ⇒ 输入错误（码 2）
+    except ValueError as exc:                    # 名字/单位/site_name 非法 ⇒ 输入错误（码 2）
         raise InputError(str(exc))
     spec_kind = {"jwd2pdms": "jwd2pdms", "pdt2pdms": "pdt2pdms"}.get(tool, tool)
     block = _section_block_and_warnings(model, smap, rep, spec_kind)
@@ -1118,6 +1180,7 @@ def _emit_pdms_macro(tool: str, model: C.Model, out_abs: str,
     rep["assumptions"].extend(plan.assumptions)
     rep["warnings"].extend(plan.warnings)
     rep["stats"]["commands"] = dict(plan.stats)
+    _record_macro_names(rep, plan, opts.site_name)
     try:
         macgen.write_macro(out_abs, plan.text())             # GBK+CRLF + 回读校验（§g）
     except (ValueError, IOError, OSError) as exc:
@@ -1547,8 +1610,12 @@ def run_pdt2pdms(pdt: str, out: str, secmap: Optional[str] = None,
                  extra: Optional[str] = None, project: Optional[str] = None,
                  base: Sequence[float] = (0.0, 0.0, 0.0), angle: float = 0.0,
                  unit: str = "mm", report: Optional[str] = None,
-                 categories: Optional[Sequence[str]] = None) -> RunResult:
-    """``pdt2pdms``（§m.1 第 2 行）：``.pdt`` → PDMS 建模型宏（选项同 §f.1，``pdt`` 代替 ``jwd``）。"""
+                 categories: Optional[Sequence[str]] = None,
+                 site_name: Optional[str] = None) -> RunResult:
+    """``pdt2pdms``（§m.1 第 2 行）：``.pdt`` → PDMS 建模型宏（选项同 §f.1，``pdt`` 代替 ``jwd``）。
+
+    ``site_name``：〔R7〕SITE 名（必填；.NET 直查试出后传入，引擎不改名）。
+    """
     t0 = time.time()
     src = os.path.abspath(pdt)
     out_abs = os.path.abspath(out)
@@ -1556,6 +1623,7 @@ def run_pdt2pdms(pdt: str, out: str, secmap: Optional[str] = None,
     res = RunResult(tool="pdt2pdms", source=src, output=out_abs, report_path=rep_path)
     rep = _new_report("pdt2pdms", src, "pdt", out_abs,
                       {"secmap": "", "extra": "", "project": project or "",
+                       "site_name": site_name or "",
                        "base": [float(x) for x in base], "angle": float(angle),
                        "unit": unit})
     rep["_report_path"] = rep_path
@@ -1587,7 +1655,8 @@ def run_pdt2pdms(pdt: str, out: str, secmap: Optional[str] = None,
         rep["skipped"].extend(sk)
         rep["warnings"].extend(notes)
         _validate_or_raise(model, rep)
-        _emit_pdms_macro("pdt2pdms", model, out_abs, smap, proj, base, angle, unit, rep)
+        _emit_pdms_macro("pdt2pdms", model, out_abs, smap, proj, base, angle, unit, rep,
+                         site_name=site_name or "")
         return _finish(res, rep, EXIT_OK, t0)
     except InputError as exc:
         rep["errors"].append(str(exc))
@@ -1601,6 +1670,143 @@ def run_pdt2pdms(pdt: str, out: str, secmap: Optional[str] = None,
         tb = traceback.format_exc()
         rep["errors"].append(tb.strip().splitlines()[-1])
         return _finish(res, rep, EXIT_EXCEPTION, t0, error=tb)
+
+
+# --------------------------------------------------------------------------
+# 〔R6〕auto2pdms：按文件头自动识别 .jwd / .pdt（用户实机反馈问题③）
+# --------------------------------------------------------------------------
+
+#: SQLite3 库的文件头魔数（§b.2：``.jwd`` 就是 SQLite3 库 ⇒ 前 16 字节即此串）
+SQLITE_MAGIC = b"SQLite format 3"
+
+#: ``.pdt`` 文本的识别标记（§b.4 的 13 段节头里最靠前的两个；GBK/UTF-8 解码后比对）
+PDT_MARKERS = ("$VERSION", "$NODECOOR")
+
+#: ``.pdt`` 首行形态（样本 ``1_PM.pdt`` 首行 = ``;File … saved …``；§b.4 的 ``;`` 注释行）
+PDT_FIRST_LINE_PREFIX = ";File"
+
+#: 识别时读取的文件头字节数（覆盖魔数、首行与 ``$VERSION``/``$NODECOOR`` 节头）
+DETECT_HEAD_BYTES = 4096
+
+
+def _decode_head(raw: bytes) -> Optional[str]:
+    """按 GBK / UTF-8 严格解码文件头；两种编码都解不出 ⇒ ``None``。
+
+    用增量解码器且 ``final=False``：文件头是按固定字节数**截断**读来的，末字节可能正好
+    切开一个多字节字符——那不是"不是文本"的证据，所以只容忍**尾部不完整**，
+    其余解码错误一律算解不出（禁止 ``errors='replace'``，契约 §g.1 的纪律）。
+    """
+    for enc in ("gbk", "utf-8"):
+        dec = codecs.getincrementaldecoder(enc)("strict")
+        try:
+            return dec.decode(raw, False)
+        except UnicodeDecodeError:
+            continue
+    return None
+
+
+def detect_source_format(path: str) -> str:
+    """读文件头判定来源格式，返回 ``'jwd'`` 或 ``'pdt'``；判不出即抛 :class:`InputError`。
+
+    判据（**只按证据、不猜**；两条都是本包已冻结的格式事实）：
+
+    * 前 16 字节含 ``SQLite format 3`` ⇒ ``'jwd'``（契约 §b.2：``.jwd`` 是 SQLite3 库）；
+    * 否则按文本解码（GBK / UTF-8）：命中 ``$VERSION`` 或 ``$NODECOOR`` 节头，
+      或**首个非空行**以 ``;File`` 开头 ⇒ ``'pdt'``（契约 §b.4 的 ``.pdt`` 形态）；
+    * 两者都不像 ⇒ 抛 :class:`InputError`（退出码 2 的路径）：**不猜**、不静默按某一支处理。
+    """
+    if not os.path.isfile(path):
+        raise InputError("输入文件不存在：%s" % (os.path.abspath(path),))
+    try:
+        with open(path, "rb") as fh:
+            raw = fh.read(DETECT_HEAD_BYTES)
+    except OSError as exc:
+        raise InputError("读取输入文件失败：%s：%s" % (os.path.abspath(path), exc))
+    if SQLITE_MAGIC in raw[:16]:
+        return "jwd"
+    text = _decode_head(raw)
+    if text is not None:
+        if any(m in text for m in PDT_MARKERS):
+            return "pdt"
+        head_lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+        if head_lines and head_lines[0].startswith(PDT_FIRST_LINE_PREFIX):
+            return "pdt"
+    raise InputError(
+        "无法自动识别输入格式（不猜）：%s —— 前 16 字节 %r 不是 SQLite3 魔数 %r；"
+        "按文本解码（GBK/UTF-8）后也没有 .pdt 的特征（%s，或首个非空行以 %r 开头）。"
+        "请显式指定方向：jwd2pdms（SQLite3 模型库）或 pdt2pdms（.pdt 文本）"
+        % (os.path.abspath(path), raw[:16], SQLITE_MAGIC,
+           " 或 ".join("含 %s" % m for m in PDT_MARKERS), PDT_FIRST_LINE_PREFIX))
+
+
+def run_auto2pdms(src: str, out: str, secmap: Optional[str] = None,
+                  extra: Optional[str] = None, project: Optional[str] = None,
+                  base: Sequence[float] = (0.0, 0.0, 0.0), angle: float = 0.0,
+                  unit: str = "mm", report: Optional[str] = None,
+                  categories: Optional[Sequence[str]] = None,
+                  site_name: Optional[str] = None) -> RunResult:
+    """``auto2pdms``（〔R6〕用户实机反馈问题③）：自动识别 ``.jwd`` / ``.pdt`` → PDMS 宏。
+
+    选项与 :func:`run_jwd2pdms` **逐项相同**（§f.1）。识别（:func:`detect_source_format`；
+    判不出 ⇒ 退出码 2）之后**内部调用** :func:`run_jwd2pdms` 或 :func:`run_pdt2pdms`
+    ——与命令行/窗体是**同一个执行函数**，不复制任何逻辑（契约 §f.3 的纪律对自动识别同样适用），
+    因此缺省值、报告键、退出码、字节纪律与显式命令逐项一致。
+
+    差异只有"身份"三处（机械可见，便于调用方区分本次是自动识别）：
+    ``report.tool='auto2pdms'``、``report.options.auto_detected='jwd'|'pdt'``、
+    ``assumptions`` 里一条说明；摘要首行也标出识别结果。
+
+    ``site_name``：〔R7〕SITE 名（必填）——原样透传给 :func:`run_jwd2pdms` /
+    :func:`run_pdt2pdms` 的**同一执行函数**（引擎不改名、不做 re 逻辑）。
+    """
+    t0 = time.time()
+    src_abs = os.path.abspath(src)
+    out_abs = os.path.abspath(out)
+    rep_path = os.path.abspath(report) if report else _default_report_path(out_abs)
+    res = RunResult(tool="auto2pdms", source=src_abs, output=out_abs, report_path=rep_path)
+    rep = _new_report("auto2pdms", src_abs, "auto", out_abs,
+                      {"secmap": "", "extra": "", "project": project or "",
+                       "site_name": site_name or "",
+                       "base": [float(x) for x in base], "angle": float(angle),
+                       "unit": unit})
+    rep["_report_path"] = rep_path
+    try:
+        fmt = detect_source_format(src_abs)             # 判不出 ⇒ InputError（码 2）
+    except InputError as exc:
+        rep["errors"].append(str(exc))
+        return _finish(res, rep, EXIT_INPUT, t0, error=str(exc))
+    rep["source_format"] = fmt                          # 识别结果（'jwd'/'pdt'）
+    rep["options"]["auto_detected"] = fmt
+
+    run = run_jwd2pdms if fmt == "jwd" else run_pdt2pdms
+    res2 = run(src_abs, out_abs, secmap=secmap, extra=extra, project=project,
+               base=base, angle=angle, unit=unit, report=rep_path,
+               categories=categories, site_name=site_name)   # §f.3：同一执行函数
+
+    # 回填 auto2pdms 身份（报告已由上面的执行函数写过一次 ⇒ 覆盖写成同一路径的最终版）
+    res2.tool = "auto2pdms"
+    rep2 = res2.report if isinstance(res2.report, dict) else {}
+    rep2["tool"] = "auto2pdms"
+    opts2 = rep2.setdefault("options", {})
+    if isinstance(opts2, dict):
+        opts2["auto_detected"] = fmt
+    rep2.setdefault("assumptions", []).append(
+        "auto2pdms：按文件头自动识别为 %s（%s）⇒ 内部调用 %s 的**同一执行函数**"
+        "（不复制逻辑，契约 §f.3）；除本键与 tool 外，报告与显式命令逐项一致"
+        % (fmt,
+           "SQLite3 魔数" if fmt == "jwd"
+           else "文本标记（%s / 首个非空行以 %r 开头）" % (" / ".join(PDT_MARKERS),
+                                                        PDT_FIRST_LINE_PREFIX),
+           "jwd2pdms" if fmt == "jwd" else "pdt2pdms"))
+    try:
+        _write_report(res2.report_path, rep2)
+    except Exception as exc:                            # 回填失败不得让整次执行崩掉
+        rep2.setdefault("warnings", []).append("auto2pdms 报告回填失败：%s" % (exc,))
+    res2.lines = (["    auto2pdms：识别为 .%s ⇒ 走 %s 的同一执行函数"
+                   % (fmt, "jwd2pdms" if fmt == "jwd" else "pdt2pdms")]
+                  + _summary_lines("auto2pdms", res2.exit_code, res2.source, res2.output,
+                                   res2.report_path, rep2, res2.elapsed, res2.error))
+    return res2
 
 
 def run_pdms2pdt(dump: str, out: str, secmap: Optional[str] = None,
@@ -2018,9 +2224,18 @@ def _sha256_bytes(data: bytes) -> str:
 # --------------------------------------------------------------------------
 
 def _add_macro_opts(p, src_help: str, src_meta: str):
-    """§f.1 的宏生成选项（``jwd2pdms``/``pdt2pdms`` 共用；§m.1 第 1/2 行）。"""
+    """§f.1 的宏生成选项（``jwd2pdms``/``pdt2pdms``/``auto2pdms`` 共用；§m.1 第 1/2 行）。
+
+    ``--site-name``〔R7〕：SITE 名。**必填**——.NET 侧执行前用 DbElement 直查逐个试名
+    （``/PKPM2PDMS`` → ``/PKPM2PDMSre`` → … re99）试出第一个可用的，再经 ``--request`` 的
+    ``site_name`` 键传给引擎（命令行批处理用本选项显式给）。引擎**不生成、不默认、不做 re 逻辑**；
+    缺省为空 ⇒ 退出码 2（错误信息会写明责任在 .NET 侧）。
+    """
     p.add_argument(src_meta, metavar="<%s>" % src_meta, help=src_help)
     p.add_argument("--out", required=True, metavar="<macro.mac>", help="输出的 PDMS 宏")
+    p.add_argument("--site-name", dest="site_name", metavar="N",
+                   help="SITE 名（如 /PKPM2PDMS）：由 .NET 侧直查试出的可用名，引擎原样使用；"
+                        "引擎不默认、不改名（缺 ⇒ 退出码 2）")
     p.add_argument("--secmap", metavar="F",
                    help="截面匹配文件；省略取与输入同目录的 %s" % DEFAULT_SECMAP_NAME)
     p.add_argument("--extra", metavar="F",
@@ -2060,20 +2275,24 @@ def _add_db_gen_opts(p, src_help: str, src_meta: str):
     p.add_argument("--clean", action="store_true",
                    help="生成清场版（OLD … DELETE … MEM，只清本包自己的容器；§l.3.5）")
     p.add_argument("--catalogue-user", dest="catalogue_user", metavar="N",
-                   help="参数化族目录名（缺省 /PKPM_JWD_USER；必须带 /PKPM_JWD_ 前缀）")
+                   help="参数化族目录名（缺省 /PKPM2PDMS_USER；必须带 /PKPM2PDMS_ 前缀）")
     p.add_argument("--catalogue-stss", dest="catalogue_stss", metavar="N",
-                   help="型钢库目录名（缺省 /PKPM_JWD_STSS；必须带 /PKPM_JWD_ 前缀）")
+                   help="型钢库目录名（缺省 /PKPM2PDMS_STSS；必须带 /PKPM2PDMS_ 前缀）")
 
 
 def build_parser() -> argparse.ArgumentParser:
     """§f.1 的三条（签名冻结）+ §m.1 的九条 R2 命令。"""
     p = argparse.ArgumentParser(
         prog="cli.py",
-        description="PKPM-JWD导入导出：.jwd / .pdt / PDMSDUMP / PDMS 目录宏的转换（契约 v%s）"
+        description="PKPM2PDMS导入导出：.jwd / .pdt / PDMSDUMP / PDMS 目录宏的转换"
+                    "（插件版本 2.1.0；契约模型 schema 版本 v%s）"
                     % C.CONTRACT_VERSION,
         epilog="退出码：0 成功；1 未捕获异常；2 参数/输入文件错误；3 Model 有 E- 项"
                "（不写产物）。报告缺省写在 <--out 同目录>\\<--out 基名>.report.json。"
-               "荷载不做：不导出、不映射（R2 §9.3）。",
+               "荷载不做：不导出、不映射（R2 §9.3）。"
+               "〔R7〕建模型的三条（jwd2pdms/pdt2pdms/auto2pdms）必须给 --site-name："
+               "SITE 名由 .NET 侧执行前用 DbElement 直查试出可用名后传入，引擎不默认、"
+               "不改名（--request 协议里是同名的 site_name 键）。",
         formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="tool", metavar="{%s}" % ",".join(TOOLS))
 
@@ -2086,9 +2305,16 @@ def build_parser() -> argparse.ArgumentParser:
                        description="PKPM .pdt → PDMS 目录宏（契约 §m.1 第 2 行）")
     _add_macro_opts(a, "PKPM .pdt 中间模型", "pdt")
 
+    # 〔R6〕自动识别（问题③）：选项与 jwd2pdms 逐项相同，位置参数名 = `<src>`
+    a = sub.add_parser("auto2pdms", help=".jwd/.pdt 自动识别 → PDMS 宏 .mac（GBK+CRLF）",
+                       description="按**文件头**自动识别 PKPM 模型：SQLite3 魔数 ⇒ jwd2pdms；"
+                                   "文本（$VERSION/$NODECOOR/行首 ;File）⇒ pdt2pdms；"
+                                   "两者都不像 ⇒ 退出码 2（不猜）。其余与 jwd2pdms 逐项相同。")
+    _add_macro_opts(a, "PKPM 模型文件：.jwd（SQLite3）或 .pdt（文本），按文件头自动识别", "src")
+
     b = sub.add_parser("pdms2jwd", help="PDMSDUMP 1.0 文本 → .jwd（SQLite3）",
                        description="PDMS 导出文本 → PKPM .jwd（契约 §f.1）")
-    b.add_argument("dump", metavar="<dump.txt>", help="#PKPM-JWD-PDMSDUMP 1.0 文本（GBK）")
+    b.add_argument("dump", metavar="<dump.txt>", help="#PKPM2PDMS-PDMSDUMP 1.0 文本（GBK）")
     b.add_argument("--out", required=True, metavar="<out.jwd>", help="输出的 .jwd")
     b.add_argument("--secmap", metavar="F",
                    help="截面匹配文件；省略取与 <dump.txt> 同目录的 %s" % DEFAULT_SECMAP_NAME)
@@ -2105,7 +2331,7 @@ def build_parser() -> argparse.ArgumentParser:
     # ---- R2：格式互转 ----------------------------------------------------
     d = sub.add_parser("pdms2pdt", help="PDMSDUMP 1.0 文本 → .pdt",
                        description="PDMS 导出文本 → PKPM .pdt（契约 §m.1 第 4 行）")
-    d.add_argument("dump", metavar="<dump.txt>", help="#PKPM-JWD-PDMSDUMP 1.0 文本（GBK）")
+    d.add_argument("dump", metavar="<dump.txt>", help="#PKPM2PDMS-PDMSDUMP 1.0 文本（GBK）")
     d.add_argument("--out", required=True, metavar="<out.pdt>", help="输出的 .pdt")
     d.add_argument("--secmap", metavar="F",
                    help="截面匹配文件；省略取与 <dump.txt> 同目录的 %s" % DEFAULT_SECMAP_NAME)
@@ -2183,11 +2409,18 @@ def _dispatch(args: argparse.Namespace) -> RunResult:
     if args.tool == "jwd2pdms":
         return run_jwd2pdms(args.jwd, args.out, secmap=args.secmap, extra=args.extra,
                             project=args.project, base=tuple(args.base), angle=args.angle,
-                            unit=args.unit, report=args.report)
+                            unit=args.unit, report=args.report,
+                            site_name=getattr(args, "site_name", None))
     if args.tool == "pdt2pdms":
         return run_pdt2pdms(args.pdt, args.out, secmap=args.secmap, extra=args.extra,
                             project=args.project, base=tuple(args.base), angle=args.angle,
-                            unit=args.unit, report=args.report)
+                            unit=args.unit, report=args.report,
+                            site_name=getattr(args, "site_name", None))
+    if args.tool == "auto2pdms":
+        return run_auto2pdms(args.src, args.out, secmap=args.secmap, extra=args.extra,
+                             project=args.project, base=tuple(args.base), angle=args.angle,
+                             unit=args.unit, report=args.report,
+                             site_name=getattr(args, "site_name", None))
     if args.tool == "pdms2jwd":
         return run_pdms2jwd(args.dump, args.out, secmap=args.secmap,
                             dump_unit=args.dump_unit, report=args.report)
@@ -2245,9 +2478,11 @@ def _request_to_argv(parser: argparse.ArgumentParser, tool: Any,
     ``cli.py`` 的实现不许分叉」），因此缺省值、校验、退出码与命令行逐字一致。
 
     键的约定（与 .NET ``EngineRunner.BuildRequest`` 对齐，pdms-net/EngineRunner.cs:17-18、71-72）：
-    * 键 = CLI 长选项名去前导 ``--``（= argparse dest，如 ``secmap``/``out``/``base``）；
-      连字符选项按 dest 给也行（``dump_unit`` ≡ ``dump-unit``，还原时按 parser 里
-      **真实注册的选项串**写回，故 ``--dump-unit``/``--from-builtin`` 等不会被拼错）；
+    * 键 = CLI 长选项名去前导 ``--``（= argparse dest，如 ``secmap``/``out``/``base``/
+      ``site_name``）；连字符选项按 dest 给也行（``dump_unit`` ≡ ``dump-unit``，还原时按
+      parser 里**真实注册的选项串**写回，故 ``--dump-unit``/``--from-builtin`` 等不会被拼错）；
+      〔R7〕``site_name`` 键 → ``--site-name``（SITE 名，三个建模型命令认；值 = .NET 直查
+      试出的可用名 —— 引擎按原样使用，不改名）；
     * 位置参数（``jwd``/``pdt``/``dump``/``db``）用**子命令自己的位置 dest** 落位（按声明顺序）；
     * ``True`` ⇒ 加选项串（store_true）；``False``/``None``/``""`` ⇒ 省略（= CLI 缺省语义）；
     * 列表 ⇒ 逐项展开（``base`` 的三元组，§f.1）；数值 ⇒ 十进制字符串。
@@ -2276,6 +2511,10 @@ def _request_to_argv(parser: argparse.ArgumentParser, tool: Any,
         if not isinstance(key, str) or not key:
             raise InputError("--request：args 的键必须是字符串，收到 %r" % (key,))
         dest = key.replace("-", "_")
+        if tool == "auto2pdms" and dest in ("jwd", "pdt") and "src" in pos_index:
+            # 〔R6〕auto2pdms 的源位置参数与 jwd2pdms 的 `jwd` / pdt2pdms 的 `pdt` 是**同一语义槽**
+            # （同一个文件路径），故容忍 .NET 侧沿用旧键名；规范键是 `src`（子命令的位置 dest）。
+            dest = "src"
         if dest in pos_index:
             if val is None or val == "" or val is False:
                 continue

@@ -11,9 +11,9 @@ import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
-FIXTURE = """#PKPM-JWD-PDMSDUMP 1.0
+FIXTURE = """#PKPM2PDMS-PDMSDUMP 1.0
 UNITS mm
-#SITE /PKPM_JWD
+#SITE /PKPM2PDMS
 #ZONE /JLCJ2
 #STRU /MAINFRAME
 #FRMW /STL_FRAME/EL1
@@ -45,7 +45,7 @@ def check(cond, label, detail=''):
 def parse(text):
     """§c.3 的最小参考实现：返回 (site, zone, stru, sctns, panes, stwalls, frmws)。"""
     lines = [l.rstrip('\r') for l in text.split('\n')]
-    if lines[0].split() != ['#PKPM-JWD-PDMSDUMP', '1.0']:
+    if lines[0].split() != ['#PKPM2PDMS-PDMSDUMP', '1.0']:
         raise ValueError('E-PARSE: 头行不匹配')
     units = 'mm'
     i = 1
@@ -105,7 +105,7 @@ def parse(text):
 
 m = parse(FIXTURE)
 print('=== 契约 §c.4 夹具解析 ===')
-check(m['site'] == '/PKPM_JWD' and m['zone'] == '/JLCJ2' and m['stru'] == '/MAINFRAME',
+check(m['site'] == '/PKPM2PDMS' and m['zone'] == '/JLCJ2' and m['stru'] == '/MAINFRAME',
       '层级前三级', '%s / %s / %s' % (m['site'], m['zone'], m['stru']))
 check(m['frmws'] == ['/STL_FRAME/EL1', '/FLOOR&WALL', '/GRID'], 'FRMW 三个分组',
       str(m['frmws']))

@@ -8,7 +8,7 @@ import time
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = r"D:\AI_Work\PKPM数据解析"
-PKG = os.path.join(ROOT, "PKPM-JWD导入导出")
+PKG = os.path.join(ROOT, "PKPM2PDMS导入导出")
 
 t0 = time.time()
 tot = n = 0
@@ -41,7 +41,7 @@ for name in os.listdir(root):
 print("hashed %d AVEVA files in %.1fs" % (h, time.time() - t0))
 
 print("== delivery dir ==")
-dd = os.path.join(ROOT, "交付_PKPM-JWD插件")
+dd = os.path.join(ROOT, "交付_PKPM2PDMS插件")
 for dp, dn, fn in os.walk(dd):
     rel = os.path.relpath(dp, dd)
     for x in fn[:3] if len(fn) > 3 else fn:
@@ -68,7 +68,7 @@ open(os.path.join(sand, "DesignAddins.xml"), "w", encoding="utf-8-sig", newline=
 open(os.path.join(sand, "DesignCustomization.xml"), "w", encoding="utf-8-sig", newline="").write(
     '<?xml version="1.0"?>\r\n<UICustomizationFiles>\r\n'
     '  <CustomizationFile Name="TGTEXT" Path="tgtext.uic" />\r\n</UICustomizationFiles>\r\n')
-p = subprocess.run([sys.executable, os.path.join(PKG, "pdms-net", "deploy", "deploy_pkpmjwd.py"),
+p = subprocess.run([sys.executable, os.path.join(PKG, "pdms-net", "deploy", "deploy_pkpm2pdms.py"),
                     "--pdms-root", sand], capture_output=True)
 print("dry-run exit", p.returncode)
 print(p.stdout.decode("utf-8", "replace")[:2600])
@@ -82,10 +82,10 @@ p = subprocess.run([sys.executable, os.path.join(PKG, "engine", "cli.py"), "jwd2
 print("jwd2pdms exit", p.returncode)
 t = open(os.path.join(OUTR3, "r3.mac"), "rb").read().decode("gbk")
 lines = t.split("\r\n")
-print("calls !!pkpmjwdUniquename =", sum(1 for l in lines if "!!pkpmjwdUniquename('" in l))
+print("calls !!pkpm2pdmsUniquename =", sum(1 for l in lines if "!!pkpm2pdmsUniquename('" in l))
 print("NEW lines =", sum(1 for l in lines if l.strip().startswith("NEW ")))
 print("literal NEW (not $!n) =", sum(1 for l in lines if l.strip().startswith("NEW ") and "$!n" not in l))
-print("has ONERROR:", any("ONERROR GOLABEL /PKPMJWDERR" in l for l in lines))
-print("has LABEL tail:", any(l.strip() == "LABEL /PKPMJWDERR" for l in lines))
+print("has ONERROR:", any("ONERROR GOLABEL /PKPM2PDMSERR" in l for l in lines))
+print("has LABEL tail:", any(l.strip() == "LABEL /PKPM2PDMSERR" for l in lines))
 print("has $M:", any(l.strip().startswith("$M") for l in lines))
-print("func-missing guard:", any("defined(!!pkpmjwdUniquename)" in l for l in lines))
+print("func-missing guard:", any("defined(!!pkpm2pdmsUniquename)" in l for l in lines))

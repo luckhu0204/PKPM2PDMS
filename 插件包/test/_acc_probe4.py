@@ -6,7 +6,7 @@ import re
 import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-ENG = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出\engine"
+ENG = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出\engine"
 sys.path.insert(0, ENG)
 import jwd_read, pdt_read  # noqa: E402
 

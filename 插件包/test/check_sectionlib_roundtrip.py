@@ -25,7 +25,7 @@
   ``.jwd`` 无力学量…），逐条给出**原因 + 信息损失 + 怎么才能确认**；
 * ``FAIL``      —— 契约声称可回算却闭合不了的**意外失败**（本脚本给 0 才算通过）。
 
-运行：``cd /d D:\\AI_Work\\PKPM数据解析\\PKPM-JWD导入导出``
+运行：``cd /d D:\\AI_Work\\PKPM数据解析\\PKPM2PDMS导入导出``
       ``python test\\check_sectionlib_roundtrip.py``
 """
 

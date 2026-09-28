@@ -351,8 +351,8 @@ def main():
     check("safety 报告三键齐全（§m.3）",
           set(["forbidden_names_scanned", "clean_targets", "ascii_only"])
           <= set(rep["safety"]), str(sorted(rep["safety"])))
-    check("4 个顶层容器都带 /PKPM_JWD_ 前缀与唯一后缀",
-          all(v.startswith("/PKPM_JWD_") and v.endswith("_SELFTEST")
+    check("4 个顶层容器都带 /PKPM2PDMS_ 前缀与唯一后缀",
+          all(v.startswith("/PKPM2PDMS_") and v.endswith("_SELFTEST")
               for v in dbmacro.resolve_containers(dbmacro.DbOptions(suffix="_SELFTEST")).values()),
           "")
     inv = invariants(mac, "生成宏")
@@ -362,7 +362,7 @@ def main():
     macc = dbmacro.generate_db_macro(tj, oc)
     check("清场版含 DELETE 且目标只在本包容器（§l.3.5）",
           "DELETE CATE MEM" in macc and "DELETE SPWL MEM" in macc
-          and all(t.startswith("/PKPM_JWD_") for t in oc.report["safety"]["clean_targets"]),
+          and all(t.startswith("/PKPM2PDMS_") for t in oc.report["safety"]["clean_targets"]),
           json.dumps(oc.report["safety"]["clean_targets"], ensure_ascii=False))
     check("清场版仍然只操作本包容器（禁用名 0 命中）",
           not dbmacro.scan_forbidden_names(macc), "")
@@ -381,7 +381,7 @@ def main():
         raised = False
     except dbmacro.DbMacroError:
         raised = True
-    check("负向控制：容器名不带 /PKPM_JWD_ 前缀 ⇒ DbMacroError", raised, "")
+    check("负向控制：容器名不带 /PKPM2PDMS_ 前缀 ⇒ DbMacroError", raised, "")
     # 确定性
     o1 = dbmacro.DbOptions(suffix="_D", date_text="FIXED", report={})
     o2 = dbmacro.DbOptions(suffix="_D", date_text="FIXED", report={})

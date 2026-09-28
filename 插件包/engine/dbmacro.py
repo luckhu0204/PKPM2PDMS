@@ -24,7 +24,7 @@
 --------------------------------------------------------------------------
 安全闸（契约 §l.1，硬约束：命中即 ``DbMacroError``，不"警告后继续"）
 --------------------------------------------------------------------------
-1. 宏只创建/修改本包自己的 4 个容器（``DbOptions`` 的 4 个名字，``/PKPM_JWD_`` 前缀）；
+1. 宏只创建/修改本包自己的 4 个容器（``DbOptions`` 的 4 个名字，``/PKPM2PDMS_`` 前缀）；
 2. 生成物里 **不得** 出现 ``NEW``/``OLD``/``DELETE`` + 用户既有容器名
    （``/PKPM_USER``、``/PKPM_STSS``、``/PKPMDATA``、``/PKPM_USER_SECTION``、``/PKPM_LIB``）；
    转化表里带的原目录名（``SectionRec.pdms_catalogue``）一律**映射成本包容器**；
@@ -66,7 +66,7 @@ __all__ = [
     "FORBIDDEN_NAMES", "TEMPLATE_FAMILIES",
 ]
 
-CONTRACT_PKG_PREFIX = "/PKPM_JWD_"
+CONTRACT_PKG_PREFIX = "/PKPM2PDMS_"
 
 #: 用户既有容器名（契约 §l.1-2 / 变更记录 §0.4-7）。生成物里出现即违规。
 FORBIDDEN_NAMES: Tuple[str, ...] = (
@@ -90,10 +90,10 @@ class DbOptions(object):
     """生成选项。前 9 个字段的名字与缺省**逐字照抄契约 §l.2**。"""
 
     # ---- 契约 §l.2 冻结字段 ----
-    catalogue_user: str = "/PKPM_JWD_USER"
-    catalogue_stss: str = "/PKPM_JWD_STSS"
-    spec_world_user: str = "/PKPM_JWD_USER_SECTION"
-    spec_world_lib: str = "/PKPM_JWD_LIB"
+    catalogue_user: str = "/PKPM2PDMS_USER"
+    catalogue_stss: str = "/PKPM2PDMS_STSS"
+    spec_world_user: str = "/PKPM2PDMS_USER_SECTION"
+    spec_world_lib: str = "/PKPM2PDMS_LIB"
     uniquify: bool = True
     suffix: str = ""
     clean_first: bool = False
@@ -697,7 +697,7 @@ def _param_fields(rec: Any) -> List[Tuple[str, int, str]]:
 
 
 def _path_join(owner: str, name: str) -> str:
-    """``('/PKPM_JWD_LIB', '/SECTION_C')`` → ``/PKPM_JWD_LIB/SECTION_C``（只给消息用）。"""
+    """``('/PKPM2PDMS_LIB', '/SECTION_C')`` → ``/PKPM2PDMS_LIB/SECTION_C``（只给消息用）。"""
     return "%s/%s" % ((owner or "").rstrip("/"), (name or "").lstrip("/"))
 
 
@@ -740,7 +740,7 @@ def _side_of(rec: Any, family: str) -> str:
     cat = str(_attr(rec, "pdms_catalogue", "") or "").strip()
     if cat:
         base = cat.rstrip("/").rsplit("/", 1)[-1].upper()
-        if base in ("PKPM_USER", "PKPM_JWD_USER") or base.startswith("PKPM_USER"):
+        if base in ("PKPM_USER", "PKPM2PDMS_USER") or base.startswith("PKPM_USER"):
             return "user"
         return "stss"
     return "stss"
@@ -811,7 +811,7 @@ def macro_plan(table: Any, opts: Optional[DbOptions] = None) -> Dict[str, Any]:
         if raw_cat and raw_cat != cat:
             catalogue_map.setdefault(raw_cat, cat)
         specname = str(_extra(rec).get("pdms_specification", "") or "").strip() \
-            or ("/PKPM_SECTION_USER" if side == "user" else "/PKPM_JWD_SPEC")
+            or ("/PKPM_SECTION_USER" if side == "user" else "/PKPM2PDMS_SPEC")
         sprfile = str(_extra(rec).get("pdms_sprfile", "") or "").strip() or ("/" + name)
         sprfile = "/" + sprfile.lstrip("/")
 
@@ -1028,7 +1028,7 @@ def _render_text(opts: DbOptions, plan: Dict[str, Any]) -> str:
     A = lines.append
     A("$S-  -- Synonym translation OFF")
     A("-- " + "-" * 70)
-    A("-- PKPM-JWD dbmacro: %s  %s" % (note, date_text))
+    A("-- PKPM2PDMS dbmacro: %s  %s" % (note, date_text))
     A("-- CONTRACT v2  engine/dbmacro.py")
     A("-- containers: %s | %s | %s | %s"
       % (res["catalogue_user"], res["catalogue_stss"],

@@ -9,7 +9,7 @@ import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 R = r"D:\AI_Work\PKPM数据解析\_recon\dbsect"
-PKG = r"D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出"
+PKG = r"D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出"
 CJK = re.compile(r"^[\u4e00-\u9fff]+")
 NUMP = re.compile(r"^\d+-")
 norm = lambda n: CJK.sub("", (n or "").strip()).upper()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """探针：sample_db.mac / sample_pdt_db.mac 的族-规格对应（§l.3.4-1 不变量的实际口径）。
 
-跑法：``python PKPM-JWD导入导出\\test\\_s3_cli\\probe_family.py [macro]``
+跑法：``python PKPM2PDMS导入导出\\test\\_s3_cli\\probe_family.py [macro]``
 """
 from __future__ import annotations
 

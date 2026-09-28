@@ -27,7 +27,7 @@ if __name__ == "__main__":
         "tool": "jwd2db",
         "args": {
             "jwd": PLUG + u"/JLCJ2.jwd",
-            "out": u"D:/AI_Work/PKPM数据解析/PKPM-JWD导入导出/test/out/_exe_request.mac",
+            "out": u"D:/AI_Work/PKPM数据解析/PKPM2PDMS导入导出/test/out/_exe_request.mac",
             "secmap": PLUG + u"/PKPM转PDMS截面匹配文件.txt",
             "project": "JLCJ2",
         },
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         "tool": "jwd2pdms",
         "args": {
             "jwd": PLUG + u"/JLCJ2.jwd",
-            "out": u"D:/AI_Work/PKPM数据解析/PKPM-JWD导入导出/test/out/r3.mac",
+            "out": u"D:/AI_Work/PKPM数据解析/PKPM2PDMS导入导出/test/out/r3.mac",
             "secmap": PLUG + u"/PKPM转PDMS截面匹配文件.txt",
             "project": "JLCJ2",
         },
@@ -45,7 +45,7 @@ if __name__ == "__main__":
         "tool": "pdt2pdms",
         "args": {
             "pdt": PLUG + u"/1_PM.pdt",
-            "out": u"D:/AI_Work/PKPM数据解析/PKPM-JWD导入导出/test/out/r3_pdt.mac",
+            "out": u"D:/AI_Work/PKPM数据解析/PKPM2PDMS导入导出/test/out/r3_pdt.mac",
             "secmap": PLUG + u"/PKPM转PDMS截面匹配文件.txt",
             "project": "JLCJ2",
         },

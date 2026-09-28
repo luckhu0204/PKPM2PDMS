@@ -1,5 +1,5 @@
 <#
-  PKPM-JWD导入导出 —— PDMS 侧卸载脚本（PDMS 12.1 SP4）
+  PKPM2PDMS导入导出 —— PDMS 侧卸载脚本（PDMS 12.1 SP4）
 
   用法（先跑 -DryRun 看清单）：
       powershell -NoProfile -ExecutionPolicy Bypass -File uninstall.ps1 -DryRun
@@ -9,28 +9,30 @@
 
   参数：
     -PdmsRoot     PDMS 安装根目录，缺省 D:\AVEVA\Plant\PDMS12.1.SP4
-    -PackageName  PMLLIB 下的包目录名，缺省 pkpmjwd
+    -PackageName  PMLLIB 下的包目录名，缺省 pkpm2pdms
     -DryRun       只打印将要发生的全部改动，不落盘
     -Purge        真正删除包目录（缺省是“移动到备份目录”，不删文件）
-    -RestoreBackup  用最新的 design.uic.bak_pkpmjwd_* 整份覆盖 design.uic
+    -RestoreBackup  用最新的 design.uic.bak_pkpm2pdms_* 整份覆盖 design.uic
                     （缺省走“只删本包追加的条目”的外科式移除，不动别人的条目）
 
   行为：
     1) 改前先把 <PDMS根>\design.uic 备份为 design.uic.bak_uninstall_<yyyyMMdd_HHmmss>
     2) 只移除本包追加的三处 XML 条目（幂等；找不到就跳过、不写文件）：
-         <ButtonTool Name="PKPMJWD.Open"> … </ButtonTool>
-         <MenuTool   Name="PKPMJWD.Menu"> … </MenuTool>
-         <MenuBar> 内的 <Tool Name="PKPMJWD.Menu" />
+         <ButtonTool Name="PKPM2PDMS.PML.Open"> … </ButtonTool>
+         <MenuTool   Name="PKPM2PDMS.PML.Menu"> … </MenuTool>
+         <MenuBar> 内的 <Tool Name="PKPM2PDMS.PML.Menu" />
+       （同时兼容 v2.1.0 首测装过的旧 Key PKPM2PDMS.Open / PKPM2PDMS.Menu：
+         那时两条路线 Tool Key 重名，下面的正则用 (?:PML\.)? 两条都认。）
        其它条目（TGTEXT / PDCOPILOT / Bopood 等）原样保留；移除后用 [xml] 校验，
        失败立即用备份回滚并报错。
-    3) 移除 <PDMS根>\PMLLIB\pkpmjwd：缺省移动为 PMLLIB\_removed_pkpmjwd_<ts>\（保留证据）；
+    3) 移除 <PDMS根>\PMLLIB\pkpm2pdms：缺省移动为 PMLLIB\_removed_pkpm2pdms_<ts>\（保留证据）；
        -Purge 时先逐条列出文件清单再删（不用通配符删除，逐条列出后按确切路径删）。
     4) 不触碰 PMLLIB\pml.index、不触碰样本原件、不触碰 P-TRANS。
 #>
 [CmdletBinding()]
 param(
     [string]$PdmsRoot = 'D:\AVEVA\Plant\PDMS12.1.SP4',
-    [string]$PackageName = 'pkpmjwd',
+    [string]$PackageName = 'pkpm2pdms',
     [switch]$DryRun,
     [switch]$Purge,
     [switch]$RestoreBackup
@@ -56,7 +58,7 @@ $strictUtf8 = New-Object System.Text.UTF8Encoding($false, $true)
 $hasUic = Test-Path -LiteralPath $uicPath -PathType Leaf
 
 Say '=============================================================='
-Say (' PKPM-JWD导入导出 卸载' + $(if ($DryRun) { '（-DryRun 只打印，不落盘）' } else { '' }))
+Say (' PKPM2PDMS导入导出 卸载' + $(if ($DryRun) { '（-DryRun 只打印，不落盘）' } else { '' }))
 Say '=============================================================='
 Say ('PDMS 根     : ' + $PdmsRoot)
 Say ('包目录      : ' + $targetDir)
@@ -64,8 +66,8 @@ Say ''
 
 # ---------------------------------------------------------------- 备份选择
 $bakList = @()
-if ($hasUic) { $bakList = @(Get-ChildItem -LiteralPath $PdmsRoot -Filter 'design.uic.bak_pkpmjwd_*' -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending) }
-Say ('【1】已有的安装前备份 design.uic.bak_pkpmjwd_* ：' + $bakList.Count + ' 个')
+if ($hasUic) { $bakList = @(Get-ChildItem -LiteralPath $PdmsRoot -Filter 'design.uic.bak_pkpm2pdms_*' -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending) }
+Say ('【1】已有的安装前备份 design.uic.bak_pkpm2pdms_* ：' + $bakList.Count + ' 个')
 foreach ($b in $bakList) { Say ('      ' + $b.Name + '   ' + $b.LastWriteTime.ToString('yyyy-MM-dd HH:mm:ss') + '   ' + $b.Length + ' 字节') }
 $uninstallBak = $uicPath + '.bak_uninstall_' + $ts
 Say ('      本次卸载前备份为： ' + $uninstallBak)
@@ -73,9 +75,9 @@ Say ''
 
 # ---------------------------------------------------------------- 待移除条目
 $patterns = @(
-    @{ Name = 'ButtonTool PKPMJWD.Open'; Regex = '(?s)[ \t]*<ButtonTool Name="PKPMJWD\.Open">.*?</ButtonTool>\r?\n' },
-    @{ Name = 'MenuTool PKPMJWD.Menu'; Regex = '(?s)[ \t]*<MenuTool Name="PKPMJWD\.Menu">.*?</MenuTool>\r?\n' },
-    @{ Name = 'MenuBar Tool PKPMJWD.Menu'; Regex = '(?m)^[ \t]*<Tool Name="PKPMJWD\.Menu" />[ \t]*\r?\n' }
+    @{ Name = 'ButtonTool PKPM2PDMS.PML.Open'; Regex = '(?s)[ \t]*<ButtonTool Name="PKPM2PDMS\.(?:PML\.)?Open">.*?</ButtonTool>\r?\n' },
+    @{ Name = 'MenuTool PKPM2PDMS.PML.Menu'; Regex = '(?s)[ \t]*<MenuTool Name="PKPM2PDMS\.(?:PML\.)?Menu">.*?</MenuTool>\r?\n' },
+    @{ Name = 'MenuBar Tool PKPM2PDMS.PML.Menu'; Regex = '(?m)^[ \t]*<Tool Name="PKPM2PDMS\.(?:PML\.)?Menu" />[ \t]*\r?\n' }
 )
 
 $uicBytes = $null
@@ -94,10 +96,10 @@ if ($hasUic) {
         $counts[$p.Name] = $m.Count
         if ($m.Count -gt 0) { $changed = $true; $newText = [regex]::Replace($newText, $p.Regex, '') }
     }
-    $orphan = ([regex]::Matches($newText, 'PKPMJWD')).Count
+    $orphan = ([regex]::Matches($newText, 'PKPM2PDMS')).Count
     Say '【2】design.uic 内本包条目的移除计划：'
     foreach ($p in $patterns) { Say ('      ' + $p.Name + ' ： 命中 ' + $counts[$p.Name] + ' 处') }
-    Say ('      移除后残留 PKPMJWD 字样 ： ' + $orphan + ' 处（应为 0）')
+    Say ('      移除后残留 PKPM2PDMS 字样 ： ' + $orphan + ' 处（应为 0）')
     Say ('      是否需要写回 ： ' + $changed)
     if ($changed) {
         try { $null = [xml]$newText }
@@ -125,7 +127,7 @@ if ($dirFiles.Count -eq 0 -and -not (Test-Path -LiteralPath $targetDir)) {
 }
 Say ''
 if ($RestoreBackup) {
-    Say '【4】-RestoreBackup：将用最新的 design.uic.bak_pkpmjwd_* 整份覆盖 design.uic'
+    Say '【4】-RestoreBackup：将用最新的 design.uic.bak_pkpm2pdms_* 整份覆盖 design.uic'
     if ($bakList.Count -eq 0) { Say '      没有可用备份 → 该项跳过' }
     else { Say ('      使用： ' + $bakList[0].Name) }
     Say ''
@@ -169,8 +171,8 @@ if ($RestoreBackup -and $bakList.Count -gt 0) {
         [System.IO.File]::WriteAllBytes($uicPath, $outBytes)
         $verify = [System.IO.File]::ReadAllText($uicPath, $strictUtf8)
         $null = [xml]$verify
-        if ($verify -match 'PKPMJWD') { throw '回读内容里仍有 PKPMJWD 字样' }
-        Say '   已移除本包条目，写后校验通过（XML 可解析、无 PKPMJWD 残留）'
+        if ($verify -match 'PKPM2PDMS') { throw '回读内容里仍有 PKPM2PDMS 字样' }
+        Say '   已移除本包条目，写后校验通过（XML 可解析、无 PKPM2PDMS 残留）'
     } catch {
         Say ('   写后校验失败：' + $_.Exception.Message + ' —— 用备份回滚')
         [System.IO.File]::WriteAllBytes($uicPath, $uicBytes)
@@ -211,7 +213,7 @@ Say ''
 Say '【6】卸载结果：'
 $uicOk = $false
 if (Test-Path -LiteralPath $uicPath) {
-    try { $t = [System.IO.File]::ReadAllText($uicPath, $strictUtf8); $null = [xml]$t; $uicOk = ($t -notmatch 'PKPMJWD') } catch { }
+    try { $t = [System.IO.File]::ReadAllText($uicPath, $strictUtf8); $null = [xml]$t; $uicOk = ($t -notmatch 'PKPM2PDMS') } catch { }
 }
 Say ('   design.uic : 可解析且无本包条目 = ' + $uicOk)
 Say ('   包目录      : 存在 = ' + (Test-Path -LiteralPath $targetDir))

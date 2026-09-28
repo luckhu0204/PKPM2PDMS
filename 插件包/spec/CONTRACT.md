@@ -1,4 +1,4 @@
-# PKPM-JWD导入导出 —— 唯一接口契约（CONTRACT v3 = v1 + R2 + R3）
+# PKPM2PDMS导入导出 —— 唯一接口契约（CONTRACT v3 = v1 + R2 + R3）
 
 > 本文件是**全部实施包**唯一 的接口依据。任何模块间交互都必须通过本文件定义的
 > 函数签名与数据结构；任何未在本文件出现的字段名、状态码、文件格式、
@@ -6,8 +6,12 @@
 >
 > 契约版本：`CONTRACT_VERSION = "1.0"`（与 `engine/canonical.py` 的常量一致；
 > **R2/R3 追加章节是增量、不推翻任何 v1 条款**，故机器可读常量保持不变，理由见 §0.4 末）
+> **插件版本：v2.1.0**（**〔改名片〕** 本插件历史上以「PKPM-JWD导入导出 v2.0」的名义交付，
+> 内部实施轮次 R1/R2/R3；v2.1.0 只做标识改名与版本号统一，逻辑一行未改）。
+> 注意区分两个版本号：插件版本 = `v2.1.0`；`CONTRACT_VERSION` = `"1.0"` 是**规范模型 schema
+> 版本**（出现在 `.jwd`/`report.json` 的 `contract_version` 字段里），本版**不动**。
 > 编制日期：2026-09-23；R2 修订：2026-09-24；R3 修订：2026-09-25
-> 工作区：`D:\AI_Work\PKPM数据解析`；交付包：`PKPM-JWD导入导出\`
+> 工作区：`D:\AI_Work\PKPM数据解析`；交付包：`PKPM2PDMS导入导出\`
 >
 > **R3 新增章节索引**（两项追加需求：①重名唯一化（加 `re` 后缀）②PDMS 原生插件（.NET + PML 混写）；
 > 四条硬边界：**不部署、不启动 PDMS、不写 G 盘、不改 `D:\AVEVA`**）：
@@ -81,12 +85,12 @@
 | 4 | 2026-09-24 | **R2 三项追加需求落地**：新增 §(j) `.pdt` 写出、§(k) 截面库核心 `sectionlib`、§(l) 目录/规格宏双向（`dbmacro`/`dbparse`）、§(m) 命令行 v2、§(n) 安全与范围；**荷载明确不做**（不导出/不映射/不新建，`.pdt` 只写段头）；§(g) 增两行编码；§12 增第 15–24 行；附录 D/E 新增；内置转化表落 `engine/section_table.csv` | 用户追加需求（本工作流 R2 轮） | 用户原文三项要求 + `计划_JWD导入导出.md` §9 R2（验收 9–14、风险 R7–R12）+ `_recon/db_pdms_catalogue.md` + `_recon/db_pkpm_sections.md` + `_recon/dbsect/*`（本次 C7–C11 逐条复核） | 新增 4 个模块（`pdt_write.py`/`sectionlib.py`/`dbmacro.py`/`dbparse.py`）+ 数据文件 `engine/section_table.csv`；`cli.py` 增 6 个子命令；`pdt_read.py` 需按 §j.4.5 增补 `TYPE=3 → 'brace'` |
 | 5 | 2026-09-24 | `$SETELEMENT.TYPE=3` **冻结为「支撑（brace）」**，并要求 `pdt_read` 同步映射（水平/竖向由几何判定，同 §d.4-2 的 HBRACE/VBRACE 规则） | 编排方 R2 需求「PDT 要完整导入+导出」要求构件集合不丢 | 样本只有 `TYPE∈{1,2}`（`pdt_format.md` §5.1【事实】）。若把支撑写成 1/2 ⇒ 静默改类型；写成其它未映射值 ⇒ 现实现的 `pdt_read`（`engine/pdt_read.py:471` 「其余 TYPE 不进 members」）会**丢构件**。两端必须约定同一个码 | `engine/pdt_read.py`（映射 + notes 文案）、`pdt_write.py`；§12#15 留痕 |
 | 6 | 2026-09-24 | 板/墙截面的 `.pdt` 表达冻结：`NAME=T<厚度%g>`、`TYPE=1`、`T2=0.00`、ID 由 §j.3 发号；`$DESIGNPARA` 只写**原样文本或全 0 占位**（不解释语义） | 编排方 R2 需求；与 v1 §e.1 候选键 3（`T<厚度>`）一致 | `pdt_format.md` §2.7【事实】`NAME=T600/T120/T100`、`T1=600.00`；§4 `$DESIGNPARA` 逐项含义【未确证】⇒ 禁止臆造 | `pdt_write.py`（`$DEFWASLABSECTION`）、报告 `assumptions`；§12#23 |
-| 7 | 2026-09-24 | 目录宏生成器默认容器名冻结为 `/PKPM_JWD_USER`、`/PKPM_JWD_STSS`、`/PKPM_JWD_USER_SECTION`、`/PKPM_JWD_LIB`；生成的宏内**禁止**出现用户既有容器名 | 编排方 R2 需求（风险 R8：不得动用户既有目录/规格） | 用户既有容器：`/PKPM_USER`、`/PKPM_STSS`、`/PKPMDATA`（`PKPM（PDMS数据库）.txt` 的 `NEW CATALOGUE`，本次 C7 复核 `NEW SPRFILE`×2,920 / `NEW SPCOMPONENT`×2,920）、`/PKPM_USER_SECTION`、`/PKPM_LIB`（同文件 `NEW SPWLD`，db_pdms_catalogue §0/§2.1） | `dbmacro.py` 的安全闸（l.1）+ 报告 |
+| 7 | 2026-09-24 | 目录宏生成器默认容器名冻结为 `/PKPM2PDMS_USER`、`/PKPM2PDMS_STSS`、`/PKPM2PDMS_USER_SECTION`、`/PKPM2PDMS_LIB`；生成的宏内**禁止**出现用户既有容器名 | 编排方 R2 需求（风险 R8：不得动用户既有目录/规格） | 用户既有容器：`/PKPM_USER`、`/PKPM_STSS`、`/PKPMDATA`（`PKPM（PDMS数据库）.txt` 的 `NEW CATALOGUE`，本次 C7 复核 `NEW SPRFILE`×2,920 / `NEW SPCOMPONENT`×2,920）、`/PKPM_USER_SECTION`、`/PKPM_LIB`（同文件 `NEW SPWLD`，db_pdms_catalogue §0/§2.1） | `dbmacro.py` 的安全闸（l.1）+ 报告 |
 | 8 | 2026-09-25 | **R2 验收第 1 轮两处修复**：① §k.2 的 `extra_json` 派生列增加 `dll_siblings`（见 k.2 表），使 §l.5 的 759 对大小写/写法差异被完整归类；② §l.3.4 冻结不变量「同一父级内同名 NEW 只出现一次」的落地方式：`dbmacro` 对参数化族**按规格路径去重**（一条规格只建一次 STCATEGORY/SPRFILE/SELEC/SPCOMPONENT；PARA 取第一条，共用事实与 PARA 冲突写 `warnings`） | 编排方验收门禁的失败反馈（"按契约 v2 修正实现……修法：同一规格只建一次族/SPRFILE/SPCOMPONENT，或给重复条目加唯一后缀"——取**前者**，后者会造出假规格名并破坏 §l.3.4-1 的 `path == <family>-SPEC/<sprfile>` 不变量） | ① recon `_dll_pairs_full.json` 显式对：`L25x16x3 ↔ 33,2,25,16,3`、`L45x28x3 ↔ 33,2,45,28,3`、`L50x32x4/L56x36x3/4/5 ↔ 33,2,…`；`_dll_tokens.json` 码后相邻 token：`6-B100*4.00`、`7-B120*80*4.00` —— 即 DLL 确有这些拼写，而源表把热轧行的 `dll_table_entry` 标成了冷弯拼写（`_recon/dbsect/pkpm_pdms_section_table.csv` 行 `L25X16X3`/`L45X28X3`/`L50X32X4`/`L56X36X3/4/5`/`6-B100*4.00`/`7-B120*80*4.00` 的 `dll_table_entry` = `3-L25x16x3`/…/`8-B100*4.00`/`9-B120*80*4.00`）；实测引擎 751 vs recon 口径 759、差额恰这 8 键、反向 0。② 样本 JLCJ2：14 根 Kind=1 梁/柱全落 `/USER_RECT-SPEC/Rectangle_Profile`、2 根焊接 H 落 `/USER_H-SPEC/H_Profile` ⇒ 旧宏同父级重名 4 处（jwd2db）/2 处（pdt2db） | `engine/section_table.csv`+`meta`（重新生成，3,176 行/机械列不变）、`test/build_section_table.py`、`engine/dbparse.py`（`_variant_index` 读 `dll_siblings`）、`engine/dbmacro.py`（规格去重） |
 | 9 | 2026-09-25 | **R3 复核·high/medium 修复（dbmacro 侧）**：① §l.3.3 第二遍引用**全部带父级限定链**（见 l.3.3 模板与 §12#25）；② §l.3.5/§l.4 重跑策略：ONERROR 先于清场段；uniquify 缺省后缀到**秒**；`--clean` 的重建容器带新运行戳、绝不复用刚清场的名字；③ DTSET 的 `PURP=PARA` 行 `PPRO ( ATTRIB PARA[n] )` 的 n 改用 **PARA 组内序号**（与 NUMB 同一编号空间；原件 PKPM（PDMS数据库）.txt:3159-3204 为证），不再用全族位置 | 编排方 R3 复核清单（发现·high 安全④、发现⑤ a/b/c、发现③潜伏 bug） | ① 用户原件 L46778 `OLD PTSSET 1 of STCATEGORY /USER_XI`、L46779 两级链、PMLLIB isometricadp `OLD RRULE 1 of RRST /…`；风险事实：供应商源名与用户库同名并存（§l.4），实测生成（合成表）含 `NEW STCATEGORY /C_COMMON`+裸名 `OLD SPRFILE /[5`，而 `scan_forbidden_names` 只查 5 个容器名 ⇒ 返回 []。② 旧代码清场段在 ONERROR 前（dbmacro 旧 982-991）、DELETE CATE MEM 自注 UNVERIFIED 且只清成员、同日两次 resolve_containers 输出完全相同。③ 实测构造混合族 /USER_FOO（L(DESP1),h,b(PARA)）生成 `PPRO ( ATTRIB PARA[2 ] ) + NUMB 1`（应为 PARA[1]）；内置表 3,176 行无混合族 ⇒ 休眠 bug | `engine/dbmacro.py`（引用链/重跑/PPRO）、`engine/dbparse.py`（§l.5-6/9 的链解析：`_split_old_target`/`_old_target_name`/`_REF_RE`/`_register_comp`）、§l.3.3/l.3.5/l.4/l.5、§12#25 |
 | 10 | 2026-09-25 | **R3 复核·medium 修复（pdt 侧）**：① §j.3 的全局流水号 N 落地（旧实现按类别各自从 1 起号，跨类复用 N，与样本「N 填满 1..2841 跨类 0 复用」及本模块 docstring 均不符）；② `write_pdt_sections`（full 骨架）段序改回 SEGMENT_ORDER（`$DEFFRAMESECTION` 不再提前）；③ §a.2 的 ecc 表增加 `.pdt` 源 6 元组行：`pdt_read` 原始记录 (ECS1..ECE3)（仅记录、不并几何）、`write_pdt` 原样写回 ⇒ .pdt→.pdt 往返不丢偏心字段；旧申报「start/end 已含偏心」对 .pdt 源不成立的理由已修正；④ §12#17/§k.3 的 M 规则改为按 SHAPE（1/3→6、39→mat=5）；⑤ `write_pdt_sections` 按 (NAME,SHAPE) 去重（消除 db2pdt.pdt 的 857 组重复定义） | 编排方 R3 复核清单（发现①a/①b、④、⑧、⑨） | ① rev2 实测 pdt2pdt_roundtrip.pdt 各段 N 都从 1 起、跨类复用 1046；样本同口径唯一 N=2051（pdt_format.md §3.2【事实】）。② rev4c：db2pdt.pdt 25 个段头序列 `$VERSION,$DESIGNPARA,$DEFFRAMESECTION,$STORY,…`，与 SEGMENT_ORDER/样本相悖。③ rev3d 直扫样本：非零偏心 = 121 根梁（TYPE=2，ECS1=ECE1=225/250），柱全 0；rev3c 实测 Member.ecc=() ⇒ 信息丢失；pdt_read 注释早已指出与 pdt_format.md §2.9 相反。④ 1_PM.pdt:2370(M=6,SHAPE=1)/:2515(M=5,SHAPE=39)；rev4：db2pdt.pdt M 分布 {5:1845} 含 SHAPE=1/3。⑤ rev4c：1,845 条记录仅 988 个唯一 (NAME,SHAPE)、重复组 857（Kind=303 同落 col+brace 两表所致） | `engine/pdt_write.py`（发号/段序/ECS/去重）、`engine/pdt_read.py`（ecc 记录）、`engine/sectionlib.py`（M 规则 + loss_items）、§a.2/§j.3/§12#17 |
-| 11 | 2026-09-25 | **R3 追加需求（v3 章节）**：① 新增 §(o) 命名唯一化——PDMS 侧运行期函数 `!!pkpmjwdUniquename`（`pdms/pkpmjwduniquename.pmlfnc`），候选序列 `原名 → 原名re → 原名re2 … 原名re99`（上限 99，共 100 个候选），占用判定用 `VAR !x EXIST /<名>` + `handle (2,109)`（出处 abaarealib.pmlfrm:107-114），改名记录进 `!!pkpmjwdRenames` 并入 `report.renames`；② 新增 §(p) PDMS 原生插件——`.NET Add-in + PML 混写`（源码 `pdms-net/`、产物 `pdms-net/dist/`、程序集 `PKPMJWD`、Command Key `PKPMJWD.OpenTools`、编译命令 = csc 3.5 + `/platform:x86` **本轮实测通过**、注册三件套 + 备份/幂等/卸载恢复的 deploy 脚本、引擎以独立可执行文件由 .NET 进程调用 `--request` 模式）；③ 新增 §(q) 验收 15–19；④ 四条硬边界入 §(p.10)：**不部署、不启动 PDMS、不写 G 盘、不改 D:\AVEVA**；⑤ §(g) 增 `.cs/.cmd/.uic` 编码行；§(h) 增 `renames` 键；§12 增 26–29 行；附录 F/G 新增 | 用户 R3 追加需求原文（重名加 re / 要 PDMS 内原生插件 / 成品放工作区 / 全程不动 PDMS、交付完也不部署） | `_recon/net_addin_feasibility.md`（全文，行号见附录 F）；可照抄样例实测：`D:\AI_Work\pmds三维文字程序-备份\TGTEXT\`（13 文件全齐；**任务给的 `D:\AI_Work\PKPM三维文字程序\TGTEXT` 已不存在**——该目录在 2026-09-21 清库事故中消失，本契约一律改引备份副本并在附录 F 注明）、`D:\AI_Work\PDMS Copilot\src\CopilotAddin.cs`、`D:\AI_Work\PDMS二次开发\PDMSSpecBuilder\dotnet\TGSPEC\TGSPECAddin.cs`；PMLLIB 占用判定与 NEW 冲突惯用法（abaarealib.pmlfrm:107-114、abaarea.pmlfrm:523-528、abacrhierarchy.pmlfrm:116-120）；本轮 C13（csc 实测）/C14（无接触基准）/C15（夹具自检） | 新增 `pdms/pkpmjwduniquename.pmlfnc`（S2 落点）、`pdms-net/` 全套（S8 落点）、`MacOptions.uniquify`/`pml_func_path`、`cli.py --request` 模式、report.renames 键、`D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\` 交付落点（S6/交付包落点）；不改变 v1/v2 任何既有行为 |
-| 12 | 2026-09-25 | **R3 复核三项修复（§o/宏/文档）**：① §o.2/§o.4 的 TYPE 通道改为**双 ! 全局** `!!pkpmjwdType`（§o.4 模板与 F.2 同步）：旧文写单 !，而函数读双 ! 全局（pmlfnc:96-97），且全包无任何调用方赋过双 ! ⇒ 运行期 `defined(!!pkpmjwdType)` 恒假、每条改名记录 TYPE 恒 '?'（可追溯性缺陷，§o.7）；PML 作用域语义：单 ! 只在定义它的宏/函数作用域内可见，跨作用域传须双 !（与 `!!CE` 同理）。② §o.3/§o.4/F.1 的占用探测形态由 `EXIST /$!cand`（base 自带前导 / ⇒ 实际探成 `//名`，**全库 0 例**的未证实形态）改为 `EXIST $!cand`——**带斜杠名字的既有惯用法就是 `EXIST $!x`**（本机 62 处，如 tgautonum.pmlfnc:33-41、abauserview.pmlfrm:859-860）；`EXIST /$!x` 的 6 处直证里插值变量**均不带斜杠**；(2,109) 双结局语义出处（abaarealib:107-114）不变；§o.4 的故障注入行同改（空名 ⇒ `EXIST` 无名参数 ⇒ 非法，§12#27 语义不变）。③ `pdms-net/README.txt` §6 补记导出方向的 PML 依赖（窗体调 `!!pkpmjwdexport`，该函数由 install\\install.ps1 安装并由 pkpmjwdrun.mac $M 载入，deploy 只装 uniquename） | 编排方 R3 复核清单（发现②、③、①） | ① macgen.py:602 旧赋 `!pkpmjwdType`（单 !）vs pmlfnc:96-97 读 `!!pkpmjwdType`；check_type_channel2.py 全包扫描：`!!pkpmjwdType` 仅命中 pmlfnc 自身与沙箱副本。② check_exist_forms.py：PMLLIB `EXIST /$!x` 6 处（变量均无斜杠）vs `EXIST $!x` 62 处（带斜杠名字）；tgvalrename.pmlfrm:181 注释明写「不带斜杠」。③ Form:519-521 调 `!!pkpmjwdexport` 且判 `OK\|`；deploy:109-110 只复制 uniquename；install.ps1:67,262,330 复制/载入 pkpmjwdexport | `engine/macgen.py`（TYPE 行 + 故障注入行）、`pdms/pkpmjwduniquename.pmlfnc`（探测行 + 头注释）、`pdms-net/README.txt` §6、`test/check_v3_contract.py`（夹具断言对齐）、`test/acceptance_r3.py`（check_15 冻结要素 + check_20 守卫形态） |
+| 11 | 2026-09-25 | **R3 追加需求（v3 章节）**：① 新增 §(o) 命名唯一化——PDMS 侧运行期函数 `!!pkpm2pdmsUniquename`（`pdms/pkpm2pdmsuniquename.pmlfnc`），候选序列 `原名 → 原名re → 原名re2 … 原名re99`（上限 99，共 100 个候选），占用判定用 `VAR !x EXIST /<名>` + `handle (2,109)`（出处 abaarealib.pmlfrm:107-114），改名记录进 `!!pkpm2pdmsRenames` 并入 `report.renames`；② 新增 §(p) PDMS 原生插件——`.NET Add-in + PML 混写`（源码 `pdms-net/`、产物 `pdms-net/dist/`、程序集 `PKPM2PDMS`、Command Key `PKPM2PDMS.OpenTools`、编译命令 = csc 3.5 + `/platform:x86` **本轮实测通过**、注册三件套 + 备份/幂等/卸载恢复的 deploy 脚本、引擎以独立可执行文件由 .NET 进程调用 `--request` 模式）；③ 新增 §(q) 验收 15–19；④ 四条硬边界入 §(p.10)：**不部署、不启动 PDMS、不写 G 盘、不改 D:\AVEVA**；⑤ §(g) 增 `.cs/.cmd/.uic` 编码行；§(h) 增 `renames` 键；§12 增 26–29 行；附录 F/G 新增 | 用户 R3 追加需求原文（重名加 re / 要 PDMS 内原生插件 / 成品放工作区 / 全程不动 PDMS、交付完也不部署） | `_recon/net_addin_feasibility.md`（全文，行号见附录 F）；可照抄样例实测：`D:\AI_Work\pmds三维文字程序-备份\TGTEXT\`（13 文件全齐；**任务给的 `D:\AI_Work\PKPM三维文字程序\TGTEXT` 已不存在**——该目录在 2026-09-21 清库事故中消失，本契约一律改引备份副本并在附录 F 注明）、`D:\AI_Work\PDMS Copilot\src\CopilotAddin.cs`、`D:\AI_Work\PDMS二次开发\PDMSSpecBuilder\dotnet\TGSPEC\TGSPECAddin.cs`；PMLLIB 占用判定与 NEW 冲突惯用法（abaarealib.pmlfrm:107-114、abaarea.pmlfrm:523-528、abacrhierarchy.pmlfrm:116-120）；本轮 C13（csc 实测）/C14（无接触基准）/C15（夹具自检） | 新增 `pdms/pkpm2pdmsuniquename.pmlfnc`（S2 落点）、`pdms-net/` 全套（S8 落点）、`MacOptions.uniquify`/`pml_func_path`、`cli.py --request` 模式、report.renames 键、`D:\AI_Work\PKPM数据解析\交付_PKPM2PDMS插件\` 交付落点（S6/交付包落点）；不改变 v1/v2 任何既有行为 |
+| 12 | 2026-09-25 | **R3 复核三项修复（§o/宏/文档）**：① §o.2/§o.4 的 TYPE 通道改为**双 ! 全局** `!!pkpm2pdmsType`（§o.4 模板与 F.2 同步）：旧文写单 !，而函数读双 ! 全局（pmlfnc:96-97），且全包无任何调用方赋过双 ! ⇒ 运行期 `defined(!!pkpm2pdmsType)` 恒假、每条改名记录 TYPE 恒 '?'（可追溯性缺陷，§o.7）；PML 作用域语义：单 ! 只在定义它的宏/函数作用域内可见，跨作用域传须双 !（与 `!!CE` 同理）。② §o.3/§o.4/F.1 的占用探测形态由 `EXIST /$!cand`（base 自带前导 / ⇒ 实际探成 `//名`，**全库 0 例**的未证实形态）改为 `EXIST $!cand`——**带斜杠名字的既有惯用法就是 `EXIST $!x`**（本机 62 处，如 tgautonum.pmlfnc:33-41、abauserview.pmlfrm:859-860）；`EXIST /$!x` 的 6 处直证里插值变量**均不带斜杠**；(2,109) 双结局语义出处（abaarealib:107-114）不变；§o.4 的故障注入行同改（空名 ⇒ `EXIST` 无名参数 ⇒ 非法，§12#27 语义不变）。③ `pdms-net/README.txt` §6 补记导出方向的 PML 依赖（窗体调 `!!pkpm2pdmsexport`，该函数由 install\\install.ps1 安装并由 pkpm2pdmsrun.mac $M 载入，deploy 只装 uniquename） | 编排方 R3 复核清单（发现②、③、①） | ① macgen.py:602 旧赋 `!pkpm2pdmsType`（单 !）vs pmlfnc:96-97 读 `!!pkpm2pdmsType`；check_type_channel2.py 全包扫描：`!!pkpm2pdmsType` 仅命中 pmlfnc 自身与沙箱副本。② check_exist_forms.py：PMLLIB `EXIST /$!x` 6 处（变量均无斜杠）vs `EXIST $!x` 62 处（带斜杠名字）；tgvalrename.pmlfrm:181 注释明写「不带斜杠」。③ Form:519-521 调 `!!pkpm2pdmsexport` 且判 `OK\|`；deploy:109-110 只复制 uniquename；install.ps1:67,262,330 复制/载入 pkpm2pdmsexport | `engine/macgen.py`（TYPE 行 + 故障注入行）、`pdms/pkpm2pdmsuniquename.pmlfnc`（探测行 + 头注释）、`pdms-net/README.txt` §6、`test/check_v3_contract.py`（夹具断言对齐）、`test/acceptance_r3.py`（check_15 冻结要素 + check_20 守卫形态） |
 
 > **`CONTRACT_VERSION` 为何仍是 `"1.0"`**：R2 的四项新增**全部是增量章节**（没有任何 v1 条款被推翻），
 > 而 `CONTRACT_VERSION` 已进入 v1 的产物契约——`report.json` 的 `contract_version` 字段、
@@ -419,8 +423,8 @@ Load               = pkpmLoadSect.ElementKind 分流：12→'beam-line'，−1�
 | `secmap` | `SectionMap \| None` | `None` | 截面解析器。**`None` ⇒ `generate_macro` 抛 `ValueError`**：禁止静默产出"无规格宏"；CLI 必须注入（`SectionMap.load(...)` 的结果） |
 | `header_note` | `str` | `""` | 附在宏头部注释里的额外说明（可留空） |
 | `time_text` | `str` | `""` | 头注释里的时间戳文本；留空则由实现取当前时间 |
-| `uniquify` | `bool` | `True` **〔R3〕** | True ⇒ 每个创建元素前 emit §o.4 的唯一化模板（`!!pkpmjwdUniquename` + 空名故障注入 + `ONERROR/LABEL` 尾）；False ⇒ v1 行为（直接 `NEW <TYPE> /名`），仅测试用 |
-| `pml_func_path` | `str` | `""` **〔R3〕** | `pkpmjwduniquename.pmlfnc` 的路径；非空时宏头 emit `$M <$!pkpmjwdFuncPath>`（§o.4）；空 ⇒ 只发注释提醒"函数须已加载" |
+| `uniquify` | `bool` | `True` **〔R3〕** | True ⇒ 每个创建元素前 emit §o.4 的唯一化模板（`!!pkpm2pdmsUniquename` + 空名故障注入 + `ONERROR/LABEL` 尾）；False ⇒ v1 行为（直接 `NEW <TYPE> /名`），仅测试用 |
+| `pml_func_path` | `str` | `""` **〔R3〕** | `pkpm2pdmsuniquename.pmlfnc` 的路径；非空时宏头 emit `$M <$!pkpm2pdmsFuncPath>`（§o.4）；空 ⇒ 只发注释提醒"函数须已加载" |
 
 * 板/墙的规格**不设独立字段**：一律由 `secmap.resolve(Section.for_panel('slab'|'wall', 厚度), kind)` 得到
   （契约 §e.6），保持"截面解析只有一条路"。
@@ -428,10 +432,19 @@ Load               = pkpmLoadSect.ElementKind 分流：12→'beam-line'，−1�
 
 ---
 
-## (c) PDMS 导出文本格式 `#PKPM-JWD-PDMSDUMP 1.0`
+## (c) PDMS 导出文本格式 `#PKPM2PDMS-PDMSDUMP 1.0`
 
 **用途**：PDMS 侧（PML 导出函数）写、Python 侧（`pdms_dump.parse_dump`）读的中性交换文本。
 **两端必须严格一致**：写方按本节的生成规则，读方按本节的解析规则；任何一端改动都先改本文件。
+
+> **〔v2.1.0 改名 —— 兼容性代价，必读〕** 首行 magic 里的**插件标识**随插件改名：
+> `#PKPM-JWD-PDMSDUMP` → **`#PKPM2PDMS-PDMSDUMP`**。紧跟其后的格式版本 **`1.0` 不动**
+> （那是格式版本，不是插件版本）。读方对此是**硬校验**（`engine/pdms_dump.py` 的 HEADER
+> 比对，以及 `engine/cli.py` 的 `pdms2jwd` / `pdms2pdt` 两个入口）：**v2.0 时代生成的旧
+> dump 文本，v2.1.0 引擎会直接报 InputError 拒绝**。迁移办法二选一：① 用 v2.0 的旧引擎；
+> ② 把旧文本**首行**的 `#PKPM-JWD-PDMSDUMP` 手工替换成 `#PKPM2PDMS-PDMSDUMP`，其余行
+> 一字不改。**不要**为了兼容去放宽读方校验（接受两个 magic）——那属行为增量，超出本次
+> "只改名"的范围（见 `计划/RENAME_MAP.md` §8 待决项 ②）。
 
 ### c.1 编码、换行、缺省单位（先说清）
 
@@ -449,7 +462,7 @@ Load               = pkpmLoadSect.ElementKind 分流：12→'beam-line'，−1�
 
 ```
 file      = header , units , { record } , end ;
-header    = "#PKPM-JWD-PDMSDUMP" , SP , "1.0" , CRLF ;
+header    = "#PKPM2PDMS-PDMSDUMP" , SP , "1.0" , CRLF ;
 units     = "UNITS" , SP , ( "mm" | "cm" | "m" ) , CRLF ;
 record    = site | zone | stru | frmw | sbfr | sctn | pane | stwall ;
 site      = "#SITE"   , SP , name , CRLF ;
@@ -518,9 +531,9 @@ num       = [ "-" ] , 1*DIGIT , [ "." , 1*DIGIT ] , [ ("e"|"E") , [ "+" | "-" ] 
 ### c.4 最小示例（**可直接用作两端联调夹具**）
 
 ```
-#PKPM-JWD-PDMSDUMP 1.0
+#PKPM2PDMS-PDMSDUMP 1.0
 UNITS mm
-#SITE /PKPM_JWD
+#SITE /PKPM2PDMS
 #ZONE /JLCJ2
 #STRU /MAINFRAME
 #FRMW /STL_FRAME/EL1
@@ -568,7 +581,7 @@ UNITS mm
 ### d.1 树形（**必须**照此实现，两套导入器的结果才能互换）
 
 ```
-SITE  /PKPM_JWD
+SITE  /PKPM2PDMS
 └ ZONE  /<工程名>                                  ← --project，缺省取 pkpmSysInfo.ID=2（样本 "JLCJ2"）
   └ STRU  /MAINFRAME
     ├ FRMW  /STL_FRAME/EL<n>      n = pkpmFloor.No_（平面型模型：按 Level.no）
@@ -633,9 +646,9 @@ SITE  /PKPM_JWD
 
 ```
 $S-                                  -- 关闭同义词翻译（源自目录宏首行惯例）
--- PKPM-JWD导入导出 自动生成：<源文件>  <时间>  契约 v1.0
+-- PKPM2PDMS导入导出 自动生成：<源文件>  <时间>  契约 v1.0
 -- 单位：<mm|cm|m>；基点 E/N/U = …；转角 = … 度
-NEW SITE /PKPM_JWD
+NEW SITE /PKPM2PDMS
 NEW ZONE /<工程名>
 NEW STRU /MAINFRAME
 NEW FRMW /STL_FRAME/EL1
@@ -764,7 +777,7 @@ $S+
 * 典型内容（示例，实施者按需增删）：
 
 ```
-///截面匹配补充（本文件属于 PKPM-JWD导入导出，不改动用户原件）
+///截面匹配补充（本文件属于 PKPM2PDMS导入导出，不改动用户原件）
 // 板厚：T<厚度mm>，见 pdt_format.md §2.7
 T120, /Concrete_Slab-SPEC/T120
 T100, /Concrete_Slab-SPEC/T100
@@ -836,13 +849,13 @@ T300, /Concrete_Wall-SPEC/WALL-300
 ### f.1 三个子命令（**签名冻结**；§m.1〔R2〕是完整命令矩阵，本节三条不变）
 
 ```
-python PKPM-JWD导入导出/engine/cli.py jwd2pdms <jwd> --out <macro.mac>
+python PKPM2PDMS导入导出/engine/cli.py jwd2pdms <jwd> --out <macro.mac>
         [--secmap F] [--extra F] [--project N] [--base E N U] [--angle D] [--unit mm] [--report R.json]
 
-python PKPM-JWD导入导出/engine/cli.py pdms2jwd <dump.txt> --out <out.jwd>
+python PKPM2PDMS导入导出/engine/cli.py pdms2jwd <dump.txt> --out <out.jwd>
         [--secmap F] [--dump-unit mm] [--report R.json]
 
-python PKPM-JWD导入导出/engine/cli.py pdt2model <pdt> --out <model.json>
+python PKPM2PDMS导入导出/engine/cli.py pdt2model <pdt> --out <model.json>
 ```
 
 | 参数 | 缺省行为 |
@@ -891,7 +904,7 @@ python PKPM-JWD导入导出/engine/cli.py pdt2model <pdt> --out <model.json>
 | `README.txt`、`docs/*.md` 等纯文本说明 | **UTF-8** | 不限 | **无** | 与 Python 源码一致，便于 git diff 与跨包读写 |
 | PDMS 侧产物 `*.mac` / `*.pmlfrm` / `*.pmlfnc` / `*.pmlobj` | **GBK** | **CRLF** | **无** | 必须用 `open(path,'w',encoding='gbk',newline='')` 并自行拼 `\r\n`；写完必须回读校验（`bytes` 里不得有 `\n` 单行） |
 | `engine/secmap_extra.txt` | **GBK** | CRLF | 无 | 与原件同构 |
-| `#PKPM-JWD-PDMSDUMP` 文本 | **GBK** | CRLF | 无 | 见 §c.1 |
+| `#PKPM2PDMS-PDMSDUMP` 文本 | **GBK** | CRLF | 无 | 见 §c.1 |
 | `engine/section_table.csv` **〔R2〕** | **UTF-8** | CRLF | **带 BOM**（例外，见纪律 2） | 数据文件；与源转化表一致，Excel 可直开；`from_csv` 必须用 `utf-8-sig` 读 |
 | 目录/规格宏 `*.mac`（`dbmacro` 产物）**〔R2〕** | **纯 ASCII**（写成 UTF-8 即可） | CRLF | 无 | 写前断言 `text.isascii()`；见 §l.4 |
 | `engine/section_table.meta.json` **〔R2〕** | UTF-8 | LF | 无 | 见 §k.2 |
@@ -899,8 +912,8 @@ python PKPM-JWD导入导出/engine/cli.py pdt2model <pdt> --out <model.json>
 | `.jwd`（SQLite） | 见 b.3 的文本列规则 | — | — | `PRAGMA encoding='UTF-8'` |
 | `.pdt`、截面匹配文件（**只读**） | GBK | CRLF | 无 | — |
 | `pdms-net/*.cs`、`*.py`（deploy 脚本）、`build.cmd` **〔R3〕** | UTF-8（.cs 由 `/codepage:65001` 读） | `.cmd` **必须 CRLF** | 无 | 见 §p.2 与纪律 6；`build.cmd` 注释用 **ASCII**（实测非 ASCII/非 CRLF 的 .cmd 会被 cmd 误解析） |
-| `pdms-net/dist/pkpmjwd.uic`（Add-in 菜单注册）**〔R3〕** | **UTF-8** | **LF** | **无** | 与可照抄样例 `tgtext.uic` 逐字节同构（实测：3C 3F 78 开头无 BOM、41 LF/0 CRLF，本次 C16） |
-| `<PDMS根>\DesignAddins.xml` / `DesignCustomization.xml`（deploy 改动时）**〔R3〕** | UTF-8 | CRLF | **带 BOM**（实测 EF BB BF） | 读写用 `utf-8-sig`、写回保留 BOM+CRLF；改前 `.pkpmjwd-bak`（§p.6） |
+| `pdms-net/dist/pkpm2pdms.uic`（Add-in 菜单注册）**〔R3〕** | **UTF-8** | **LF** | **无** | 与可照抄样例 `tgtext.uic` 逐字节同构（实测：3C 3F 78 开头无 BOM、41 LF/0 CRLF，本次 C16） |
+| `<PDMS根>\DesignAddins.xml` / `DesignCustomization.xml`（deploy 改动时）**〔R3〕** | UTF-8 | CRLF | **带 BOM**（实测 EF BB BF） | 读写用 `utf-8-sig`、写回保留 BOM+CRLF；改前 `.pkpm2pdms-bak`（§p.6） |
 | PDMS 安装内 `.uic` / `DesignAddins.xml`（安装器追加菜单时） | UTF-8 | CRLF | **带 BOM**（惯例） | 改前必须 `.bak`（属 S3 安装包职责，本契约只规定纪律） |
 
 **硬性纪律**
@@ -908,7 +921,7 @@ python PKPM-JWD导入导出/engine/cli.py pdt2model <pdt> --out <model.json>
 1. **禁止**用 `errors='replace'`/`ignore'` 静默吞掉解码失败；编码失败一律按 f.2 的码 2 退出。
 2. **禁止**在任何产物里写 BOM —— 例外**仅**三处：`<PDMS根>\design.uic` / `DesignAddins.xml` /
    `DesignCustomization.xml`（实测带 BOM，属安装器/deploy 职责）与 `engine/section_table.csv`〔R2〕
-   （数据文件，与源转化表一致，见 §k.2）。`pdms-net/dist/pkpmjwd.uic` **不带 BOM**（§g 表）。
+   （数据文件，与源转化表一致，见 §k.2）。`pdms-net/dist/pkpm2pdms.uic` **不带 BOM**（§g 表）。
 3. 写 GBK 文件时，**先编码再写**（`text.encode('gbk')`，失败即报错），不要依赖平台默认编码。
 4. 所有"用户原件"（`JLCJ2.jwd`、`1_PM.pdt`、`PKPM转PDMS截面匹配文件.txt`、`PKPM（PDMS数据库）.txt`、
    `P-TRANS\*`）**只读**；本包**不得**写入、改名、移动其中任何文件。
@@ -1428,7 +1441,7 @@ def from_pdms(spec_path: str, secmap=None) -> SectionRec | None
 ### l.1 安全约束（**硬，实现必须自校验**）
 
 1. 生成的宏**只允许**创建/修改**本包自己的 4 个容器**：`opts.catalogue_user`、`opts.catalogue_stss`、
-   `opts.spec_world_user`、`opts.spec_world_lib`（缺省见 l.2，全部带 `/PKPM_JWD_` 前缀）。
+   `opts.spec_world_user`、`opts.spec_world_lib`（缺省见 l.2，全部带 `/PKPM2PDMS_` 前缀）。
 2. **禁止**：宏内出现 `NEW`/`OLD`/`DELETE` + 用户既有容器名
    （`/PKPM_USER`、`/PKPM_STSS`、`/PKPMDATA`、`/PKPM_USER_SECTION`、`/PKPM_LIB`）。
    实现必须做一次**字符串扫描自检**，命中即 `ValueError`（不得"警告后继续"）。
@@ -1443,10 +1456,10 @@ def from_pdms(spec_path: str, secmap=None) -> SectionRec | None
 
 | 字段 | 类型 | 缺省 | 说明 |
 |---|---|---|---|
-| `catalogue_user` | str | `"/PKPM_JWD_USER"` | 参数化族目录（`STSECTION /USER_SECTION` 的父） |
-| `catalogue_stss` | str | `"/PKPM_JWD_STSS"` | 型钢库目录（11 个 `STSECTION` 的父） |
-| `spec_world_user` | str | `"/PKPM_JWD_USER_SECTION"` | 用户参数化族的 `SPWLD` |
-| `spec_world_lib` | str | `"/PKPM_JWD_LIB"` | 型钢库的 `SPWLD` |
+| `catalogue_user` | str | `"/PKPM2PDMS_USER"` | 参数化族目录（`STSECTION /USER_SECTION` 的父） |
+| `catalogue_stss` | str | `"/PKPM2PDMS_STSS"` | 型钢库目录（11 个 `STSECTION` 的父） |
+| `spec_world_user` | str | `"/PKPM2PDMS_USER_SECTION"` | 用户参数化族的 `SPWLD` |
+| `spec_world_lib` | str | `"/PKPM2PDMS_LIB"` | 型钢库的 `SPWLD` |
 | `uniquify` | bool | `True` | 给 4 个顶层容器名追加 `suffix`（**SPRFILE/SPCOMPONENT 名保持不变**，见 l.4） |
 | `suffix` | str | `""` | 唯一名后缀；`uniquify=True` 且为空 ⇒ 用 `_YYYYMMDD` |
 | `clean_first` | bool | `False` | 生成清场版（l.3.5） |
@@ -1460,7 +1473,7 @@ def from_pdms(spec_path: str, secmap=None) -> SectionRec | None
 ```
 $S-  -- Synonym translation OFF
 -- ------------------------------------------------------------------     ← 70 个 '-'，与样本 L2 同
--- PKPM-JWD导入导出  dbmacro: <table 来源>  <date_text>
+-- PKPM2PDMS导入导出  dbmacro: <table 来源>  <date_text>
 ONERROR GOLABEL <onerror_label>
 
 … 正文（l.3.2/l.3.3）…
@@ -1716,8 +1729,8 @@ def write_pdt_sections(sections: dict, path: str, opts: PdtOptions | None = None
 ```jsonc
 "db": {
   "macro_source": "G:\\…\\PKPM（PDMS数据库）.txt",   // 或 jwd/pdt 来源
-  "generated": { "catalogue": ["/PKPM_JWD_USER","/PKPM_JWD_STSS"],
-                 "spec_world": ["/PKPM_JWD_USER_SECTION","/PKPM_JWD_LIB"],
+  "generated": { "catalogue": ["/PKPM2PDMS_USER","/PKPM2PDMS_STSS"],
+                 "spec_world": ["/PKPM2PDMS_USER_SECTION","/PKPM2PDMS_LIB"],
                  "stsection": 12, "stcategory": 57, "sprfile": 2920, "spcomponent": 2920,
                  "text": 533, "dtset": 57, "data": 578, "ptsset": 57, "pline": 430,
                  "gmsset": 57, "profile": 59, "specification": 12, "selec": 57,
@@ -1748,7 +1761,7 @@ def write_pdt_sections(sections: dict, path: str, opts: PdtOptions | None = None
 5. **匹配文件的 256 条失效右值与 759 处大小写差异**：只做报告归类与纠正建议，
    **不改用户原件**；纠正项只允许写进 `engine/secmap_extra.txt`（§e.4）。
 6. **不改 `PDMSxCA_Addin*.dll`**、不反编译它（`M`/`EXI`/`EXR` 的残留疑点按 §12 留痕，不靠反编译解决）。
-7. 新增产物一律落在 `PKPM-JWD导入导出\` 内（`engine/section_table.csv`、`section_table.meta.json`
+7. 新增产物一律落在 `PKPM2PDMS导入导出\` 内（`engine/section_table.csv`、`section_table.meta.json`
    属**数据文件**，由 `test/build_section_table.py` 可复现生成）。
 8. R2 落地后 `docs/` 必须同步（`交付清单.md`、`使用说明.md` 的命令表、`格式规范_PDT.md` 的**写出**章节、
    新增 `格式规范_PDMSDB.md` 的目录宏章节）；文档结论的证据分级仍按 §0.1（**未实机**不得写成"已验证"）。
@@ -1776,19 +1789,19 @@ def write_pdt_sections(sections: dict, path: str, opts: PdtOptions | None = None
 ### o.2 PML 函数（**冻结**签名与落点）
 
 ```pml
--- 落点：PKPM-JWD导入导出/pdms/pkpmjwduniquename.pmlfnc（GBK 无 BOM + CRLF，§g）
-define function !!pkpmjwdUniquename(!base is STRING) is STRING
+-- 落点：PKPM2PDMS导入导出/pdms/pkpm2pdmsuniquename.pmlfnc（GBK 无 BOM + CRLF，§g）
+define function !!pkpm2pdmsUniquename(!base is STRING) is STRING
 ```
 
 * **算法**（附录 F.1 是逐字夹具，`test/check_v3_contract.py` 静态断言）：
-  1. `if (defined(!!pkpmjwdRenames)) then … else … endif`（`defined()` 出处：`nucdesogwall.pmlobj:206`；
-     数组建立用 `!!pkpmjwdRenames = object ARRAY()`（`object ARRAY()` 出处：`nucroommcreation.pmlfnc`））。
+  1. `if (defined(!!pkpm2pdmsRenames)) then … else … endif`（`defined()` 出处：`nucdesogwall.pmlobj:206`；
+     数组建立用 `!!pkpm2pdmsRenames = object ARRAY()`（`object ARRAY()` 出处：`nucroommcreation.pmlfnc`））。
   2. 依 §o.1 的序列逐个探测：占用判定见 §o.3。
-  3. 命中可用名 `!final` 后：`if (!final ne !base) then !!pkpmjwdRenames.append('SCTN|<base>|<final>') endif`
-     —— 记录格式**冻结**为 `'TYPE|原名|实际名'` 三段竖线串（TYPE 由调用方在 **`!!pkpmjwdType`
+  3. 命中可用名 `!final` 后：`if (!final ne !base) then !!pkpm2pdmsRenames.append('SCTN|<base>|<final>') endif`
+     —— 记录格式**冻结**为 `'TYPE|原名|实际名'` 三段竖线串（TYPE 由调用方在 **`!!pkpm2pdmsType`
      双 ! 全局变量**里传入——单 ! 变量只在定义它的宏/函数作用域内可见，跨作用域传须双 !，
      与 `!!CE` 同理；见 §o.4；`.append()` 出处：`GRIDDESIGN.pmlfrm:986` `!this.SCTNLIST.APPEND(!!CE)`）。
-  4. 返回 `!final`；**候选耗尽** ⇒ `!!pkpmjwdRenames.append('FAIL|<base>|<base>re99')` 并返回 `''`。
+  4. 返回 `!final`；**候选耗尽** ⇒ `!!pkpm2pdmsRenames.append('FAIL|<base>|<base>re99')` 并返回 `''`。
 * **只允许**用 §o.3 的两种已证实写法之一做探测；不得自造第三种。
 
 ### o.3 占用判定的两种已证实写法（**出处强制**）
@@ -1798,7 +1811,7 @@ define function !!pkpmjwdUniquename(!base is STRING) is STRING
 | 1 | `VAR !probe EXIST $!cand` 包在 `handle (2,109)` 里；**VAR 成功（'TRUEA'）⇒ 已占用**、正常返回 'FALSEA' 或落到 `(2,109)` ⇒ **可用** | `!cand` 自带前导 `/`（§o.1）⇒ 插值后就是 `/名`；**带斜杠名字的既有惯用法就是 `EXIST $!x`**（本机 62 处；如 `TIANGONG\functions\tgautonum.pmlfnc:33-41` `!cand = '/' & !pre & …` 后 `exist $!cand` 循环探测、`aba\Forms\abauserview.pmlfrm:859-860`）。`EXIST /$!cand`（⇒ `//名`）形态全库 **0 例** ⇒ R3 复核发现⑬后禁用（旧写法 `EXIST /$!x` 的 6 处直证里插值变量**均不带斜杠**，如 `aba\Forms\abaarealib.pmlfrm:107-114`） | `aba\Forms\abaarealib.pmlfrm:107-114`（`VAR !exist EXIST /$!!abaDefaults.task.val` + `handle (2,109)`，注释原文 `-- Undefined name`——(2,109) 双结局语义的出处，与本表行的 `$!x` 形态并用） |
 | 2 | `NEW <TYPE> <名>` 包在 `handle (41,12)` 里；落到 `(41,12)` ⇒ 重名（先 `delete` 再补救或换名） | 建了才知道 | `PMLLIB\aba\Forms\abaarea.pmlfrm:523-528`（`NEW IDLI $!this.name.val` + `handle(41,12)` + `!!alert.error('An element of this name already exists.…')`）；`PMLLIB\aba\Forms\abacrhierarchy.pmlfrm:116-120`（`NEW LIBY …` + `handle (41,12)` + `delete DLLB` + `!!ce = ….dbref()`） |
 
-**裁定**：`!!pkpmjwdUniquename` 用**写法 1**（无副作用）；写法 2 是"创建即冲突"的兜底——宏的
+**裁定**：`!!pkpm2pdmsUniquename` 用**写法 1**（无副作用）；写法 2 是"创建即冲突"的兜底——宏的
 `ONERROR` 尾（§o.5）会把任何漏网的 `(41,12)` 变成整宏中止（§12#26 标注 (2,109) 语义待实机确认）。
 
 ### o.4 宏里的确切用法（**冻结模板**）
@@ -1806,21 +1819,21 @@ define function !!pkpmjwdUniquename(!base is STRING) is STRING
 **前置**：宏头（`$S-` 之后）加载函数文件；`MacOptions.pml_func_path`（§b.6 v3 新增）非空时 emit：
 
 ```pml
-$M <$!pkpmjwdFuncPath>
+$M <$!pkpm2pdmsFuncPath>
 ```
 （`$M <路径>` 出处：`nucdesogwall.pmlobj:204` `$M/%PDMSUI%/DES/STLWRK/LPNODE $<AT $!PosString$>`——
 用 PDMS 环境变量路径带参数执行宏文件；**绝对路径直跑 .pmlfnc** 的同源证据是注释形态
 `nucdesmanchor.mac:9-11` `$m/V:/PML/gcplus/…mac /DEV /floor450 …` ⇒ 标【推断】待实机，见 §12#28。
 `.NET` 路径下由 Add-in 在 `Start()` 里 `$M` 一次，路径取 §p.5 的 engine_path 机制旁的
-`<PDMS根>\PKPMJWD\pml\`。）
+`<PDMS根>\PKPM2PDMS\pml\`。）
 
 **每个创建元素前**（TYPE 传给函数用；`eq` 运算符出处：`sdnfinver3.pmlfnc:113` `!errflag eq 1`）：
 
 ```pml
-!!pkpmjwdType = 'SCTN'
-!n = !!pkpmjwdUniquename('/STL_COL_1')
+!!pkpm2pdmsType = 'SCTN'
+!n = !!pkpm2pdmsUniquename('/STL_COL_1')
 if (!n eq '') then
-  var !pkpmjwdFatal EXIST $!n
+  var !pkpm2pdmsFatal EXIST $!n
 endif
 NEW SCTN $!n
   SPREF …
@@ -1828,8 +1841,8 @@ NEW SCTN $!n
   …
 ```
 
-* `!!pkpmjwdType` 是**双 ! 全局**（跨作用域传给函数；单 ! 在函数内不可见，§o.2 步骤 3）。
-* `if (!n eq '') then var !pkpmjwdFatal EXIST $!n endif` 是**故障注入**：`!n` 为空串时该行变成
+* `!!pkpm2pdmsType` 是**双 ! 全局**（跨作用域传给函数；单 ! 在函数内不可见，§o.2 步骤 3）。
+* `if (!n eq '') then var !pkpm2pdmsFatal EXIST $!n endif` 是**故障注入**：`!n` 为空串时该行变成
   `VAR … EXIST`（无名参数）⇒ 非法 ⇒ 触发宏头的 `ONERROR GOLABEL` ⇒ 整宏中止（§12#27 标注该
   行为为【推断-高】）；`!n` 非空时该行重探一次刚验证过的名字（`EXIST /名`，§o.3 的已证实形态），无副作用。
 * 骨架层（SITE/ZONE/STRU/FRMW/SBFR）与元件层（SCTN/PANE/STWALL）**全部**走该模板；
@@ -1841,9 +1854,9 @@ NEW SCTN $!n
 
 ```pml
 $S-  -- Synonym translation OFF
-ONERROR GOLABEL /PKPMJWDERR
+ONERROR GOLABEL /PKPM2PDMSERR
 …（§o.4 的创建块 …）…
-LABEL /PKPMJWDERR
+LABEL /PKPM2PDMSERR
 handle ANY
 $S+
 RETURN ERROR
@@ -1857,10 +1870,10 @@ endhandle
 
 ### o.6 失败行为（**冻结**；不许静默跳过）
 
-1. 候选耗尽（含 `re99` 也被占用）：函数返回 `''` + `!!pkpmjwdRenames` 追加 `'FAIL|<base>|<base>re99'`；
+1. 候选耗尽（含 `re99` 也被占用）：函数返回 `''` + `!!pkpm2pdmsRenames` 追加 `'FAIL|<base>|<base>re99'`；
 2. 宏经 §o.4/§o.5 中止 ⇒ 后续元素**不再创建**（部分建成模型 + 报错，**不是**回滚）；
 3. .NET 路径：`Command.Run()` 返回假 / `Result` 含错误（recon §3.5A：`bool ok = c.Run(); string result = c.Result;`）
-   ⇒ 窗体弹错 + `addin.log` + 把 `!!pkpmjwdRenames` 取回并入 `report.renames`；
+   ⇒ 窗体弹错 + `addin.log` + 把 `!!pkpm2pdmsRenames` 取回并入 `report.renames`；
 4. **绝不**改用"跳过该元素继续"或"覆盖既有元素"。
 
 ### o.7 可追溯（**冻结**）
@@ -1885,29 +1898,29 @@ endhandle
 ### p.1 交付形态与目录（**冻结**）
 
 ```
-PKPM-JWD导入导出/
+PKPM2PDMS导入导出/
 ├─ pdms-net/                        ← C# 源码 + 构建脚本（S8 落点）
-│  ├─ PKPMJWDAddin.cs               IAddin 入口（照 TGTextAddin.cs 骨架）
-│  ├─ PKPMJWDForm.cs                WinForms 窗体（控件清单见 p.3）
+│  ├─ PKPM2PDMSAddin.cs               IAddin 入口（照 TGTextAddin.cs 骨架）
+│  ├─ PKPM2PDMSForm.cs                WinForms 窗体（控件清单见 p.3）
 │  ├─ PmlBridge.cs                  .NET→PML / PML→.NET 桥（p.4）
 │  ├─ EngineRunner.cs               引擎进程调用（p.5）
 │  ├─ PKLog.cs                      日志（照 TGSPECAddin.cs 的 Log()）
 │  ├─ build.cmd                     编译命令（p.2，原样可跑）
-│  ├─ pkpmjwd.uic                   菜单/工具条注册（p.3）
-│  ├─ dist/                         产物：PKPMJWD.dll + pkpmjwd.uic
+│  ├─ pkpm2pdms.uic                   菜单/工具条注册（p.3）
+│  ├─ dist/                         产物：PKPM2PDMS.dll + pkpm2pdms.uic
 │  └─ deploy/                       安装/卸载脚本（p.6；本轮只交付、不执行）
-│     ├─ deploy_pkpmjwd.py
-│     └─ undeploy_pkpmjwd.py
+│     ├─ deploy_pkpm2pdms.py
+│     └─ undeploy_pkpm2pdms.py
 ├─ engine/dist/                     引擎独立可执行入口（p.5；S9 落点）
-│  ├─ pkpmjwd_engine.exe            构建期用 PyInstaller --onefile 打包 engine/cli.py（若可用）
+│  ├─ pkpm2pdms_engine.exe            构建期用 PyInstaller --onefile 打包 engine/cli.py（若可用）
 │  └─ run_engine.cmd                回退包装器（exe 不存在时用）
-└─ pdms/pkpmjwduniquename.pmlfnc    §o.2 的唯一化函数（S2 落点）
+└─ pdms/pkpm2pdmsuniquename.pmlfnc    §o.2 的唯一化函数（S2 落点）
 ```
 
-* **身份冻结**：程序集名 `PKPMJWD`；命名空间 `PKPMJWD`；Add-in 类 `PKPMJWDAddin : IAddin`
+* **身份冻结**：程序集名 `PKPM2PDMS`；命名空间 `PKPM2PDMS`；Add-in 类 `PKPM2PDMSAddin : IAddin`
   （`IAddin` 4 成员签名见 recon §3.4：`Name / Description / Start(ServiceManager) / Stop()`）；
-  Command 类 `OpenPKPMJWDCommand : Command`；**Command Key = `"PKPMJWD.OpenTools"`**；
-  `IAddin.Name` 返回 `"PKPMJWD"`（该串同时是 `DesignAddins.xml` 的条目文本）。
+  Command 类 `OpenPKPM2PDMSCommand : Command`；**Command Key = `"PKPM2PDMS.OpenTools"`**；
+  `IAddin.Name` 返回 `"PKPM2PDMS"`（该串同时是 `DesignAddins.xml` 的条目文本）。
 * 样例对照（**可照抄**，逐条行号见附录 F.4）：`TGTextAddin.cs:13-137`（IAddin + Command + WindowWrapper）、
   `TGSPECAddin.cs:14-109`（IAddin + Log 模式）、`TextForm.cs`（35,588 B WinForms 窗体实例）。
   **任务给的 `D:\AI_Work\PKPM三维文字程序\TGTEXT` 已不存在**（2026-09-21 清库事故）；
@@ -1920,7 +1933,7 @@ PKPM-JWD导入导出/
 
 ```bat
 @echo off
-rem build PKPMJWD.dll (x86, CLR2/.NET3.5, C#3) against local PDMS 12.1.SP4 assemblies
+rem build PKPM2PDMS.dll (x86, CLR2/.NET3.5, C#3) against local PDMS 12.1.SP4 assemblies
 setlocal
 set CSC=C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe
 set PDMS=D:\AVEVA\Plant\PDMS12.1.SP4
@@ -1929,7 +1942,7 @@ set HERE=%~dp0
 if not exist "%CSC%" set CSC=C:\Windows\Microsoft.NET\Framework64\v3.5\csc.exe
 
 "%CSC%" /nologo /target:library /platform:x86 /optimize+ /utf8output /codepage:65001 ^
- /warnaserror- /out:"%HERE%dist\PKPMJWD.dll" ^
+ /warnaserror- /out:"%HERE%dist\PKPM2PDMS.dll" ^
  /r:"%PDMS%\Aveva.ApplicationFramework.dll" ^
  /r:"%PDMS%\Aveva.ApplicationFramework.Presentation.dll" ^
  /r:"%PDMS%\Aveva.Pdms.Database.dll" ^
@@ -1937,14 +1950,14 @@ if not exist "%CSC%" set CSC=C:\Windows\Microsoft.NET\Framework64\v3.5\csc.exe
  /r:"%PDMS%\Aveva.Pdms.Geometry.dll" ^
  /r:System.dll /r:System.Core.dll /r:System.Drawing.dll ^
  /r:System.Windows.Forms.dll ^
- "%HERE%PKPMJWDAddin.cs" "%HERE%PKPMJWDForm.cs" "%HERE%PmlBridge.cs" ^
+ "%HERE%PKPM2PDMSAddin.cs" "%HERE%PKPM2PDMSForm.cs" "%HERE%PmlBridge.cs" ^
  "%HERE%EngineRunner.cs" "%HERE%PKLog.cs"
 
 if errorlevel 1 (
   echo BUILD FAILED
   exit /b 1
 )
-echo BUILD OK: %HERE%dist\PKPMJWD.dll
+echo BUILD OK: %HERE%dist\PKPM2PDMS.dll
 ```
 
 * **引用清单（冻结，最小集）**：系统 `System.dll`、`System.Core.dll`、`System.Drawing.dll`、
@@ -1963,31 +1976,31 @@ echo BUILD OK: %HERE%dist\PKPMJWD.dll
 
 ### p.3 界面（**冻结**；"原生界面"的核心）
 
-**菜单/工具条注册**（`pdms-net/dist/pkpmjwd.uic`，UTF-8 无 BOM + LF——与 `tgtext.uic` 逐条同构，
+**菜单/工具条注册**（`pdms-net/dist/pkpm2pdms.uic`，UTF-8 无 BOM + LF——与 `tgtext.uic` 逐条同构，
 对照表见附录 F.3）：
 
 ```xml
-<ButtonTool Name="PKPMJWD.Open">
-  <Command><Type>Instance</Type><Key>PKPMJWD.OpenTools</Key><Arguments /></Command>
+<ButtonTool Name="PKPM2PDMS.Open">
+  <Command><Type>Instance</Type><Key>PKPM2PDMS.OpenTools</Key><Arguments /></Command>
   <Image />
-  <Caption>PKPM JWD 导入导出</Caption>
+  <Caption>PKPM2PDMS导入导出</Caption>
   <DisplayStyle>Default</DisplayStyle>
 </ButtonTool>
-<MenuTool Name="PKPMJWD.Menu">
+<MenuTool Name="PKPM2PDMS.Menu">
   <Image />
-  <Caption>PKPM JWD</Caption>
+  <Caption>PKPM2PDMS</Caption>
   <DisplayStyle>Default</DisplayStyle>
-  <Tools><Tool Name="PKPMJWD.Open" /></Tools>
+  <Tools><Tool Name="PKPM2PDMS.Open" /></Tools>
 </MenuTool>
 ```
-外加 `<MenuBar><Tool Name="PKPMJWD.Menu" /></MenuBar>` 与 `<QATTools><Tool Name="PKPMJWD.Open" /></QATTools>`
+外加 `<MenuBar><Tool Name="PKPM2PDMS.Menu" /></MenuBar>` 与 `<QATTools><Tool Name="PKPM2PDMS.Open" /></QATTools>`
 （同 tgtext.uic:25-36）。**注册链 = 三件套**（recon §4.1/§4.2【事实】）：
-① `DesignAddins.xml` 的 `<ArrayOfString>` 加 `<string>PKPMJWD</string>`；
+① `DesignAddins.xml` 的 `<ArrayOfString>` 加 `<string>PKPM2PDMS</string>`；
 ② **`DesignCustomization.xml` 的 `<UICustomizationFiles>` 加
-`<CustomizationFile Name="PKPMJWD" Path="pkpmjwd.uic" />`**（最易漏的一步）；
-③ `pkpmjwd.uic` 复制到 `<PDMS根>\`。
+`<CustomizationFile Name="PKPM2PDMS" Path="pkpm2pdms.uic" />`**（最易漏的一步）；
+③ `pkpm2pdms.uic` 复制到 `<PDMS根>\`。
 
-**窗体 `PKPMJWDForm`（WinForms，控件清单冻结）**——一窗三向，控件自上而下：
+**窗体 `PKPM2PDMSForm`（WinForms，控件清单冻结）**——一窗三向，控件自上而下：
 
 | # | 控件 | 类型 | 说明 |
 |---|---|---|---|
@@ -1999,17 +2012,17 @@ echo BUILD OK: %HERE%dist\PKPMJWD.dll
 | 6 | `numAngle` | NumericUpDown（2 位小数） | 转角（度）；同上 |
 | 7 | `cmbUnit` | ComboBox | `mm/cm/m`，缺省 `mm`（§d.4-1：只缩放宏内数值） |
 | 8 | 构件类别勾选 | CheckBox ×8 | `chkColumn/chkBeam/chkHBrace/chkVBrace/chkSlab/chkWall/chkGrid/chkHole`——与现有 Add-in 的 `Chk_Column/Chk_Beam/Chk_Brace/Chk_Slab/Chk_Wall/Chk_Grid/Chk_Hole` 同名同义（`pdms_target.md` §3.2 控件名直证；本包拆 HBrace/VBrace 两个）；仅建模方向启用 |
-| 9 | `txtOut` + `btnBrowseOut` | TextBox + Button | 输出文件（`.mac/.jwd/.pdt/.csv/.json`）；缺省 = `%TEMP%\PKPMJWD\<源基名>.<ext>` |
+| 9 | `txtOut` + `btnBrowseOut` | TextBox + Button | 输出文件（`.mac/.jwd/.pdt/.csv/.json`）；缺省 = `%TEMP%\PKPM2PDMS\<源基名>.<ext>` |
 | 10 | `btnRun` | Button「执行」 | 见 p.5 的执行序列 |
 | 11 | `progressBar1` + `txtSummary` | ProgressBar + multiline TextBox(ReadOnly) | 进度与摘要（引擎 report.json 的 `counts`/`sections` 计数 + `renames` + 未解析清单） |
 | 12 | `btnOpenReport` | Button「打开报告」 | 用系统默认程序打开 report.json（`Process.Start`） |
-| 13 | 全窗体 | — | 非模态（`Show()` 不 `ShowDialog()`，照 `TGSPECAddin.cs:86-88`）；Owner 设为 PDMS 主窗（照 `TGTextAddin.cs:114-127` 的 `WindowWrapper`）；窗体标题 `PKPM JWD 导入导出`；**不暴露命令行**——所有引擎参数由窗体收集 |
+| 13 | 全窗体 | — | 非模态（`Show()` 不 `ShowDialog()`，照 `TGSPECAddin.cs:86-88`）；Owner 设为 PDMS 主窗（照 `TGTextAddin.cs:114-127` 的 `WindowWrapper`）；窗体标题 `PKPM2PDMS导入导出`；**不暴露命令行**——所有引擎参数由窗体收集 |
 
 ### p.4 混写边界（**冻结**；三层职责）
 
 | 层 | 职责 | 机制（出处） |
 |---|---|---|
-| **.NET**（`PKPMJWD.dll`） | 菜单/窗体呈现、文件选择、参数收集、进度显示、结果写状态/弹窗、日志 | `IAddin/Command/CommandManager`（recon §3.4）；Owner+非模态（TGTextAddin.cs:114-127） |
+| **.NET**（`PKPM2PDMS.dll`） | 菜单/窗体呈现、文件选择、参数收集、进度显示、结果写状态/弹窗、日志 | `IAddin/Command/CommandManager`（recon §3.4）；Owner+非模态（TGTextAddin.cs:114-127） |
 | **PML** | **PDMS 库内**一切取数与执行：遍历 `STRU/FRMW/SBFR/SCTN/PANE/STWALL` 写 PDMSDUMP（§c.5）、名字唯一化（§o）、`$M` 执行导入宏 | `.NET→PML`：`Aveva.Pdms.Utilities.CommandLine.Command.CreateCommand(s)` + `Run()`/`Result`（recon §3.4/§3.5A）；`PML→.NET`：`import '<dll 绝对路径去 .dll>'` + `using namespace '<NS>'` + `!!o = object Class()`（recon §3.5B，SolidSupport `mac/loadVariable` 原文） |
 | **Python 引擎**（已验证，**本轮不重写**） | 文件格式转换：`.jwd/.pdt` ↔ 规范模型 ↔ PDMS 宏/PDMSDUMP ↔ 目录宏（§j/k/l/m 的全部子命令） | 独立可执行入口，由 .NET 进程调用（p.5） |
 
@@ -2021,9 +2034,9 @@ echo BUILD OK: %HERE%dist\PKPMJWD.dll
 ### p.5 引擎调用（**冻结**；"独立可执行文件 + 进程调用"）
 
 **入口解析顺序**（`EngineRunner`）：
-1. 环境变量 `PKPMJWD_ENGINE`（绝对路径）；
-2. `<PDMS根>\PKPMJWD\engine_path.txt`（deploy 脚本写入，内容 = 引擎入口绝对路径，UTF-8 无 BOM 单行）；
-3. `<DLL 所在目录>\..\..\engine\dist\pkpmjwd_engine.exe`（工作区直跑场景）。
+1. 环境变量 `PKPM2PDMS_ENGINE`（绝对路径）；
+2. `<PDMS根>\PKPM2PDMS\engine_path.txt`（deploy 脚本写入，内容 = 引擎入口绝对路径，UTF-8 无 BOM 单行）；
+3. `<DLL 所在目录>\..\..\engine\dist\pkpm2pdms_engine.exe`（工作区直跑场景）。
 
 **调用协议（冻结）**：
 
@@ -2037,26 +2050,26 @@ request = { "tool": "jwd2pdms",                     // §m.1 的 10 个窗体子
   **v3 新增全局选项**（§0.4-11）；执行完把 report.json 写到 `args.report`，退出码用 §f.2；
   stdout 输出**一行摘要 + 未解析清单**（UTF-8；.NET 按 UTF-8 读字节）。
 * .NET 执行序列（`btnRun`）：① 校验输入存在/扩展名合法 → ② 写 request JSON 到
-  `%TEMP%\PKPMJWD\<op>-<timestamp>.json` → ③ `Process.Start(engine_entry, "--request …")` 等待退出
+  `%TEMP%\PKPM2PDMS\<op>-<timestamp>.json` → ③ `Process.Start(engine_entry, "--request …")` 等待退出
   （**同步等待 + 窗体进度条滚动**，超时上限 30 分钟）→ ④ 退出码 ≠0 ⇒ 弹错 + 日志；=0 ⇒
   **建模方向**继续：`PmlBridge.RunPml("$M <生成的 .mac>")`（宏由引擎生成到 `txtOut`，内含 §o 唯一化），
-  再取回 `!!pkpmjwdRenames` 并入 report → ⑤ 摘要上窗 + `btnOpenReport` 可用。
+  再取回 `!!pkpm2pdmsRenames` 并入 report → ⑤ 摘要上窗 + `btnOpenReport` 可用。
 * **导出方向**（`pdms2jwd/pdms2pdt`）：先 `PmlBridge` 执行 §c.5 的 PML 导出函数得到 PDMSDUMP 到
   `txtOut` 同目录的 `<源基名>.dump.txt`（GBK+CRLF，§c.1），再以该 dump 为 `--request` 的输入调引擎。
 
 ### p.6 注册脚本（**冻结**；本轮**只交付、绝不执行**）
 
-`pdms-net/deploy/deploy_pkpmjwd.py` / `undeploy_pkpmjwd.py`（骨架照 `deploy_tgtext.py`，逐行出处见附录 F.5）：
+`pdms-net/deploy/deploy_pkpm2pdms.py` / `undeploy_pkpm2pdms.py`（骨架照 `deploy_tgtext.py`，逐行出处见附录 F.5）：
 
 | 步骤 | 行为 | 出处（deploy_tgtext.py） |
 |---|---|---|
 | 0 | **缺省 dry-run**：只打印"将要改变的全部对象"完整清单（逐条绝对路径），**不落盘**；带 `--execute` 才真正修改（v3 硬化，对应红线 6「先打印完整清单再执行」） | TGTEXT 无此步（v3 新增） |
-| 1 | 备份 `DesignAddins.xml`/`DesignCustomization.xml` 各一次，后缀 `.pkpmjwd-bak` | :21-26 `backup_once()` |
-| 2 | `DesignAddins.xml` 的 `</ArrayOfString>` 前插 `  <string>PKPMJWD</string>\n`；幂等（已有则跳过） | :28-38 |
-| 3 | `DesignCustomization.xml` 的 `</UICustomizationFiles>` 前插 `  <CustomizationFile Name="PKPMJWD" Path="pkpmjwd.uic" />\n`；幂等 | :41-51 |
-| 4 | 复制 `dist\PKPMJWD.dll`、`dist\pkpmjwd.uic` 到 `<PDMS根>\` | :54-58 |
-| 5 | 写 `<PDMS根>\PKPMJWD\engine_path.txt`（引擎入口绝对路径）与 `<PDMS根>\PKPMJWD\pml\pkpmjwduniquename.pmlfnc`（§o.2 函数，GBK+CRLF 原样复制） | v3 新增 |
-| 卸载 | **恢复优先**：从 `.pkpmjwd-bak` 复原两个 XML；把安装的 4 个文件（DLL/uic/engine_path.txt/pmlfnc）**移动**到 `<PDMS根>\PKPMJWD\_uninstalled_<时间戳>\`（不删除） | TGTEXT :61-84 是"删条目+unlink"；v3 改为恢复+移动（更符合红线 3） |
+| 1 | 备份 `DesignAddins.xml`/`DesignCustomization.xml` 各一次，后缀 `.pkpm2pdms-bak` | :21-26 `backup_once()` |
+| 2 | `DesignAddins.xml` 的 `</ArrayOfString>` 前插 `  <string>PKPM2PDMS</string>\n`；幂等（已有则跳过） | :28-38 |
+| 3 | `DesignCustomization.xml` 的 `</UICustomizationFiles>` 前插 `  <CustomizationFile Name="PKPM2PDMS" Path="pkpm2pdms.uic" />\n`；幂等 | :41-51 |
+| 4 | 复制 `dist\PKPM2PDMS.dll`、`dist\pkpm2pdms.uic` 到 `<PDMS根>\` | :54-58 |
+| 5 | 写 `<PDMS根>\PKPM2PDMS\engine_path.txt`（引擎入口绝对路径）与 `<PDMS根>\PKPM2PDMS\pml\pkpm2pdmsuniquename.pmlfnc`（§o.2 函数，GBK+CRLF 原样复制） | v3 新增 |
+| 卸载 | **恢复优先**：从 `.pkpm2pdms-bak` 复原两个 XML；把安装的 4 个文件（DLL/uic/engine_path.txt/pmlfnc）**移动**到 `<PDMS根>\PKPM2PDMS\_uninstalled_<时间戳>\`（不删除） | TGTEXT :61-84 是"删条目+unlink"；v3 改为恢复+移动（更符合红线 3） |
 
 * 两个 XML 的读写必须 `utf-8-sig`（实测两者均 **UTF-8 带 BOM + CRLF**：DesignAddins.xml 1,140 B/26 CRLF、
   DesignCustomization.xml 688 B/11 CRLF，本次 C16 实测）——写回必须保留 BOM 与 CRLF。
@@ -2064,7 +2077,7 @@ request = { "tool": "jwd2pdms",                     // §m.1 的 10 个窗体子
 
 ### p.7 日志与状态（**冻结**）
 
-* 日志：`<PDMS根>\PKPMJWD\addin.log`（ASCII、追加、带时间戳）——照 `TGSPECAddin.cs:52-63` 的 `Log()`；
+* 日志：`<PDMS根>\PKPM2PDMS\addin.log`（ASCII、追加、带时间戳）——照 `TGSPECAddin.cs:52-63` 的 `Log()`；
   `TGLog.cs`（952 B）是可直接照抄的实现。
 * 用户可见反馈：窗体 `txtSummary`（主）+ `MessageBox`（错误，照 `TGTextAddin.cs:110`）+
   `report.json`（完整）。不要求写 PDMS 命令窗。
@@ -2081,7 +2094,7 @@ request = { "tool": "jwd2pdms",                     // §m.1 的 10 个窗体子
 
 1. **不部署**：不执行 deploy 脚本；`D:\AVEVA` 的注册三件套与 DLL 在整轮前后零变化（C14 基准）。
 2. **不启动 PDMS**：不运行 `des.exe`/`pdms.bat`/任何 PDMS 模块；验收只做静态与文件级检查。
-3. **不写 G 盘**：交付物只出现在 `PKPM-JWD导入导出\` 与 `D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\`；
+3. **不写 G 盘**：交付物只出现在 `PKPM2PDMS导入导出\` 与 `D:\AI_Work\PKPM数据解析\交付_PKPM2PDMS插件\`；
    G 盘清单零变化（C14 基准）。
 4. **不改 `D:\AVEVA`**：只允许**读**（csc `/reference`、静态取证）；C14 基准核对。
 5. 交付声明：`docs/交付清单.md` 与 `docs/使用说明.md` 必须写明
@@ -2093,11 +2106,11 @@ request = { "tool": "jwd2pdms",                     // §m.1 的 10 个窗体子
 
 | # | 标准 | 怎么验（可执行口径） |
 |---|---|---|
-| 15 | **重名唯一化** | ① 静态：附录 F.1 夹具与 `pdms/pkpmjwduniquename.pmlfnc` 逐字对照（签名、探测写法、上限 99、FAIL 记录、append/defined 出处注释齐全）——`test/check_v3_contract.py`；② **逻辑对照**：用 Python 参考实现（同一算法）对构造的"占用表"跑出候选序列，断言 `原名→re→re2…`、第 100 个候选耗尽即 FAIL——同脚本；③ 改名记录：模拟结果必须能产出 §o.7 的 `renames` 条目；④ 耗尽行为 = 报错中止（§o.6），代码评审确认无"跳过/覆盖"分支。**PDMS 实机行为标注"未实机"**（§12#26/27） |
-| 16 | **.NET 插件真编译通过** | 跑 `pdms-net/build.cmd`（§p.2 原样）：退出码 0；产物 `dist\PKPMJWD.dll` 存在；CLR 版本 = **v2.0.50727**、PE machine = **I386**（`test/check_v3_csc_probe.py` 的 PE 检查逻辑复用，C13 已对探针桩实测通过）；D:\AVEVA 零变化 |
-| 17 | **注册脚本静态检查** | ① 对 deploy 脚本跑**dry-run**（缺省即 dry-run）：打印的清单 = 备份 2 + 追加 2 + 复制 2 + 写 2（§p.6 表）；② 幂等：对临时目录副本连跑两次（脚本支持 `--pdms-root <dir>` 指向沙箱副本），第二次无新增条目；③ 卸载恢复：uninstall 后两个 XML 与 `.pkpmjwd-bak` **逐字节相等**、4 个安装文件被移入 `_uninstalled_*`；④ 只加不删：dry-run 清单里不得出现"删除"字样；⑤ **未被执行过**：C14 verify（真实 `D:\AVEVA` 与 G 盘零变化） |
-| 18 | **界面清单完整** | ① `pkpmjwd.uic` 与 tgtext.uic 逐条同构对照（附录 F.3 表：结构/键名/命令形态一致，仅 Name/Caption/Key 不同）——`test/check_v3_contract.py`；② `PKPMJWDForm.cs` 含 §p.3 表的全部 13 项控件（控件名静态检索）；③ 编译通过（=标准 16）⇒ 菜单→Command→窗体链成立（Key 三处一致：.uic / Addin / Command 构造器）；④ 实机可见性标注"未实机" |
-| 19 | **交付落点** | ① 成品只存在于 `PKPM-JWD导入导出\` 与 `D:\AI_Work\PKPM数据解析\交付_PKPM-JWD插件\`（后者含：整包副本 + `交付清单.md` + 哈希清单）；② C14 verify：G 盘 751 文件与 `D:\AVEVA` 顶层 645 文件在整轮前后 size+mtime+sha256 零变化；③ `docs/交付清单.md` 含 §p.10-5 的未部署声明 |
+| 15 | **重名唯一化** | ① 静态：附录 F.1 夹具与 `pdms/pkpm2pdmsuniquename.pmlfnc` 逐字对照（签名、探测写法、上限 99、FAIL 记录、append/defined 出处注释齐全）——`test/check_v3_contract.py`；② **逻辑对照**：用 Python 参考实现（同一算法）对构造的"占用表"跑出候选序列，断言 `原名→re→re2…`、第 100 个候选耗尽即 FAIL——同脚本；③ 改名记录：模拟结果必须能产出 §o.7 的 `renames` 条目；④ 耗尽行为 = 报错中止（§o.6），代码评审确认无"跳过/覆盖"分支。**PDMS 实机行为标注"未实机"**（§12#26/27） |
+| 16 | **.NET 插件真编译通过** | 跑 `pdms-net/build.cmd`（§p.2 原样）：退出码 0；产物 `dist\PKPM2PDMS.dll` 存在；CLR 版本 = **v2.0.50727**、PE machine = **I386**（`test/check_v3_csc_probe.py` 的 PE 检查逻辑复用，C13 已对探针桩实测通过）；D:\AVEVA 零变化 |
+| 17 | **注册脚本静态检查** | ① 对 deploy 脚本跑**dry-run**（缺省即 dry-run）：打印的清单 = 备份 2 + 追加 2 + 复制 2 + 写 2（§p.6 表）；② 幂等：对临时目录副本连跑两次（脚本支持 `--pdms-root <dir>` 指向沙箱副本），第二次无新增条目；③ 卸载恢复：uninstall 后两个 XML 与 `.pkpm2pdms-bak` **逐字节相等**、4 个安装文件被移入 `_uninstalled_*`；④ 只加不删：dry-run 清单里不得出现"删除"字样；⑤ **未被执行过**：C14 verify（真实 `D:\AVEVA` 与 G 盘零变化） |
+| 18 | **界面清单完整** | ① `pkpm2pdms.uic` 与 tgtext.uic 逐条同构对照（附录 F.3 表：结构/键名/命令形态一致，仅 Name/Caption/Key 不同）——`test/check_v3_contract.py`；② `PKPM2PDMSForm.cs` 含 §p.3 表的全部 13 项控件（控件名静态检索）；③ 编译通过（=标准 16）⇒ 菜单→Command→窗体链成立（Key 三处一致：.uic / Addin / Command 构造器）；④ 实机可见性标注"未实机" |
+| 19 | **交付落点** | ① 成品只存在于 `PKPM2PDMS导入导出\` 与 `D:\AI_Work\PKPM数据解析\交付_PKPM2PDMS插件\`（后者含：整包副本 + `交付清单.md` + 哈希清单）；② C14 verify：G 盘 751 文件与 `D:\AVEVA` 顶层 645 文件在整轮前后 size+mtime+sha256 零变化；③ `docs/交付清单.md` 含 §p.10-5 的未部署声明 |
 
 ---
 
@@ -2132,8 +2145,8 @@ request = { "tool": "jwd2pdms",                     // §m.1 的 10 个窗体子
 | 24 **〔R2〕** | 匹配文件的 256 条失效右值 / 759 处大小写差异 / 344 条宏独有 | 只做**归类报告 + 纠正建议**，**不改用户原件**；纠正项只允许写进 `engine/secmap_extra.txt` | conflicts §2.1–§2.6；本次 C8 复核（`in_pdms_macro=''` 恰 256） |
 | 25 **〔R3〕** | 第二遍父级限定链的**链深**（`of STSECTION` / `of CATALOGUE` / `of SPECIFICATION` / `of SELEC <n>` 段） | **待实机确认**：样本只直证一级 `OLD PTSSET 1 of STCATEGORY /X` 与两级属性链（`NARE PLINE n of PTSSET 1 of …`）；更深链节是同一文法的外推（§l.3.3/§0.4-9）。实机若报错 ⇒ 回报后改为"OLD 唯一容器 + 相对 OLD"方案（走 §0.3 契约变更） | 语法证据：`PKPM（PDMS数据库）.txt:46778/46779`、PMLLIB `isometricadp\data\*.dat` 的 `OLD RRULE 1 of RRST /…`；风险事实：供应商源名与用户库同名并存（§l.4），裸名 OLD 的归属取决于 PDMS 运行时解析顺序，无法静态验证（R3 复核发现·high） |
 | 26 **〔R3〕** | `VAR !probe EXIST /<名>` + `handle (2,109)` 的语义：**VAR 成功 = 已占用；(2,109) = 名字未定义（可用）** | **冻结该语义**（§o.3 写法 1）；备选（同样已证实）= `NEW` + `handle (41,12)`（abaarea.pmlfrm:523-528）。**待实机确认**：错误号语义只能静态引证，无法在本轮验证 | 依据：`abaarealib.pmlfrm:107-114`（`VAR !exist EXIST /$!!abaDefaults.task.val` + `handle (2,109)`，注释原文 `-- Undefined name` / `-- Does not exist`） |
-| 27 **〔R3〕** | 宏内空名故障注入 `var !pkpmjwdFatal EXIST $!n`（`!n = ''` ⇒ 该行变成无名参数的 `EXIST` ⇒ 非法 ⇒ 触发 `ONERROR GOLABEL` ⇒ 整宏中止） | **冻结该机制**（§o.4/§o.5）；【推断-高】：无名参数的 `EXIST` 必然报错——但具体错误号未证。实机若发现空名被"容忍"，改用 §o.3 写法 2 的 handle 内 return（走 §0.3 变更）。**§0.4-12 修订**：探测/重探的形态统一为 `EXIST $!n`（`!n` 自带前导 `/`）——旧形 `EXIST /$!n` 对非空名会探成 `//名`（全库 0 例的未证实形态，R3 复核发现⑬） | `ONERROR GOLABEL`/`LABEL`/`handle ANY`/`RETURN ERROR`/`endhandle` 全部有出处（`PKPM（PDMS数据库）.txt` L5/L70291-70295；`rptoutput.pmlfrm:728,3586-3591`）；`eq` 运算符出处 `sdnfinver3.pmlfnc:113` |
-| 28 **〔R3〕** | 宏内 `$M <绝对路径>` 直跑 `.pmlfnc`（加载 `!!pkpmjwdUniquename`） | **待实机确认**：同源证据是①环境变量路径形态 `nucdesogwall.pmlobj:204`、②注释里的盘符绝对路径形态 `nucdesmanchor.mac:9-11`。若实机拒绝 ⇒ 备选（已冻结）：Add-in 在 `Start()` 里用 `Command.CreateCommand("$M <绝对路径>")` 预载（Add-in 侧字符串拼接无宏解析限制）；或把函数文件随 DLL 部署进 `<PDMS根>\PKPMJWD\pml\`（§p.6 步骤 5 已安排） | recon §3.5A（.NET→PML 用 CreateCommand）；§p.6 步骤 5 |
+| 27 **〔R3〕** | 宏内空名故障注入 `var !pkpm2pdmsFatal EXIST $!n`（`!n = ''` ⇒ 该行变成无名参数的 `EXIST` ⇒ 非法 ⇒ 触发 `ONERROR GOLABEL` ⇒ 整宏中止） | **冻结该机制**（§o.4/§o.5）；【推断-高】：无名参数的 `EXIST` 必然报错——但具体错误号未证。实机若发现空名被"容忍"，改用 §o.3 写法 2 的 handle 内 return（走 §0.3 变更）。**§0.4-12 修订**：探测/重探的形态统一为 `EXIST $!n`（`!n` 自带前导 `/`）——旧形 `EXIST /$!n` 对非空名会探成 `//名`（全库 0 例的未证实形态，R3 复核发现⑬） | `ONERROR GOLABEL`/`LABEL`/`handle ANY`/`RETURN ERROR`/`endhandle` 全部有出处（`PKPM（PDMS数据库）.txt` L5/L70291-70295；`rptoutput.pmlfrm:728,3586-3591`）；`eq` 运算符出处 `sdnfinver3.pmlfnc:113` |
+| 28 **〔R3〕** | 宏内 `$M <绝对路径>` 直跑 `.pmlfnc`（加载 `!!pkpm2pdmsUniquename`） | **待实机确认**：同源证据是①环境变量路径形态 `nucdesogwall.pmlobj:204`、②注释里的盘符绝对路径形态 `nucdesmanchor.mac:9-11`。若实机拒绝 ⇒ 备选（已冻结）：Add-in 在 `Start()` 里用 `Command.CreateCommand("$M <绝对路径>")` 预载（Add-in 侧字符串拼接无宏解析限制）；或把函数文件随 DLL 部署进 `<PDMS根>\PKPM2PDMS\pml\`（§p.6 步骤 5 已安排） | recon §3.5A（.NET→PML 用 CreateCommand）；§p.6 步骤 5 |
 | 29 **〔R3〕** | 引擎独立可执行文件的**构建方式** | 调用**接口**已冻结（§p.5：`--request` 协议、入口解析顺序、退出码）；构建方式在构建期决定——首选 PyInstaller `--onefile` 打包 `engine/cli.py`；不可用则交付 `engine\dist\run_engine.cmd` 回退（内容：定位 Python 3.12 后 `"…python.exe" "%~dp0..\cli.py" %*`）。实施者**不得**改调用接口，也不得让 .NET 直接 import Python | 任务原文「引擎的调用方式定为：打包好的独立可执行文件，由 .NET 以进程方式调用」；本机 Python 3.12.10（C13 会话实测 `py -V` 场景） |
 
 ---
@@ -2182,7 +2195,7 @@ request = { "tool": "jwd2pdms",                     // §m.1 的 10 个窗体子
 ## 附录 C：本次会话实际执行的核对（可复现）
 
 ```
-cd /d D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出
+cd /d D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出
 python test\probe_samples.py          # C1
 python test\probe_samples2.py         # C2
 python test\probe_kind26_keys.py      # C3
@@ -2314,10 +2327,10 @@ stats={"keys_unique":3176,"pkpm_name_nonempty":2835,"pkpm_name_unique":2835,
 ```dbm
 $S-  -- Synonym translation OFF
 -- ----------------------------------------------------------------------
--- PKPM-JWD dbmacro: CONTRACT appendix D.4 minimal fixture (ASCII only)
+-- PKPM2PDMS dbmacro: CONTRACT appendix D.4 minimal fixture (ASCII only)
 ONERROR GOLABEL /PKPKERR
 
-NEW CATALOGUE /PKPM_JWD_USER
+NEW CATALOGUE /PKPM2PDMS_USER
 PURP STL
 
 NEW STSECTION /USER_SECTION
@@ -2400,11 +2413,11 @@ END
 END
 END
 
-NEW SPWLD /PKPM_JWD_USER_SECTION
+NEW SPWLD /PKPM2PDMS_USER_SECTION
 DESC 'Structural Steel'
 PURP STL
 
-NEW SPECIFICATION /PKPM_JWD_SECTION_USER
+NEW SPECIFICATION /PKPM2PDMS_SECTION_USER
 DESC 'PKPM_User_Section'
 LNTP unset
 QUES GTYP
@@ -2454,7 +2467,7 @@ endhandle
 ## 附录 E：R2 自检命令与输出（可复现）
 
 ```
-cd /d D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出
+cd /d D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出
 python test\probe_v2_shapes.py        # C7  .pdt 行式 + DLL 格式串 + 转化表规模
 python test\probe_v2_table_keys.py    # C8  转化表键/重复分析（256 条 in_pdms_macro=''）
 python test\probe_v2_exr_wrap.py      # C9  EXR 每行 ≤10 组、SLABID 每行 20 个、缩进 8/11
@@ -2470,7 +2483,7 @@ python test\probe_v2_kind303_slots.py # C12 Kind=303 槽位原文（标定 §k.3
 3. `HN450X200` 的 `dims` 与 `.jwd` 样本 `26,39,1,450,0,200,14,9,0,5,4484,` 逐项一致；
 4. 附录 D.4 的宏夹具：`NEW` 数 == `END` 数、`OLD` 均无 `END`、
    含 `PSTR/GSTR/DTRE/CATR/NARE` 五个引用链、`SPCOMPONENT 名 == /<STCATEGORY>-SPEC/<SPRFILE 名>`、
-   **纯 ASCII**、容器名全部以 `/PKPM_JWD_` 开头、不含用户既有容器名；
+   **纯 ASCII**、容器名全部以 `/PKPM2PDMS_` 开头、不含用户既有容器名；
 5. 本文件（`spec/CONTRACT.md`）的 Markdown 表格列数自检（`test/check_markdown_tables.py`）。
 
 **未做的验证（R2 同样不得当作已通过）**
@@ -2483,22 +2496,22 @@ python test\probe_v2_kind303_slots.py # C12 Kind=303 槽位原文（标定 §k.3
 
 ## 附录 F：R3 证据与夹具（唯一化 + 原生插件）
 
-### F.1 `!!pkpmjwdUniquename` 的逐字夹具（`pdms/pkpmjwduniquename.pmlfnc` 的**产物形状**）
+### F.1 `!!pkpm2pdmsUniquename` 的逐字夹具（`pdms/pkpm2pdmsuniquename.pmlfnc` 的**产物形状**）
 
 > `test/check_v3_contract.py` 从本代码块抽取并静态断言：签名、探测写法（EXIST + `(2,109)`）、
 > 候选序列（`re`、`re2..re99`、上限）、`defined()` 守卫、`append` 记录、FAIL 返回空串。
 > 每一行写法的出处以行尾 `-- ↑` 注释标明（实施时**保留**这些出处注释）。
 
 ```pml
--- PKPM-JWD导入导出 -- §o.2 命名唯一化（CONTRACT 附录 F.1 夹具）
--- 依赖：本文件被 $M 加载后，!!pkpmjwdUniquename 对所有调用方可用（§o.4）。
-define function !!pkpmjwdUniquename(!base is STRING) is STRING
-  if (defined(!!pkpmjwdRenames)) then           -- ↑ defined()：nucdesogwall.pmlobj:206
+-- PKPM2PDMS导入导出 -- §o.2 命名唯一化（CONTRACT 附录 F.1 夹具）
+-- 依赖：本文件被 $M 加载后，!!pkpm2pdmsUniquename 对所有调用方可用（§o.4）。
+define function !!pkpm2pdmsUniquename(!base is STRING) is STRING
+  if (defined(!!pkpm2pdmsRenames)) then           -- ↑ defined()：nucdesogwall.pmlobj:206
   else
-    !!pkpmjwdRenames = object ARRAY()           -- ↑ object ARRAY()：nucroommcreation.pmlfnc
+    !!pkpm2pdmsRenames = object ARRAY()           -- ↑ object ARRAY()：nucroommcreation.pmlfnc
   endif
   if (!base eq '') then                         -- 空基名 = 编码错误，按失败处理（eq 出处：sdnfinver3:113）
-    !!pkpmjwdRenames.append('FAIL||')           -- ↑ .append()：GRIDDESIGN.pmlfrm:986
+    !!pkpm2pdmsRenames.append('FAIL||')           -- ↑ .append()：GRIDDESIGN.pmlfrm:986
     return ''
   endif
   -- 候选序列：base, base&'re', base&'re2' .. base&'re99'（§o.1，共 100 个；& 连接：nucdesogwall:185）
@@ -2515,13 +2528,13 @@ define function !!pkpmjwdUniquename(!base is STRING) is STRING
         if (!cand eq !base) then
           return !cand                          --   handle 内 return：abaarea.pmlfrm:527 同形态
         else
-          !!pkpmjwdRenames.append(!pkpmjwdType & '|' & !base & '|' & !cand)
+          !!pkpm2pdmsRenames.append(!pkpm2pdmsType & '|' & !base & '|' & !cand)
           return !cand
         endif
       endhandle
   enddo
   -- 全部 100 个候选都被占用 ⇒ 失败（§o.6）：留痕并返回空串，由宏的故障注入中止（§o.4）
-  !!pkpmjwdRenames.append('FAIL|' & !base & '|' & !base & 're99')
+  !!pkpm2pdmsRenames.append('FAIL|' & !base & '|' & !base & 're99')
   return ''
 endfunction
 ```
@@ -2529,31 +2542,31 @@ endfunction
 > `return` 出现在 `do`/`handle` 块内、`elseif` 链等属于**实机语法层**——`return` 在 handle 块内已有
 > 同形态直证（`abaarea.pmlfrm:527`），`do` 块内的 `return` 未单独取证。实施 S2 时要以能被 PDMS
 > 接受的形式落地（必要时把 `do` 循环展开成显式 100 分支或逐个 `if` 链——**语义不变**），并把差异写进
-> 交付说明；不得改变：候选序列、探测写法（EXIST + `(2,109)`）、记录格式（`!pkpmjwdType|原名|实际名`）、
+> 交付说明；不得改变：候选序列、探测写法（EXIST + `(2,109)`）、记录格式（`!pkpm2pdmsType|原名|实际名`）、
 > FAIL 语义（返回空串 + `'FAIL|…'` 留痕）。
 
 ### F.2 宏片段夹具（§o.4 模板的产物形状）
 
 ```pml
 $S-  -- Synonym translation OFF
-ONERROR GOLABEL /PKPMJWDERR
-$M <$!pkpmjwdFuncPath>
-!!pkpmjwdType = 'SITE'
-!n = !!pkpmjwdUniquename('/PKPM_JWD')
+ONERROR GOLABEL /PKPM2PDMSERR
+$M <$!pkpm2pdmsFuncPath>
+!!pkpm2pdmsType = 'SITE'
+!n = !!pkpm2pdmsUniquename('/PKPM2PDMS')
 if (!n eq '') then
-  var !pkpmjwdFatal EXIST $!n
+  var !pkpm2pdmsFatal EXIST $!n
 endif
 NEW SITE $!n
-!!pkpmjwdType = 'SCTN'
-!n = !!pkpmjwdUniquename('/STL_COL_1')
+!!pkpm2pdmsType = 'SCTN'
+!n = !!pkpm2pdmsUniquename('/STL_COL_1')
 if (!n eq '') then
-  var !pkpmjwdFatal EXIST $!n
+  var !pkpm2pdmsFatal EXIST $!n
 endif
 NEW SCTN $!n
   SPREF /H_INTERNATIONAL-SPEC/HN450X200
   POSS E 400 N 400 U -2000
   POSE E 400 N 400 U -1000
-LABEL /PKPMJWDERR
+LABEL /PKPM2PDMSERR
 handle ANY
 $S+
 RETURN ERROR
@@ -2561,16 +2574,16 @@ endhandle
 ```
 （骨架完整版见 §d.4；本片段只展示唯一化模板的接入点。）
 
-### F.3 `pkpmjwd.uic` 与 `tgtext.uic` 的同构对照（验收 18-①）
+### F.3 `pkpm2pdms.uic` 与 `tgtext.uic` 的同构对照（验收 18-①）
 
-| 结构项 | tgtext.uic（备份副本，行号） | pkpmjwd.uic（本包） |
+| 结构项 | tgtext.uic（备份副本，行号） | pkpm2pdms.uic（本包） |
 |---|---|---|
 | 根元素与命名空间 | `:2` `<UserInterfaceCustomization xmlns="www.aveva.com">` | 相同 |
-| ButtonTool + Command | `:5-14` `<ButtonTool Name="TGTEXT.Open">` → `<Type>Instance</Type>` + `<Key>TGTEXT.OpenTools</Key>` | `Name="PKPMJWD.Open"` + `<Key>PKPMJWD.OpenTools</Key>` + `<Caption>PKPM JWD 导入导出</Caption>` |
-| MenuTool 容器 | `:15-22` `<MenuTool Name="TGTEXT.Menu">` → `<Tools><Tool Name="TGTEXT.Open" /></Tools>` | `Name="PKPMJWD.Menu"` + `<Caption>PKPM JWD</Caption>` |
+| ButtonTool + Command | `:5-14` `<ButtonTool Name="TGTEXT.Open">` → `<Type>Instance</Type>` + `<Key>TGTEXT.OpenTools</Key>` | `Name="PKPM2PDMS.Open"` + `<Key>PKPM2PDMS.OpenTools</Key>` + `<Caption>PKPM2PDMS导入导出</Caption>` |
+| MenuTool 容器 | `:15-22` `<MenuTool Name="TGTEXT.Menu">` → `<Tools><Tool Name="TGTEXT.Open" /></Tools>` | `Name="PKPM2PDMS.Menu"` + `<Caption>PKPM2PDMS</Caption>` |
 | 挂载点 | `:25-27` `<MenuBar><Tool Name="TGTEXT.Menu" /></MenuBar>` | 相同 |
 | QAT | `:34-36` `<QATTools><Tool Name="TGTEXT.Open" /></QATTools>` | 相同 |
-| 中文 Caption | `:12` `<Caption>三维文字</Caption>`（中文直排可行） | `PKPM JWD 导入导出` |
+| 中文 Caption | `:12` `<Caption>三维文字</Caption>`（中文直排可行） | `PKPM2PDMS导入导出` |
 | 编码 | **UTF-8 无 BOM + LF**（实测 3C 3F 78、41 LF / 0 CRLF） | 相同 |
 
 ### F.4 可照抄样例的实测清单（本次亲自读取；路径为**实际存在**的副本）
@@ -2609,7 +2622,7 @@ endhandle
 ## 附录 G：R3 自检命令与输出（可复现）
 
 ```
-cd /d D:\AI_Work\PKPM数据解析\PKPM-JWD导入导出
+cd /d D:\AI_Work\PKPM数据解析\PKPM2PDMS导入导出
 python test\check_v3_csc_probe.py        # C13 csc 3.5 工具链实测（产物 CLR2/x86）
 python test\check_v3_notouch.py snapshot # C14 建立无接触基准（G 盘 751 文件 + D:\AVEVA 顶层 645 文件）
 python test\check_v3_notouch.py verify   # C14 核对（0 added / 0 removed / 0 changed）
@@ -2624,9 +2637,9 @@ python test\check_v3_contract.py         # C15 v3 夹具自检（F.1/F.2/F.3 + r
   [OK] 引用存在 Aveva.ApplicationFramework.dll / .Presentation.dll / Aveva.Pdms.Database.dll
        / Aveva.Pdms.Utilities.dll / Aveva.Pdms.Geometry.dll
   --- build.cmd 输出 ---
-    BUILD OK: …\test\_v3_csc_check\stub_pkpmjwd.dll
+    BUILD OK: …\test\_v3_csc_check\stub_pkpm2pdms.dll
   [OK] csc 退出码 0
-  [OK] 产物存在 stub_pkpmjwd.dll 4096 B
+  [OK] 产物存在 stub_pkpm2pdms.dll 4096 B
   [OK] CLR 运行时版本 = v2.0.50727 @0x2d4
   [OK] PE machine = I386 (x86) 0x14c
   [OK] D:\AVEVA 被监视文件零变化（编译只读）
@@ -2643,17 +2656,17 @@ snapshot: G:\…\PKPM导入导出插件  751 个文件
 verify:   0 added / 0 removed / 0 changed（两个区域）
 ```
 
-**C15 检查项**：① F.1 夹具含 `define function !!pkpmjwdUniquename`、`EXIST /$!cand`、
+**C15 检查项**：① F.1 夹具含 `define function !!pkpm2pdmsUniquename`、`EXIST /$!cand`、
 `handle (2,109)`、`'re'` 与 `re99` 上限、`defined(`、`.append(`、`FAIL|`、`return ''`；
-② F.2 夹含 `ONERROR GOLABEL /PKPMJWDERR`、`if (!n eq '') then`、`LABEL /PKPMJWDERR`；
+② F.2 夹含 `ONERROR GOLABEL /PKPM2PDMSERR`、`if (!n eq '') then`、`LABEL /PKPM2PDMSERR`；
 ③ §p.3 的 13 项控件名在 §p.3 表内可检索（文本级）；④ `report.renames` 键在 §h 出现；
 ⑤ CONTRACT.md 表格列数自检；⑥ `engine/README.txt`/`test/README.txt`/`pdms/README.txt`
 包含 R3 条目（落地指引）。
 
 **未做的验证（R3 不得当作已通过）**
 
-* **未在 PDMS 实机运行**任何东西（含 `$M`、`VAR EXIST`、`!!pkpmjwdUniquename`、Add-in 加载）——
+* **未在 PDMS 实机运行**任何东西（含 `$M`、`VAR EXIST`、`!!pkpm2pdmsUniquename`、Add-in 加载）——
   §o/§p 的运行期行为全部标注"待实机确认"（§12#26/27/28）；
 * **未部署**：deploy 脚本只交付（§p.10-1），C14 基准证明 `D:\AVEVA` 与 G 盘零变化；
-* **未实现** §o/§p 的交付物（`pdms/pkpmjwduniquename.pmlfnc`、`pdms-net/*`、`engine/dist/*`）
+* **未实现** §o/§p 的交付物（`pdms/pkpm2pdmsuniquename.pmlfnc`、`pdms-net/*`、`engine/dist/*`）
   —— 本契约只冻结签名、命令、控件清单、协议与夹具；实现与验收 15–19 的完整执行由后续实施包完成。

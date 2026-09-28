@@ -1,0 +1,21 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: !!pkpm2pdmsRenamesCount -> "PML: Function not found"；
+--    P7_export_1: "(46,85) PML: Wrong Function found"）。故一函数一文件。
+-- 源     : pkpm2pdmsuniquename.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmsRenamesCount
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- 记录条数（窗体显示"本次/累计"用；数组未建 => 0）
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsRenamesCount() is REAL
+
+   if (undefined(!!pkpm2pdmsRenames)) then
+      return 0
+   endif
+   -- 〔R6 实机修复〕ARRAY 没有 .size() 方法（本机实测 (2,759)）；用 arraySize()。
+   return arraySize(!!pkpm2pdmsRenames)
+
+endfunction
+-- End of function !!pkpm2pdmsRenamesCount

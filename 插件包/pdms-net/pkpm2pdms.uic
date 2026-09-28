@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserInterfaceCustomization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="www.aveva.com">
+  <Version>1.0</Version>
+  <Tools>
+    <ButtonTool Name="PKPM2PDMS.Open">
+      <Command>
+        <Type>Instance</Type>
+        <Key>PKPM2PDMS.OpenTools</Key>
+        <Arguments />
+      </Command>
+      <Image />
+      <Caption>PKPM2PDMS导入导出</Caption>
+      <DisplayStyle>Default</DisplayStyle>
+    </ButtonTool>
+    <MenuTool Name="PKPM2PDMS.Menu">
+      <Image />
+      <Caption>PKPM2PDMS</Caption>
+      <DisplayStyle>Default</DisplayStyle>
+      <Tools>
+        <Tool Name="PKPM2PDMS.Open" />
+      </Tools>
+    </MenuTool>
+  </Tools>
+  <InstanceTools />
+  <MenuBar>
+    <Tool Name="PKPM2PDMS.Menu" />
+  </MenuBar>
+  <CommandBars />
+  <TaskPanes />
+  <ContextMenus />
+  <AreaLeftTools />
+  <AreaRightTools />
+  <FooterTools />
+  <QATTools>
+    <Tool Name="PKPM2PDMS.Open" />
+  </QATTools>
+  <ContextualTabGroups />
+  <TabToolbarTools />
+  <Tabs />
+  <MiniToolbarTools />
+</UserInterfaceCustomization>

@@ -7,8 +7,8 @@ import os
 
 ROOT = r"D:\AI_Work\PKPM数据解析"
 SRC = os.path.join(ROOT, r"_recon\dbsect\pkpm_pdms_section_table.csv")
-BUILT = os.path.join(ROOT, r"PKPM-JWD导入导出\engine\section_table.csv")
-OUT = open(os.path.join(ROOT, r"PKPM-JWD导入导出\test\_r2_probe_srcdll.txt"), "w",
+BUILT = os.path.join(ROOT, r"PKPM2PDMS导入导出\engine\section_table.csv")
+OUT = open(os.path.join(ROOT, r"PKPM2PDMS导入导出\test\_r2_probe_srcdll.txt"), "w",
            encoding="utf-8")
 
 NAMES = ["3-L25x16x3", "L25X16X3", "3-L45x28x3", "L45X28X3", "3-L50X32X4", "L50X32X4",

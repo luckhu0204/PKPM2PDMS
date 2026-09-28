@@ -1,0 +1,242 @@
+------------------------------------------------------------------------------
+-- PKPM2PDMS导入导出 —— PDMS 侧导出函数（对应 CONTRACT v1.0 §c / §d.5）
+-- 文件   : pkpm2pdmsexport.pmlfnc     落盘: GBK 无 BOM + CRLF，注释一律用 --
+-- 入口   : !!pkpm2pdmsexport(!scope is DBREF, !outFile is STRING) is STRING
+--          由 pkpm2pdms.pmlfrm 的「导出当前模型到文本」按钮调用；
+--          命令行也可直接执行（见 README 用法）。
+-- 职责   : 遍历 SITE → ZONE → STRU → FRMW → SBFR → SCTN/PANE/STWALL，
+--          写 #PKPM2PDMS-PDMSDUMP 1.0 中性交换文本（契约 §c.2 文法）。
+-- 返回值 : 'OK|site=..|zone=..|stru=..|frmw=..|sbfr=..|sctn=..|pane=..|stwall=..|
+--           skip=..|unit=..|lines=..'  或  'ERR|<原因>'
+--
+-- 语法出处（全部为本机 D:\AVEVA\Plant\PDMS12.1.SP4\PMLLIB 内既有代码，未自造语法）：
+--   define function / is STRING / handle any / endhandle
+--        common\functions\comunitsconvert.pmlfnc:30,51-56
+--   .mCount() / .members[i] / .type eq |TOKEN|      common\functions\findfirstmember.pmlfnc:37,43,46-49
+--   |STRU| |FRMW| |SBFR| 类型码 / .owner.type      common\forms\saverestoreview.pmlfrm:310,317
+--   |SCTN| |PANE| |STWALL| |WALL| |PLOO| |PLOOP|   design\functions\sctlcrelem.pmlfnc:156,201,229
+--                                                  design\functions\cvfloortracefl.pmlfnc:42
+--   !!findFirstMember(元素,'PLOO','',消息)          design\functions\cvfloortracefl.pmlfnc:42
+--   object COMUNITS(TRUE) / getDimensionIndex / savedUnits
+--                                                  aba\Forms\ababuildkeyplan.pmlfrm:224-227
+--   !!comUnitsConvert(值,'DIST','MM')              common\functions\comunitsconvert.pmlfnc:30
+--   object FILE / .open / .writeFile('OVERWRITE',!数组) / .close / .exists
+--                                                  design\objects\hvacDetailSpec.pmlobj:95-96,515-516
+--                                                  common\forms\runmacro.pmlfrm:55-57,82
+--   属性 .poss/.pose/.east/.north/.up              aba\UserTasks\aaagrids.pmlfnc:162
+--                                                  accommodation\...\accceilinggriddefinition.pmlfrm:1396-1397
+--   PLOOP 厚度 .heig                               common\functions\lineonextrusion.pmlfnc:53
+--   规格 .spref/.spre、.jusl/.meml、.bang、.desp[i] sctlcrelem.pmlfnc:201-202,229-292
+--                                                  Building_Design\...\nucdesothickval.pmlobj:273
+--                                                  MYTOOLS\...\sdnfinver3.pmlfnc:117-198
+--   全名 .flnn                                     aba\Forms\abaareabyvol.pmlfrm:324
+--   字符串 .replace/.upcase/.after/.length         aba\Forms\ababatchmode.pmlfrm:375
+--                                                  common\functions\comunitsconvert.pmlfnc:33
+--                                                  common\functions\findfirstmember.pmlfnc:41
+--
+-- 写方纪律（与契约逐条对应）：
+--   1) 长度量按数据库当前 DIST 单位写出，并在第 2 行写 UNITS 声明；数据库单位不是
+--      mm/cm/m 时，用 !!comUnitsConvert(...,'DIST','MM') 换算后写 UNITS mm（§c.1）。
+--   2) 坐标取 POSS/POSE 的 .East/.North/.Up 分量（§c.5）；本包生成的
+--      SITE/ZONE/STRU/FRMW/SBFR 都在原点且无旋转，故等价于模型绝对坐标。
+--   3) 名称中的空白与 '~' 一律替换为 '_'（§c.1：名称不含空白、不含 '~'）。
+--   4) 角度 BANG 恒为度、不随单位变化（§c.1）；'~' 尾部厚度取不到时整段省略（§c.5）。
+--   5) 行分隔符由 PDMS 文件对象按本机惯例写出；契约 §c.1 要求 CRLF，读方
+--      engine/pdms_dump.py 按 splitlines() 处理（LF/CRLF 均可解析）。
+--   6) 几何容差 TOL=1.0（数据库长度单位）用于 ctype/ori 判定，与读方 §c.3.6 同义。
+------------------------------------------------------------------------------
+
+
+--
+-- == R6 拆分说明（2026-09-28，实机依据见 验收/实机日志_R4/E_series.txt、
+--    F_series.txt、P7_export_1.txt）==
+--   本机 PDMS 12.1 SP4 实测：.pmlfnc 只按「文件名 = 函数名」被 PMLLIB 自动加载；
+--   多函数单文件里其余函数解析不到（"PML: Function not found"），且首个 define
+--   与文件名不符时报 "(46,85) PML: Wrong Function found"。
+--   故本文件只保留 !!pkpm2pdmsexport；其余函数已各自成文件（同名 .pmlfnc），
+--   逐个是：pkpm2pdmsname、pkpm2pdmsnum、pkpm2pdmsdesp、pkpm2pdmsgroup、pkpm2pdmsctype、pkpm2pdmsori、pkpm2pdmsgroupof、pkpm2pdmssctn、pkpm2pdmspane、pkpm2pdmsstwall、pkpm2pdmsexportce。
+--   拆分未改一行函数体（原样切出），拆分前的单体文件留档于
+--   验收/_R6_pml_split_backup/。
+--
+-- ---------------------------------------------------------------------------
+-- 主函数：!!pkpm2pdmsexport(!scope, !outFile)
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsexport(!scope is DBREF, !outFile is STRING) is STRING
+
+   -- 0) 参数检查
+   if (!outFile.unset() or !outFile.length() le 0) then
+      return 'ERR|导出文件路径为空'
+   endif
+   if (!scope.unset()) then
+      return 'ERR|导出范围无效（未指定导出范围元素）'
+   endif
+   if (!scope.badref()) then
+      return 'ERR|导出范围无效（DBREF 无效）'
+   endif
+
+   -- 1) 向上找到所属 SITE（最多 20 级）
+   !site = !scope
+   !found = FALSE
+   do !i from 1 to 20
+      if (!found.not()) then
+         -- 〔R6 实机修复·handle 语义〕块体只在报错时执行（见 pdms\pkpm2pdmsrunmac.pmlfnc
+         --   头注与 验收/R6日志/P5_h*.txt）：语句移出，块留作「报错就吞掉继续」。
+         if (!site.type eq |SITE|) then
+            !found = TRUE
+         else
+            !site = !site.owner
+         endif
+         handle any
+         endhandle
+      endif
+   enddo
+   if (!found.not()) then
+      return 'ERR|未能在 20 级内找到所属 SITE'
+   endif
+
+   -- 2) 单位：数据库当前 DIST 单位；不是 mm/cm/m 时换算成 mm 并写 UNITS mm（§c.1）
+   !units = object COMUNITS(TRUE)
+   !distIndex = !units.getDimensionIndex('DIST')
+   !unitName = !units.savedUnits[!distIndex].lowcase()
+   !wUnit = !unitName
+   !toMm = FALSE
+   if (!unitName eq 'mm' or !unitName eq 'cm' or !unitName eq 'm') then
+      !toMm = FALSE
+      !wUnit = !unitName
+   else
+      !toMm = TRUE
+      !wUnit = 'mm'
+   endif
+
+   -- 3) 逐级遍历，收集记录行
+   !lines = object ARRAY()
+   !n = 0
+   !nZ = 0
+   !nS = 0
+   !nF = 0
+   !nB = 0
+   !nC = 0
+   !nP = 0
+   !nW = 0
+   !nSkip = 0
+
+   !n = !n + 1
+   !lines[!n] = '#PKPM2PDMS-PDMSDUMP 1.0'
+   !n = !n + 1
+   !lines[!n] = 'UNITS ' & !wUnit
+   !n = !n + 1
+   !lines[!n] = '#SITE ' & !!pkpm2pdmsname(!site.name)
+
+   do !i1 from 1 to !site.mCount()
+      !e1 = !site.members[!i1]
+      if (!e1.type eq |ZONE|) then
+         !nZ = !nZ + 1
+         !n = !n + 1
+         !lines[!n] = '#ZONE ' & !!pkpm2pdmsname(!e1.name)
+
+         do !i2 from 1 to !e1.mCount()
+            !e2 = !e1.members[!i2]
+            if (!e2.type eq |STRU|) then
+               !nS = !nS + 1
+               !n = !n + 1
+               !lines[!n] = '#STRU ' & !!pkpm2pdmsname(!e2.name)
+
+               do !i3 from 1 to !e2.mCount()
+                  !e3 = !e2.members[!i3]
+                  if (!e3.type eq |FRMW|) then
+                     !nF = !nF + 1
+                     !n = !n + 1
+                     !lines[!n] = '#FRMW ' & !!pkpm2pdmsname(!e3.name)
+
+                     do !i4 from 1 to !e3.mCount()
+                        !e4 = !e3.members[!i4]
+                        if (!e4.type eq |SBFR|) then
+                           !nB = !nB + 1
+                           !n = !n + 1
+                           !lines[!n] = '#SBFR ' & !!pkpm2pdmsname(!e4.name)
+
+                           do !i5 from 1 to !e4.mCount()
+                              !e5 = !e4.members[!i5]
+                              !t5 = !e5.type
+                              if (!t5 eq |SCTN|) then
+                                 !nC = !nC + 1
+                                 !n = !n + 1
+                                 !lines[!n] = !!pkpm2pdmssctn(!e5, !e4.name, !toMm)
+                              elseif (!t5 eq |PANE|) then
+                                 !rec = !!pkpm2pdmspane(!e5, !toMm)
+                                 if (!rec.length() gt 0) then
+                                    !nP = !nP + 1
+                                    !n = !n + 1
+                                    !lines[!n] = !rec
+                                 else
+                                    !nSkip = !nSkip + 1
+                                 endif
+                              elseif (!t5 eq |STWALL|) then
+                                 !nW = !nW + 1
+                                 !n = !n + 1
+                                 !lines[!n] = !!pkpm2pdmsstwall(!e5, !toMm)
+                              endif
+                           enddo
+                        elseif (!e4.type eq |SCTN| or !e4.type eq |PANE| or !e4.type eq |STWALL|) then
+                           -- FRMW 直挂构件（非本包生成的树）：补一条 #SBFR 组行
+                           !g = !!pkpm2pdmsgroupof(!e4)
+                           !n = !n + 1
+                           !lines[!n] = '#SBFR ' & !g
+                           if (!e4.type eq |SCTN|) then
+                              !nC = !nC + 1
+                              !n = !n + 1
+                              !lines[!n] = !!pkpm2pdmssctn(!e4, !g, !toMm)
+                           elseif (!e4.type eq |PANE|) then
+                              !rec = !!pkpm2pdmspane(!e4, !toMm)
+                              if (!rec.length() gt 0) then
+                                 !nP = !nP + 1
+                                 !n = !n + 1
+                                 !lines[!n] = !rec
+                              else
+                                 !nSkip = !nSkip + 1
+                              endif
+                           else
+                              !nW = !nW + 1
+                              !n = !n + 1
+                              !lines[!n] = !!pkpm2pdmsstwall(!e4, !toMm)
+                           endif
+                        endif
+                     enddo
+                  endif
+               enddo
+            endif
+         enddo
+      endif
+   enddo
+
+   !n = !n + 1
+   !lines[!n] = '#END'
+
+   -- 4) 写出（覆盖写；不改任何既有文件）
+   -- 〔R6 实机修复·handle 语义〕原写法把「写文件」整段放在 handle 块内 -> 正常时根本不执行。
+   --   语句移出；!ok 默认 TRUE，写失败（紧跟 handle）或文件不存在时置 FALSE。
+   !ok = TRUE
+   !file = object FILE(!outFile)
+   !file.open('OVERWRITE')
+   !file.writeFile('OVERWRITE', !lines)
+   handle any
+      !ok = FALSE
+   endhandle
+   !file.close()
+   !file = object FILE(!outFile)
+   if (!file.exists().not()) then
+      !ok = FALSE
+   endif
+   if (!ok.not()) then
+      return 'ERR|写入 ' & !outFile & ' 失败（请检查路径与目录是否存在）'
+   endif
+
+   !res = 'OK|site=1|zone=' & !nZ.string()
+   !res = !res & '|stru=' & !nS.string() & '|frmw=' & !nF.string()
+   !res = !res & '|sbfr=' & !nB.string() & '|sctn=' & !nC.string() & '|pane=' & !nP.string()
+   !res = !res & '|stwall=' & !nW.string() & '|skip=' & !nSkip.string()
+   !res = !res & '|unit=' & !wUnit & '|lines=' & !n.string()
+   return !res
+
+endfunction
+-- End of function !!pkpm2pdmsexport

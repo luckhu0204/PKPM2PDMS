@@ -1,0 +1,112 @@
+-- ---------------------------------------------------------------------------
+-- R6 拆分产物（2026-09-28）：本机 PDMS 12.1 SP4 实测，.pmlfnc 只按「文件名 = 函数名」
+--   （忽略大小写）被 PMLLIB 自动加载；多函数单文件里的其余函数不可解析
+--   （R4 实机 F4: "PML: Function not found"；P7_export_1: "(46,85) PML: Wrong
+--    Function found"；本工程 lint-pml.ps1 的 PKG-04 同指此文件）。故一函数一文件。
+-- 源     : pkpm2pdmsdbexport.pmlfnc（R6 拆分前单体；函数体原样切出，未改一行代码）
+-- 函数   : !!pkpm2pdmsdbexportWith
+-- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- 显式版：!outFile 输出文件；!itemsText 根（元素全名，空格分隔，空则自动遍历）；
+--         !options 传给核心 OUTPUT 的选项（空则用 'TABULATE 0 '）
+-- ---------------------------------------------------------------------------
+define function !!pkpm2pdmsdbexportWith(!outFile is STRING, !itemsText is STRING, !options is STRING) is STRING
+
+   if (!outFile.unset()) then
+      return 'ERR|导出文件路径为空'
+   endif
+   if (!outFile.length() le 0) then
+      return 'ERR|导出文件路径为空'
+   endif
+
+   !items = !itemsText
+   if (!items.unset()) then
+      !items = !!pkpm2pdmsdbroots()
+   endif
+   if (!items.length() le 0) then
+      !items = !!pkpm2pdmsdbroots()
+   endif
+   if (!items.length() le 0) then
+      return 'ERR|没有找到可导出的根（CATA/SPWL 都是 0）；请在 PARAGON 模块打开 Catalogue 库后重跑'
+   endif
+
+   !opts = !options
+   if (!opts.unset()) then
+      !opts = 'TABULATE 0 '
+   endif
+   if (!opts.length() le 0) then
+      !opts = 'TABULATE 0 '
+   endif
+
+   !date = !!pkpm2pdmsdbdate()
+
+   -- 打开 alpha 文件：核心把 OUTPUT 的正文写进它（rptoutput.pmlfrm:2887 同写法）
+   alpha file "$!outFile" over
+   handle ANY
+      return 'ERR|打不开输出文件（ALPHA FILE）： ' & !outFile & ' | ' & !!error.text
+   endhandle
+
+   -- 头部 6 行：逐字取自 rptoutput.pmlfrm:724-729（标号固定 /PKPKERR；
+   -- 读方 dbparse 丢弃 LABEL/handle 段，契约 §l.5 规则 2/8）
+   writealphafile '$S-  -- Synonym translation OFF '
+   writealphafile '-- ----------------------------------------------------------------'
+   writealphafile '-- Data Listing    Date : $!date '
+   writealphafile ''
+   writealphafile 'ONERROR GOLABEL /PKPKERR'
+   writealphafile ''
+
+   -- 正文：交给核心（INPUT BEGIN/END/FINISH 也由核心写，本函数不模仿）
+   output $!opts $!items
+   handle (2, 731)
+      -- 无效引用/属性：与 rptoutput.pmlfrm:707-710 同样的忽略策略
+   endhandle
+
+   -- 尾部 9 行：逐字取自 rptoutput.pmlfrm:3586-3596 + 调用方注释行 :744
+   writealphafile '-- Switch synonyms back on if an error occurs.'
+   writealphafile 'LABEL /PKPKERR'
+   writealphafile 'handle ANY'
+   writealphafile '$S+'
+   writealphafile 'RETURN ERROR'
+   writealphafile 'endhandle'
+   writealphafile ''
+   writealphafile '-- End Data Listing    Date : $!date '
+   writealphafile '$S+  -- Synonym translation ON '
+   writealphafile '-- ----------------------------------------------------------------'
+   writealphafile ''
+
+   alpha file end
+
+   -- 回读校验（pfpipeconsistencycheck.pmlobj:119-120 同做法）
+   !file = object FILE(!outFile)
+   if (!file.exists().not()) then
+      return 'ERR|文件未生成： ' & !outFile
+   endif
+   !size = !file.size()
+   !head = !file.readFile(3)
+   !first = ''
+   if (arraySize(!head) gt 0) then
+      !first = !head[1]
+   endif
+   !firstOk = FALSE
+   if (!first eq '$S-  -- Synonym translation OFF ') then
+      !firstOk = TRUE
+   endif
+   if (!first eq '$S-  -- Synonym translation OFF') then
+      !firstOk = TRUE
+   endif
+
+   !res = 'OK|file=' & !outFile
+   !res = !res & '|bytes=' & !size.string()
+   !res = !res & '|roots=' & !items
+   !res = !res & '|cata=' & arraySize(!!collectAllFor('CATA', '', WORLD)).string()
+   !res = !res & '|spwl=' & arraySize(!!collectAllFor('SPWL', '', WORLD)).string()
+   !res = !res & '|sprf=' & arraySize(!!collectAllFor('SPRF', '', WORLD)).string()
+   !res = !res & '|spco=' & arraySize(!!collectAllFor('SPCO', '', WORLD)).string()
+   !res = !res & '|first=' & !first
+   if (!firstOk) then
+      !res = 'WARN|首行不是 $S- 头|' & !res
+   endif
+   return !res
+
+endfunction
+-- End of function !!pkpm2pdmsdbexportWith

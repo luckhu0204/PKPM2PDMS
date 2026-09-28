@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """S3-v2 开发探针：看 jwd2pdt 的段统计 / skipped 分类 / 报告 db 块。
 
-跑法：``python PKPM-JWD导入导出\\test\\_s3_cli\\probe_v2.py [report.json ...]``
+跑法：``python PKPM2PDMS导入导出\\test\\_s3_cli\\probe_v2.py [report.json ...]``
 只读产物，不写任何东西。
 """
 from __future__ import annotations

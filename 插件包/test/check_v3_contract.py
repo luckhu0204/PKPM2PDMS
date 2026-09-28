@@ -8,7 +8,7 @@ r"""C15：R3 契约静态自检（架构包）。对应 CONTRACT 附录 G。
      全占用 ⇒ FAIL；与夹具的算法语义一致
   3. 附录 F.2 宏片段：ONERROR GOLABEL / 故障注入 / LABEL 尾 / $M 预载
   4. 附录 F.3：本契约 §p.3 的 .uic 描述与 tgtext.uic 同构对照表存在且 Key 三处一致
-     （.uic Key = Addin Command Key = "PKPMJWD.OpenTools"）
+     （.uic Key = Addin Command Key = "PKPM2PDMS.OpenTools"）
   5. §h 的 renames 键、§p.3 的 13 项控件名、§q 验收 15–19、§12#26–29 存在
   6. CONTRACT.md 表格列数自检
   7. 无接触基准可核对（C14 的 verify 直接由独立脚本承担，这里只检查基准文件存在）
@@ -41,22 +41,22 @@ def check(cond, label, detail=''):
 print('=== 1. 附录 F.1 唯一化函数夹具 ===')
 fixtures = re.findall(r'```pml\r?\n(.*?)```', doc, re.S)
 # 契约里有 6 个 ```pml 块（§o.2 签名/§o.4 片段/§o.4 模板/§o.5 尾/F.1 函数/F.2 宏片段），按内容定位
-fx = next((b for b in fixtures if 'define function !!pkpmjwdUniquename' in b
+fx = next((b for b in fixtures if 'define function !!pkpm2pdmsUniquename' in b
            and 'EXIST' in b), '')
-mac = next((b for b in fixtures if 'ONERROR GOLABEL /PKPMJWDERR' in b
-            and 'NEW SCTN $!n' in b and 'LABEL /PKPMJWDERR' in b), '')
+mac = next((b for b in fixtures if 'ONERROR GOLABEL /PKPM2PDMSERR' in b
+            and 'NEW SCTN $!n' in b and 'LABEL /PKPM2PDMSERR' in b), '')
 check(len(fixtures) >= 6, '找到 pml 夹具（§o.2/§o.4×2/§o.5/F.1/F.2）', '%d 块' % len(fixtures))
 check(bool(fx), 'F.1 函数夹具定位成功')
 check(bool(mac), 'F.2 宏片段定位成功')
-check('define function !!pkpmjwdUniquename(!base is STRING) is STRING' in fx,
+check('define function !!pkpm2pdmsUniquename(!base is STRING) is STRING' in fx,
       '函数签名与 §o.2 一致')
 check('var !probe EXIST $!cand' in fx, '占用探测写法①（EXIST $!x，base 自带 /；§0.4-12）')
 check('EXIST /$!cand' not in fx, '旧形 //名 探测已禁用（§0.4-12：全库 0 例的未证实形态）')
 check('handle (2,109)' in fx, 'handle (2,109)（Undefined name ⇒ 可用）')
 check("from 0 to 99" in fx, '候选上限 re99（do 0..99，共 100 个）')
 check("!base & 're'" in fx, "后缀 re 直接拼接")
-check('defined(!!pkpmjwdRenames)' in fx, 'defined() 守卫（nucdesogwall.pmlobj:206）')
-check('!!pkpmjwdRenames = object ARRAY()' in fx, '全局数组建立')
+check('defined(!!pkpm2pdmsRenames)' in fx, 'defined() 守卫（nucdesogwall.pmlobj:206）')
+check('!!pkpm2pdmsRenames = object ARRAY()' in fx, '全局数组建立')
 check('.append(' in fx, 'append 记录（GRIDDESIGN.pmlfrm:986）')
 check("'FAIL|'" in fx and "'FAIL|' & !base" in fx, 'FAIL 留痕条目')
 check('abaarealib.pmlfrm:107-114' in fx, '探测写法的出处注释在夹具内')
@@ -99,27 +99,27 @@ check(name == '/STL_COL_1' and why == 'original', '全新环境 → 原名，不
 # ------------------------------------------------- 3. F.2 macro fragment
 print('\n=== 3. 附录 F.2 宏片段 ===')
 check(bool(mac), 'F.2 宏片段已定位（见上）')
-check('ONERROR GOLABEL /PKPMJWDERR' in mac, 'ONERROR 尾（DB Listing 同构，出处 L5）')
-check("$M <$!pkpmjwdFuncPath>" in mac, '$M 预载唯一化函数（§o.4）')
+check('ONERROR GOLABEL /PKPM2PDMSERR' in mac, 'ONERROR 尾（DB Listing 同构，出处 L5）')
+check("$M <$!pkpm2pdmsFuncPath>" in mac, '$M 预载唯一化函数（§o.4）')
 check('if (!n eq \'\') then' in mac, '空名检查（eq 运算符，出处 sdnfinver3:113）')
-check('var !pkpmjwdFatal EXIST $!n' in mac, '故障注入（§12#27；§0.4-12 形态 = EXIST $!n）')
-check('!!pkpmjwdType =' in mac, 'TYPE 通道 = 双 ! 全局（§0.4-12：跨作用域传给函数）')
-check('LABEL /PKPMJWDERR' in mac and 'handle ANY' in mac and 'RETURN ERROR' in mac
+check('var !pkpm2pdmsFatal EXIST $!n' in mac, '故障注入（§12#27；§0.4-12 形态 = EXIST $!n）')
+check('!!pkpm2pdmsType =' in mac, 'TYPE 通道 = 双 ! 全局（§0.4-12：跨作用域传给函数）')
+check('LABEL /PKPM2PDMSERR' in mac and 'handle ANY' in mac and 'RETURN ERROR' in mac
       and 'endhandle' in mac, '宏尾四件套')
 check('NEW SCTN $!n' in mac, '创建命令用唯一化结果')
 
 # ------------------------------------------------- 4. §p.3 uic + key consistency
 print('\n=== 4. §p.3 界面与 Command Key 一致性 ===')
-uic = re.search(r'```xml\r?\n(<ButtonTool Name="PKPMJWD\.Open".*?)```', doc, re.S)
+uic = re.search(r'```xml\r?\n(<ButtonTool Name="PKPM2PDMS\.Open".*?)```', doc, re.S)
 check(uic is not None, '找到 §p.3 的 .uic 片段')
 u = uic.group(1) if uic else ''
-check('<Key>PKPMJWD.OpenTools</Key>' in u, '.uic 的 Command Key')
-check('<Caption>PKPM JWD 导入导出</Caption>' in u, '中文 Caption（对照 tgtext.uic:12 中文直排）')
-check('<MenuTool Name="PKPMJWD.Menu">' in u, 'MenuTool 容器（对照 tgtext.uic:15-22）')
-check(doc.count('PKPMJWD.OpenTools') >= 3, 'Key 三处一致（.uic/Addin/Command）',
-      '出现 %d 次' % doc.count('PKPMJWD.OpenTools'))
+check('<Key>PKPM2PDMS.OpenTools</Key>' in u, '.uic 的 Command Key')
+check('<Caption>PKPM2PDMS导入导出</Caption>' in u, '中文 Caption（对照 tgtext.uic:12 中文直排）')
+check('<MenuTool Name="PKPM2PDMS.Menu">' in u, 'MenuTool 容器（对照 tgtext.uic:15-22）')
+check(doc.count('PKPM2PDMS.OpenTools') >= 3, 'Key 三处一致（.uic/Addin/Command）',
+      '出现 %d 次' % doc.count('PKPM2PDMS.OpenTools'))
 # F.3 对照表
-check('| 结构项 | tgtext.uic（备份副本，行号） | pkpmjwd.uic（本包） |' in doc,
+check('| 结构项 | tgtext.uic（备份副本，行号） | pkpm2pdms.uic（本包） |' in doc,
       'F.3 同构对照表存在')
 
 # ------------------------------------------------- 5. contract-wide keys
@@ -141,8 +141,8 @@ for row in ('| 26 **〔R3〕**', '| 27 **〔R3〕**', '| 28 **〔R3〕**', '| 29
     check(row in doc, '§12 行存在 %s' % row)
 check('不部署' in doc and '不启动 PDMS' in doc and '不写 G 盘' in doc and 'D:\\AVEVA' in doc,
       '§p.10 四条硬边界')
-check('PKPM-JWD导入导出/pdms/pkpmjwduniquename.pmlfnc'.replace('/', '\\') in doc
-      or 'pdms/pkpmjwduniquename.pmlfnc' in doc, 'PML 函数落点写明')
+check('PKPM2PDMS导入导出/pdms/pkpm2pdmsuniquename.pmlfnc'.replace('/', '\\') in doc
+      or 'pdms/pkpm2pdmsuniquename.pmlfnc' in doc, 'PML 函数落点写明')
 check('PDMS三维文字程序' in doc and '备份' in doc, 'F.6 记录了样例路径差异（任务给的路径已不存在）')
 
 # ------------------------------------------------- 6. markdown tables

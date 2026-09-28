@@ -9,7 +9,7 @@ import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = r"D:\AI_Work\PKPM数据解析"
-PKG = os.path.join(ROOT, "PKPM-JWD导入导出")
+PKG = os.path.join(ROOT, "PKPM2PDMS导入导出")
 sys.path.insert(0, os.path.join(PKG, "engine"))
 sys.path.insert(0, os.path.join(PKG, "test"))
 OUT = os.path.join(PKG, "test", "_acc_r2_out")
